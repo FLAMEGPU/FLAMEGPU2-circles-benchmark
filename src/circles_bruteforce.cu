@@ -160,5 +160,5 @@ void run_circles_bruteforce(const simMethodParametrs params, simulationTiming &t
     
     std::vector<float> ms_steps = simulation.getElapsedTimeSteps();
     times.ms_per_step = std::make_shared<std::vector<float>>(std::vector<float>(ms_steps.begin(), ms_steps.end()));
-    times.ms_stepMean = std::accumulate(ms_steps.begin(), ms_steps.end(), 0) / (float)simulation.getStepCounter();
+    times.ms_stepMean = std::accumulate(ms_steps.begin(), ms_steps.end(), 0.f) / (float)simulation.getStepCounter();
 }
