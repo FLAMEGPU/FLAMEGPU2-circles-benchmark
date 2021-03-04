@@ -9,82 +9,6 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-
-
-""" def matt():
-    initialPopSize = 0 
-    finalPopSize = 0
-    popSizeIncrement = 0
-
-    initialNumSpecies = 0
-    finalNumSpecies = 0
-    numSpeciesIncrement = 0
-
-    with open('params.csv') as f:
-        csvreader = csv.reader(f)
-
-        popRow = next(csvreader)
-        popRow = list(map(int, popRow))
-        initialPopSize = popRow[0]
-        finalPopSize = popRow[1]
-        popSizeIncrement = popRow[2]
-
-        speciesRow = next(csvreader)
-        speciesRow = list(map(int, speciesRow))
-        initialNumSpecies = speciesRow[0]
-        finalNumSpecies = speciesRow[1]
-        numSpeciesIncrement = speciesRow[2]     
-
-    with open('serial.csv') as serial:
-        with open('concurrent.csv') as concurrent:
-            fig, ax = plt.subplots()
-            
-            # Read in data
-            serialRows = []
-            concurrentRows = []
-            
-            csvreader = csv.reader(serial)
-            for row in csvreader:
-            row = list(map(float, row))
-            serialRows.append(row)
-            
-            csvreader = csv.reader(concurrent)
-            for row in csvreader:
-            row = list(map(float, row))
-            concurrentRows.append(row)
-            
-            # Plot serial results
-            for row in serialRows:
-            ax.plot(np.arange(initialNumSpecies, finalNumSpecies + 1, numSpeciesIncrement),row,"^--", linewidth=1)
-            
-            # Plot concurrent results
-            for row in concurrentRows:
-            ax.plot(np.arange(initialNumSpecies, finalNumSpecies + 1, numSpeciesIncrement),row,"^-", linewidth=1)
-            
-            # Display timing results  
-            ax.grid(True)
-            ax.set_title('Average step time against number of species')
-            ax.set_ylabel('Average Step time (ms)')
-            ax.set_xlabel('Number of species')
-            ax.xaxis.set_ticks(np.arange(initialNumSpecies, finalNumSpecies + 1, numSpeciesIncrement))
-            ax.legend(np.arange(initialPopSize, finalPopSize + 1, popSizeIncrement), title="Population Size")
-            
-            # Plot speedup
-            fig2, ax2 = plt.subplots()
-            for s, c in zip(serialRows, concurrentRows):
-            r = []
-            for i in range(len(s)):
-                r.append(s[i] / c[i])
-            ax2.plot(np.arange(initialNumSpecies, finalNumSpecies + 1, numSpeciesIncrement), r, "^-", linewidth=1)
-
-            ax2.set_title('Speedup against number of species')
-            ax2.set_ylabel('Speedup')
-            ax2.set_xlabel('Number of species')
-            ax2.xaxis.set_ticks(np.arange(initialNumSpecies, finalNumSpecies + 1, numSpeciesIncrement))
-            ax2.legend(np.arange(initialPopSize, finalPopSize + 1, popSizeIncrement), title="Population Size")
-            plt.show() """
-    
-
 def cli():
     parser = argparse.ArgumentParser(description="Python script to generate figures from csv files")
     parser.add_argument(
@@ -93,12 +17,12 @@ def cli():
         action="store_true", 
         help="increase verbosity of output"
     )
-    # parser.add_argument(
-    #     "-f", 
-    #     "--force", 
-    #     action="store_true", 
-    #     help="Force overwriting of files (surpress user confirmation)"
-    # )
+    parser.add_argument(
+        "-f", 
+        "--force", 
+        action="store_true", 
+        help="Force overwriting of files (surpress user confirmation)"
+    )
     parser.add_argument(
         "-o", 
         "--output-dir", 
@@ -112,6 +36,12 @@ def cli():
         default=96
     )
     parser.add_argument(
+        "-s",
+        "--show", 
+        action="store_true",
+        help="Show the plot(s)"
+    )
+    parser.add_argument(
         "input_csv", 
         type=str, 
         help="csv containing one row per run"
@@ -123,7 +53,7 @@ def cli():
 
 def load_inputs(input_csv):
     # Read in the csv
-    df = pd.read_csv(input_csv)
+    df = pd.read_csv(input_csv, sep=',', quotechar='"')
     # Strip any whitespace from column names
     df.columns = df.columns.str.strip()
 
@@ -158,21 +88,53 @@ def process_data(input_df):
 
     return grouped
 
-def plot(output_dir, dpi, processed_df):
-    print("@todo - plot()")
+# @todo
+def print_summary(processed_df, output_dir, force):
+
+    if output_dir is not None:
+        output_dir_check(output_dir)
+        output_filename = "processed.csv"
+        # Get the path for output 
+        output_filepath = pathlib.Path(output_dir) / output_filename
+        # If the file does not exist, or force is true write the output file, otherwise error.
+        if not output_filepath.exists or force:
+            try:
+                print(f"writing csv to {output_filepath}")
+                processed_df.to_csv(output_filepath, sep=",", header=True, index=False, quotechar='"', float_format='%.3f')
+            except Exception as e:
+                print(f"Error: could not write to {output_filepath}")
+                return
+        else:
+            print(f"Error: {output_filepath} already exists. Specify a different `-o/--output-dir` or use `-f/--force`")
+            return
+
+def output_dir_check(output_dir):
+    if output_dir is not None:
+        p = pathlib.Path(output_dir)
+        p.mkdir(exist_ok=True)
+
+def plot(processed_df, output_dir, dpi, force, show):
     print(processed_df)
+   
+    # Use some seaborn deafault for fontsize etc.
+    sns.set_context("talk", rc={"lines.linewidth": 2.5})  # notebook, talk, paper or poster
 
-
-    # f, ax = plt.subplots(figsize=(7, 7))
-    # ax.set(xscale="log", yscale="linear")
-    # Some formatting
-    sns.set_theme()
+    # Add a background colour.
     sns.set_style("darkgrid")
-    sns.set_palette(sns.color_palette("Dark2"))
+    # sns.set_palette(sns.color_palette("Dark2"))
+
+    # Have some ticks
+    sns.set_style("ticks")
+
 
     fig, ax = plt.subplots(constrained_layout=True)
 
+    # Set the size of the figure in inches
+    fig.set_size_inches(11.7, 8.27)
 
+    # Log scale on either axis
+    # ax.set(xscale="log")
+    # ax.set(yscale="log")
 
     xkey = "agentCount"
     xlabel = "Agent Count"
@@ -209,8 +171,29 @@ def plot(output_dir, dpi, processed_df):
     # g.set_ylabels("survival probability")
     # g.add_legend(bbox_to_anchor=(1.05, 0), loc=2, borderaxespad=0.)
 
-    plt.show()
 
+    output_filename = f"{ykey}.png"
+    # Make the output direcotry if needed.
+    if output_dir is not None:
+        output_dir_check(output_dir)
+
+        # Get the path for output 
+        output_filepath = pathlib.Path(output_dir) / output_filename
+        # If the file does not exist, or force is true write the otuput file, otherwise error.
+        if not output_filepath.exists or force:
+            try:
+                print(f"writing figure to {output_filepath}")
+                fig.savefig(output_filepath, dpi=dpi)
+            except Exception as e:
+                print(f"Error: could not write to {output_filepath}")
+                return
+        else:
+            print(f"Error: {output_filepath} already exists. Specify a different `-o/--output-dir` or use `-f/--force`")
+            return
+
+    # If not outputting, or if the show flag was set, show the plot.
+    if show or output_dir is None:
+        plt.show()
 
 def main():
     # @todo - print some key info to stdout to complement the data? i.e. RTC time? This can just be fetched from the input csv.
@@ -221,8 +204,12 @@ def main():
     input_df = load_inputs(args.input_csv)
     # Construct the data to plot
     processed_df = process_data(input_df)
+
+    # Print summary?
+    print_summary(processed_df, args.output_dir, args.force)
+
     # Plot the data
-    plot(args.output_dir, args.dpi, processed_df)
+    plot(processed_df, args.output_dir, args.dpi, args.force, args.show)
 
 
 
