@@ -10,7 +10,7 @@
 #define ENV_REPULSE 0.05f
 
 const unsigned long long int DEFAULT_SEED = 123u;
-const unsigned int DEFAULT_STEPS = 200u;
+const unsigned int DEFAULT_STEPS = 256u;
 const unsigned int DEFAULT_REPETITIONS = 3u;
 const int DEFAULT_DEVICE = 0;
 

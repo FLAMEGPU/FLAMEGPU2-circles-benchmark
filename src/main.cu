@@ -47,25 +47,36 @@ int main(int argc, const char ** argv) {
     custom_cli cli = parse_custom_cli(argc, argv);
     
     // Define the benchmark parameters. I.e. initial environment width, max width, method of interpolation etc. 
-    std::vector<uint32_t> POPULATION_SIZES = {
-        2u << 4,
-        2u << 5,
-        2u << 6,
-        // 2u << 7,
-        // 2u << 8,
-        // 2u << 9,
-        // 2u << 10,
-        // 2u << 11,
-        // 2u << 12,
-        // 2u << 13,
-        // 2u << 14,
-        // 2u << 15,
-        // 2u << 16,
-        // 2u << 17,
-        // 2u << 18,
-        // 2u << 19,
-        // 2u << 20,
-    };
+    /* std::vector<uint32_t> POPULATION_SIZES = {
+        1u << 4,
+        1u << 5,
+        1u << 6,
+        // 1u << 7,
+        // 1u << 8,
+        // 1u << 9,
+        // 1u << 10,
+        // 1u << 11,
+        // 1u << 12,
+        // 1u << 13,
+        // 1u << 14,
+        // 1u << 15,
+        // 1u << 16,
+        // 1u << 17,
+        // 1u << 18,
+        // 1u << 19,
+        // 1u << 20,
+    }; */
+
+
+    std::vector<uint32_t> POPULATION_SIZES = {};
+    const uint32_t imin = 5; 
+    const uint32_t imax = 22;
+    for(uint32_t i = imin; i < imax; i++){
+        POPULATION_SIZES.push_back((1 << i));
+        if(i < imax -1){
+            POPULATION_SIZES.push_back((1 << i) + (1 << (i-1)));
+        }
+    }
 
     // Define the models to execute, with a function pointer that builds and runs the model.
     std::map<std::string, std::function<void(const RunSimulationInputs, RunSimulationOutputs&)>> MODELS = {
