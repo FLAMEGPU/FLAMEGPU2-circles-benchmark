@@ -70,7 +70,7 @@ int main(int argc, const char ** argv) {
 
     std::vector<uint32_t> POPULATION_SIZES = {};
     const uint32_t imin = 5; 
-    const uint32_t imax = 22;
+    const uint32_t imax = 8;
     for(uint32_t i = imin; i < imax; i++){
         POPULATION_SIZES.push_back((1 << i));
         if(i < imax -1){
