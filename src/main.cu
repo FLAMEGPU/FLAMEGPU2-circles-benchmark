@@ -8,12 +8,26 @@
 // Include the bruteforce implementation
 
 #include "common.cuh"
-// #include "circles_bruteforce.cuh"
-// #include "circles_spatial3D.cuh"
 
 void run_circles_bruteforce(const simMethodParametrs params, simulationTiming &times);
+void run_circles_bruteforce_rtc(const simMethodParametrs params, simulationTiming &times);
 void run_circles_spatial3D(const simMethodParametrs params, simulationTiming &times);
+void run_circles_spatial3D_rtc(const simMethodParametrs params, simulationTiming &times);
 
+
+
+// Convert some compiler flag values into global constants (if defined) to be output to file
+#if defined(NDEBUG) || defined(_NDEBUG)
+    const bool RELEASE_MODE = true;
+#else 
+    const bool RELEASE_MODE = false;
+#endif
+
+#if defined(SEATBELTS) && !SEATBELTS
+    const bool SEATBELTS_ON = false;
+#else 
+    const bool SEATBELTS_ON = true;
+#endif
 
 
 void print_cli_help(const int argc, const char ** argv );
@@ -54,6 +68,15 @@ void cudaWarmup() {
 
 
 }
+
+void printProgress(const std::string modelName, const uint32_t count, const uint32_t total, const uint32_t agentCount, const uint32_t repeat){
+    std::time_t now = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
+    char buf[sizeof "2011-10-08T07:07:09Z"];
+    std::strftime(buf, sizeof buf, "%FT%TZ", std::gmtime(&now));
+    fprintf(stdout, "%s: %u/%u: %s %u %u\n", buf, count + 1, total, modelName.c_str(), agentCount, repeat);
+}
+
+
 // @todo deal with what happens if a simulation throws an exception?
 int main(int argc, const char ** argv) {
     // Custom arg parsing, to prevent the current F2 arg parsing from occuring. 
@@ -80,10 +103,10 @@ int main(int argc, const char ** argv) {
 
     // Define the models to execute, with a function pointer that builds and runs the model.
     std::map<std::string, std::function<void(const simMethodParametrs, simulationTiming&)>> MODELS = {
-        {std::string("circles_bruteforce"), run_circles_bruteforce},
-        {std::string("circles_spatial3D"), run_circles_spatial3D},
-        // {std::string("circles_bruteforce_rtc"), 2u},
-        // {std::string("circles_spatial3D_rtc"), 3u},
+        // {std::string("circles_spatial3D"), run_circles_spatial3D},
+        {std::string("circles_spatial3D_rtc"), run_circles_spatial3D_rtc},
+        // {std::string("circles_bruteforce"), run_circles_bruteforce},
+        {std::string("circles_bruteforce_rtc"), run_circles_bruteforce_rtc},
     };
 
 
@@ -113,17 +136,6 @@ int main(int argc, const char ** argv) {
     fprintf(fp_rowPerSimulation, "GPU, release_mode, seatbelts, model, steps, agentCount, repeat, ms_rtc, ms_simulation, ms_init, ms_exit, ms_stepMean\n");
     
 
-#if defined(NDEBUG) || defined(_NDEBUG)
-    const bool RELEASE_MODE = true;
-#else 
-    const bool RELEASE_MODE = false;
-#endif
-
-#if defined(SEATBELTS) && !SEATBELTS
-    const bool SEATBELTS_ON = false;
-#else 
-    const bool SEATBELTS_ON = true;
-#endif
     
     // Get the name of the gpu. 
     std::string deviceName("unknown");
@@ -148,8 +160,11 @@ int main(int argc, const char ** argv) {
         printf("@todo handle error \n");
     }
     
+    // find the total number of sims to run.
     uint32_t totalSimulations = MODELS.size() * POPULATION_SIZES.size() * cli.repetitions;
     uint32_t counter = 0;
+
+    // Iterate over population size first. This then allows for early exit when sims become too slow? Alternatively do the fastest simulations first, but this would require changing the map to be ordered.
     // Iterate the models/simulations to run.
     for(auto const& modelFunctionPair : MODELS){
         auto const& modelName = modelFunctionPair.first;
@@ -163,11 +178,7 @@ int main(int argc, const char ** argv) {
             for(uint32_t repeat = 0u; repeat < cli.repetitions; repeat++) { 
 
                 // Progress. 
-
-                std::time_t now = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
-                char buf[sizeof "2011-10-08T07:07:09Z"];
-                std::strftime(buf, sizeof buf, "%FT%TZ", std::gmtime(&now));
-                fprintf(stdout, "%s: %u/%u: %s %u %u\n", buf, counter +1, totalSimulations, modelName.c_str(), agentCount, repeat);
+                printProgress(modelName, counter, totalSimulations, agentCount, repeat);
 
                 // @todo - better filenaming
                 std::string simulationStepsRawFilename = std::string("simulation-steps-raw-") + std::to_string(counter) + std::string(".csv");
@@ -293,3 +304,29 @@ custom_cli parse_custom_cli(const int argc, const char ** argv) {
 
     return values;
 }
+
+
+
+// Todo:
+
+/* 
++ [ ] Change the order of loops so pops are first, toa llow early exit.
++ [ ] RTC bruteforce
++ [ ] Move pop gen to init fn? so it gets timed.
++ [ ] RTC Spatial
++ [ ] Better disk io? 
+    + [ ] Combine the per-step time files somehow? Maybe even just cat them into a very tall, repettitive csv?
++ [ ] Better error checking. 
++ [ ] Plotting (.py)
+    + [ ] Headless plotting.
++ [ ] density experiment
++ [ ] Individual visualistion
++ [ ] Comments
++ [ ] Seeding?
++ [ ] readme
++ [ ] Check initialisation 
++ [ ] Decide on parameters to use, number of reps
++ [ ] V100 (bessemer) script(s) / trial run. Don't commit these to the public rpo.
++ [ ] limit the scale of some simulators - i.e. bruteforce cpp is horribly slow, so don't push the pops as far. 
++ [ ] Have each agent store the message count it read. Exit fn that reduces theses and adds min/max/mean to the output data and CSVs. This might be useful
+*/
