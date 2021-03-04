@@ -8,9 +8,9 @@ namespace {
 FLAMEGPU_AGENT_FUNCTION(output_message, MsgNone, MsgSpatial3D) {
     FLAMEGPU->message_out.setVariable<int>("id", FLAMEGPU->getVariable<int>("id"));
     FLAMEGPU->message_out.setLocation(
-    FLAMEGPU->getVariable<float>("x"),
-    FLAMEGPU->getVariable<float>("y"),
-    FLAMEGPU->getVariable<float>("z"));
+        FLAMEGPU->getVariable<float>("x"),
+        FLAMEGPU->getVariable<float>("y"),
+        FLAMEGPU->getVariable<float>("z"));
     return ALIVE;
 }
 FLAMEGPU_AGENT_FUNCTION(move, MsgSpatial3D, MsgNone) {
@@ -24,6 +24,7 @@ FLAMEGPU_AGENT_FUNCTION(move, MsgSpatial3D, MsgNone) {
     const float y1 = FLAMEGPU->getVariable<float>("y");
     const float z1 = FLAMEGPU->getVariable<float>("z");
     int count = 0;
+    int messageCount = 0;
     for (const auto &message : FLAMEGPU->message_in(x1, y1, z1)) {
         if (message.getVariable<int>("id") != ID) {
             const float x2 = message.getVariable<float>("x");
@@ -45,6 +46,7 @@ FLAMEGPU_AGENT_FUNCTION(move, MsgSpatial3D, MsgNone) {
                 count++;
             }
         }
+        messageCount++;
     }
     fx /= count > 0 ? count : 1;
     fy /= count > 0 ? count : 1;
@@ -52,8 +54,19 @@ FLAMEGPU_AGENT_FUNCTION(move, MsgSpatial3D, MsgNone) {
     FLAMEGPU->setVariable<float>("x", x1 + fx);
     FLAMEGPU->setVariable<float>("y", y1 + fy);
     FLAMEGPU->setVariable<float>("z", z1 + fz);
+#if defined(CIRCLES_VALIDATION) && CIRCLES_VALIDATION
     FLAMEGPU->setVariable<float>("drift", cbrt(fx*fx + fy*fy + fz*fz));
+#endif
+    float totalMessageCount = FLAMEGPU->getVariable<float>("totalMessageCount");
+    FLAMEGPU->setVariable<float>("totalMessageCount", totalMessageCount + messageCount);
     return ALIVE;
+}
+static float meanMessageCount = 0.f;
+FLAMEGPU_EXIT_FUNCTION(getMeanMessageCount) {
+
+    const float totalMessageCount = FLAMEGPU->agent("Circle").sum<float>("totalMessageCount") / FLAMEGPU->agent("Circle").count();
+
+    meanMessageCount = totalMessageCount / FLAMEGPU->getStepCounter();
 }
 
 #if defined(CIRCLES_VALIDATION) && CIRCLES_VALIDATION
@@ -96,7 +109,10 @@ void run_circles_spatial3D(const RunSimulationInputs runInputs, RunSimulationOut
         agent.newVariable<float>("x");
         agent.newVariable<float>("y");
         agent.newVariable<float>("z");
+        agent.newVariable<float>("totalMessageCount", 0.f);
+#if defined(CIRCLES_VALIDATION) && CIRCLES_VALIDATION
         agent.newVariable<float>("drift");  // Store the distance moved here, for validation
+#endif
         agent.newFunction("output_message", output_message).setMessageOutput("location");
         agent.newFunction("move", move).setMessageInput("location");
     }
@@ -108,6 +124,8 @@ void run_circles_spatial3D(const RunSimulationInputs runInputs, RunSimulationOut
     }
 
     // Organise the model. 
+
+    model.addExitFunction(getMeanMessageCount);
 
 #if defined(CIRCLES_VALIDATION) && CIRCLES_VALIDATION
     {   // Attach init/step/exit functions and exit condition
@@ -161,4 +179,5 @@ void run_circles_spatial3D(const RunSimulationInputs runInputs, RunSimulationOut
     std::vector<float> ms_steps = simulation.getElapsedTimeSteps();
     runOutputs.ms_per_step = std::make_shared<std::vector<float>>(std::vector<float>(ms_steps.begin(), ms_steps.end()));
     runOutputs.ms_stepMean = std::accumulate(ms_steps.begin(), ms_steps.end(), 0.f) / (float)simulation.getStepCounter();
+    runOutputs.mean_messageCount = meanMessageCount;
 }

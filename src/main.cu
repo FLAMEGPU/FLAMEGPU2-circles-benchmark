@@ -51,9 +51,9 @@ int main(int argc, const char ** argv) {
         2u << 4,
         2u << 5,
         2u << 6,
-        2u << 7,
-        2u << 8,
-        2u << 9,
+        // 2u << 7,
+        // 2u << 8,
+        // 2u << 9,
         // 2u << 10,
         // 2u << 11,
         // 2u << 12,
@@ -88,7 +88,7 @@ int main(int argc, const char ** argv) {
     }
     
     // Output the header for the per run timing.
-    fprintf(fp_rowPerSimulation, "GPU,release_mode,seatbelts,model,steps,agentCount,repeat,ms_rtc,ms_simulation,ms_init,ms_exit,ms_stepMean\n");
+    fprintf(fp_rowPerSimulation, "GPU,release_mode,seatbelts,model,steps,agentCount,repeat,mean_messageCount,ms_rtc,ms_simulation,ms_init,ms_exit,ms_stepMean\n");
     
     // Write a row per step out to  a differnt file.
     std::FILE * fp_rowPerStepPerSimulation = std::fopen("row-per-step-per-simulation.csv", "w");
@@ -145,7 +145,7 @@ int main(int argc, const char ** argv) {
                 modelFunction(runInputs, runOutputs);
 
                 // Add a row to the row per simulation csv file
-                fprintf(fp_rowPerSimulation, "%s,%d,%d,%s,%u,%u,%u,%.3f,%.3f,%.3f,%.3f,%.3f\n", deviceName.c_str(), RELEASE_MODE, SEATBELTS_ON, modelName.c_str(), cli.steps, agentCount, repeat, runOutputs.ms_rtc, runOutputs.ms_simulation, runOutputs.ms_init, runOutputs.ms_exit, runOutputs.ms_stepMean); 
+                fprintf(fp_rowPerSimulation, "%s,%d,%d,%s,%u,%u,%u,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f\n", deviceName.c_str(), RELEASE_MODE, SEATBELTS_ON, modelName.c_str(), cli.steps, agentCount, repeat, runOutputs.mean_messageCount, runOutputs.ms_rtc, runOutputs.ms_simulation, runOutputs.ms_init, runOutputs.ms_exit, runOutputs.ms_stepMean); 
                 
                 // add a row to the row per step per simulation file for each step. This is wasting a lot of disk space... 
                 for(uint32_t step = 0; step < runOutputs.ms_per_step->size(); step++){
@@ -267,5 +267,5 @@ custom_cli parse_custom_cli(const int argc, const char ** argv) {
 + [ ] Decide on parameters to use, number of reps
 + [ ] V100 (bessemer) script(s) / trial run. Don't commit these to the public rpo.
 + [ ] limit the scale of some simulators - i.e. bruteforce cpp is horribly slow, so don't push the pops as far. 
-+ [ ] Have each agent store the message count it read. Exit fn that reduces theses and adds min/max/mean to the output data and CSVs. This might be useful
++ [x] Have each agent store the message count it read. Exit fn that reduces theses and adds min/max/mean to the output data and CSVs. This might be useful
 */

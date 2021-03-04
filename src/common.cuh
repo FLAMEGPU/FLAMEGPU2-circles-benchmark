@@ -38,4 +38,5 @@ struct RunSimulationOutputs {
     float ms_init = 0.f;
     float ms_exit = 0.f;
     float ms_stepMean = 0.f;
+    float mean_messageCount = 0.f;
 };

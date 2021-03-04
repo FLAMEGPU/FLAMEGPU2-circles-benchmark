@@ -161,4 +161,5 @@ void run_circles_bruteforce(const RunSimulationInputs runInputs, RunSimulationOu
     std::vector<float> ms_steps = simulation.getElapsedTimeSteps();
     runOutputs.ms_per_step = std::make_shared<std::vector<float>>(std::vector<float>(ms_steps.begin(), ms_steps.end()));
     runOutputs.ms_stepMean = std::accumulate(ms_steps.begin(), ms_steps.end(), 0.f) / (float)simulation.getStepCounter();
+    runOutputs.mean_messageCount = runInputs.AGENT_COUNT;
 }
