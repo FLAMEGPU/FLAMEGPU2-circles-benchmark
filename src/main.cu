@@ -9,11 +9,10 @@
 
 #include "common.cuh"
 
-void run_circles_bruteforce(const simMethodParametrs params, simulationTiming &times);
-void run_circles_bruteforce_rtc(const simMethodParametrs params, simulationTiming &times);
-void run_circles_spatial3D(const simMethodParametrs params, simulationTiming &times);
-void run_circles_spatial3D_rtc(const simMethodParametrs params, simulationTiming &times);
-
+void run_circles_bruteforce(const RunSimulationInputs runInputs, RunSimulationOutputs &runOutputs);
+void run_circles_bruteforce_rtc(const RunSimulationInputs runInputs, RunSimulationOutputs &runOutputs);
+void run_circles_spatial3D(const RunSimulationInputs runInputs, RunSimulationOutputs &runOutputs);
+void run_circles_spatial3D_rtc(const RunSimulationInputs runInputs, RunSimulationOutputs &runOutputs);
 
 
 // Convert some compiler flag values into global constants (if defined) to be output to file
@@ -89,40 +88,30 @@ int main(int argc, const char ** argv) {
         2u << 8,
         2u << 9,
         2u << 10,
-        2u << 11,
-        2u << 12,
-        2u << 13,
-        2u << 14,
-        2u << 15,
-        2u << 16,
-        2u << 17,
-        2u << 18,
-        2u << 19,
-        2u << 20,
+        // 2u << 11,
+        // 2u << 12,
+        // 2u << 13,
+        // 2u << 14,
+        // 2u << 15,
+        // 2u << 16,
+        // 2u << 17,
+        // 2u << 18,
+        // 2u << 19,
+        // 2u << 20,
     };
 
     // Define the models to execute, with a function pointer that builds and runs the model.
-    std::map<std::string, std::function<void(const simMethodParametrs, simulationTiming&)>> MODELS = {
-        // {std::string("circles_spatial3D"), run_circles_spatial3D},
+    std::map<std::string, std::function<void(const RunSimulationInputs, RunSimulationOutputs&)>> MODELS = {
+        {std::string("circles_spatial3D"), run_circles_spatial3D},
         {std::string("circles_spatial3D_rtc"), run_circles_spatial3D_rtc},
-        // {std::string("circles_bruteforce"), run_circles_bruteforce},
+        {std::string("circles_bruteforce"), run_circles_bruteforce},
         {std::string("circles_bruteforce_rtc"), run_circles_bruteforce_rtc},
     };
-
 
     // Make the output directory if required.
     printf("@todo - output dir via cli (and use it).\n");
 
     
-    // Write out the parameters used to generate the model? This might not be required as it can be figured out from the actual data...
-
-    // std::ofstream paramsFile("params.csv");
-    // @todo - output directory.
-    // @todo - add cuda device name. 
-    // if (paramsFile.is_open()) {
-    //     paramsFile << initialPopSize << "," << finalPopSize << "," << popSizeIncrement << std::endl;
-    //     paramsFile << initialNumSpecies << "," << finalNumSpecies << "," << numSpeciesIncrement << std::endl;
-    // }
 
     // @todo - error checking, overwrite checking, filename, etc. 
     std::FILE * fp_rowPerSimulation = std::fopen("row-per-simulation.csv", "w");
@@ -133,7 +122,7 @@ int main(int argc, const char ** argv) {
     
     
     // Output the header for the per run timing.
-    fprintf(fp_rowPerSimulation, "GPU, release_mode, seatbelts, model, steps, agentCount, repeat, ms_rtc, ms_simulation, ms_init, ms_exit, ms_stepMean\n");
+    fprintf(fp_rowPerSimulation, "GPU,release_mode,seatbelts,model,steps,agentCount,repeat,ms_rtc,ms_simulation,ms_init,ms_exit,ms_stepMean\n");
     
 
     
@@ -193,18 +182,19 @@ int main(int argc, const char ** argv) {
                 
                 // Call the fn to run this simulation witht his pop for this rep. 
                 // @todo get timing info to save for alter.
-                simulationTiming t = {};
-                modelFunction({modelName, seed, agentCount, cli.steps, cli.device}, t);
+                const RunSimulationInputs runInputs = {modelName, seed, agentCount, cli.steps, cli.device};
+                RunSimulationOutputs runOutputs = {};
+                modelFunction(runInputs, runOutputs);
 
 
                 // Output the individual runs times
-                fprintf(fp_rowPerSimulation, "\"%s\", %d, %d, \"%s\", %u, %u, %u, %.3f, %.3f, %.3f, %.3f, %.3f\n", deviceName.c_str(), RELEASE_MODE, SEATBELTS_ON, modelName.c_str(), cli.steps, agentCount, repeat, t.ms_rtc, t.ms_simulation, t.ms_init, t.ms_exit, t.ms_stepMean); 
+                fprintf(fp_rowPerSimulation, "\"%s\",%d,%d,\"%s\",%u,%u,%u,%.3f,%.3f,%.3f,%.3f,%.3f\n", deviceName.c_str(), RELEASE_MODE, SEATBELTS_ON, modelName.c_str(), cli.steps, agentCount, repeat, runOutputs.ms_rtc, runOutputs.ms_simulation, runOutputs.ms_init, runOutputs.ms_exit, runOutputs.ms_stepMean); 
                 
                 // Output a csv containing the per step time 
-                fprintf(fp_simulationStepsRaw, "GPU, release_mode, seatbelts, model, steps, agentCount, repeat, step, ms_step\n");
-                for(uint32_t step = 0; step < t.ms_per_step->size(); step++){
-                    auto& ms_step = t.ms_per_step->at(step);
-                    fprintf(fp_simulationStepsRaw, "\"%s\", %d, %d, \"%s\", %u, %u, %u, %u, %.3f\n", deviceName.c_str(), RELEASE_MODE, SEATBELTS_ON, modelName.c_str(), cli.steps, agentCount, repeat, step, ms_step); 
+                fprintf(fp_simulationStepsRaw, "GPU,release_mode,seatbelts,model,steps,agentCount,repeat,step,ms_step\n");
+                for(uint32_t step = 0; step < runOutputs.ms_per_step->size(); step++){
+                    auto& ms_step = runOutputs.ms_per_step->at(step);
+                    fprintf(fp_simulationStepsRaw, "\"%s\",%d,%d,\"%s\",%u,%u,%u,%u,%.3f\n", deviceName.c_str(), RELEASE_MODE, SEATBELTS_ON, modelName.c_str(), cli.steps, agentCount, repeat, step, ms_step); 
                 }
 
                 std::fclose(fp_simulationStepsRaw);
@@ -311,9 +301,9 @@ custom_cli parse_custom_cli(const int argc, const char ** argv) {
 
 /* 
 + [ ] Change the order of loops so pops are first, toa llow early exit.
-+ [ ] RTC bruteforce
++ [x] RTC bruteforce
 + [ ] Move pop gen to init fn? so it gets timed.
-+ [ ] RTC Spatial
++ [x] RTC Spatial
 + [ ] Better disk io? 
     + [ ] Combine the per-step time files somehow? Maybe even just cat them into a very tall, repettitive csv?
 + [ ] Better error checking. 

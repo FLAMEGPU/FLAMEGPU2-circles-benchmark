@@ -79,10 +79,10 @@ FLAMEGPU_STEP_FUNCTION(Validation) {
 // @todo - ad a way to visualise a single run of a single simulator somehow? maybe -v/--visualise <model_name> <pop>
 
 // Run an individual simulation, using 
-void run_circles_spatial3D(const simMethodParametrs params, simulationTiming &times){
+void run_circles_spatial3D(const RunSimulationInputs runInputs, RunSimulationOutputs &runOutputs){
 
-    ModelDescription model(params.modelName);
-    const float ENV_MAX = static_cast<float>(floor(cbrt(params.AGENT_COUNT)));
+    ModelDescription model(runInputs.modelName);
+    const float ENV_MAX = static_cast<float>(floor(cbrt(runInputs.AGENT_COUNT)));
     {   // Location message
         MsgSpatial3D::Description &message = model.newMessage<MsgSpatial3D>("location");
         message.newVariable<int>("id");
@@ -130,15 +130,15 @@ void run_circles_spatial3D(const simMethodParametrs params, simulationTiming &ti
     // Set config configuraiton properties 
     simulation.SimulationConfig().timing = false;
     simulation.SimulationConfig().verbose = false;
-    simulation.SimulationConfig().random_seed = params.HOST_SEED;  // @todo device seed != host seed? 
-    simulation.SimulationConfig().steps = params.STEPS;
-    simulation.CUDAConfig().device_id = params.CUDA_DEVICE;
+    simulation.SimulationConfig().random_seed = runInputs.HOST_SEED;  // @todo device seed != host seed? 
+    simulation.SimulationConfig().steps = runInputs.STEPS;
+    simulation.CUDAConfig().device_id = runInputs.CUDA_DEVICE;
 
     // Generate the initial population
-    std::default_random_engine rng(params.HOST_SEED);
+    std::default_random_engine rng(runInputs.HOST_SEED);
     std::uniform_real_distribution<float> dist(0.0f, ENV_MAX);
-    AgentVector population(model.Agent("Circle"), params.AGENT_COUNT);
-    for (unsigned int i = 0; i < params.AGENT_COUNT; i++) {
+    AgentVector population(model.Agent("Circle"), runInputs.AGENT_COUNT);
+    for (unsigned int i = 0; i < runInputs.AGENT_COUNT; i++) {
         AgentVector::Agent instance = population[i];
         instance.setVariable<int>("id", i);
         instance.setVariable<float>("x", dist(rng));
@@ -153,12 +153,12 @@ void run_circles_spatial3D(const simMethodParametrs params, simulationTiming &ti
     simulation.simulate();
 
     // Store timing information for later use.
-    times.ms_rtc = simulation.getElapsedTimeRTCInitialisation();
-    times.ms_simulation = simulation.getElapsedTimeSimulation();
-    times.ms_init = simulation.getElapsedTimeInitFunctions();
-    times.ms_exit = simulation.getElapsedTimeExitFunctions();
+    runOutputs.ms_rtc = simulation.getElapsedTimeRTCInitialisation();
+    runOutputs.ms_simulation = simulation.getElapsedTimeSimulation();
+    runOutputs.ms_init = simulation.getElapsedTimeInitFunctions();
+    runOutputs.ms_exit = simulation.getElapsedTimeExitFunctions();
     
     std::vector<float> ms_steps = simulation.getElapsedTimeSteps();
-    times.ms_per_step = std::make_shared<std::vector<float>>(std::vector<float>(ms_steps.begin(), ms_steps.end()));
-    times.ms_stepMean = std::accumulate(ms_steps.begin(), ms_steps.end(), 0.f) / (float)simulation.getStepCounter();
+    runOutputs.ms_per_step = std::make_shared<std::vector<float>>(std::vector<float>(ms_steps.begin(), ms_steps.end()));
+    runOutputs.ms_stepMean = std::accumulate(ms_steps.begin(), ms_steps.end(), 0.f) / (float)simulation.getStepCounter();
 }

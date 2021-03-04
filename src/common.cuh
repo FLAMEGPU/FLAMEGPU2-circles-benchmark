@@ -22,7 +22,7 @@ struct custom_cli {
     int device = DEFAULT_DEVICE;
 };
 
-struct simMethodParametrs {
+struct RunSimulationInputs {
     std::string modelName;
     const uint64_t HOST_SEED;
     const uint32_t AGENT_COUNT;
@@ -31,7 +31,7 @@ struct simMethodParametrs {
 };
 
 
-struct simulationTiming { 
+struct RunSimulationOutputs { 
     std::shared_ptr<std::vector<float>> ms_per_step = nullptr;
     float ms_rtc = 0.f;
     float ms_simulation = 0.f;
