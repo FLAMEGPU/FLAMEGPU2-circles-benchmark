@@ -47,8 +47,11 @@ int main(int argc, const char ** argv) {
     custom_cli cli = parse_custom_cli(argc, argv);
     
     // Define the benchmark parameters. I.e. initial environment width, max width, method of interpolation etc. 
-    // @todo
     std::vector<uint32_t> POPULATION_SIZES = {
+        2u << 4,
+        2u << 5,
+        2u << 6,
+        2u << 7,
         2u << 8,
         2u << 9,
         // 2u << 10,
@@ -87,13 +90,6 @@ int main(int argc, const char ** argv) {
     // Output the header for the per run timing.
     fprintf(fp_rowPerSimulation, "GPU,release_mode,seatbelts,model,steps,agentCount,repeat,ms_rtc,ms_simulation,ms_init,ms_exit,ms_stepMean\n");
     
-    /* std::string s = std::string("");
-    for(uint32_t step = 0; step < cli.steps; step++){
-        s += std::string(",ms_step_") + std::to_string(step);
-    }
-    fprintf(fp_rowPerSimulation, "%s\n", s.c_str()); */
-
-
     // Write a row per step out to  a differnt file.
     std::FILE * fp_rowPerStepPerSimulation = std::fopen("row-per-step-per-simulation.csv", "w");
     if(fp_rowPerSimulation == nullptr){
@@ -130,30 +126,23 @@ int main(int argc, const char ** argv) {
     uint32_t totalSimulations = MODELS.size() * POPULATION_SIZES.size() * cli.repetitions;
     uint32_t counter = 0;
 
-    // Iterate over population size first. This then allows for early exit when sims become too slow? Alternatively do the fastest simulations first, but this would require changing the map to be ordered.
-    // Iterate the models/simulations to run.
-    for(auto const& modelFunctionPair : MODELS){
-        auto const& modelName = modelFunctionPair.first;
-        auto const& modelFunction = modelFunctionPair.second;    
-        
-        // @todo - do (some) aggregation of timers? e.g. output 1 csv for a given sim-popsize combo, with step times for each sim and mean step times? for 
-        
-        // Iterate over the population sizes for that model
-        for(auto const& agentCount : POPULATION_SIZES){     
+    // Iterate over the population sizes for that model
+    for(auto const& agentCount : POPULATION_SIZES){     
+        // Iterate the models/simulations to run.
+        for(auto const& modelFunctionPair : MODELS){
+            auto const& modelName = modelFunctionPair.first;
+            auto const& modelFunction = modelFunctionPair.second;    
             // Repeat a number of times to get an average.
             for(uint32_t repeat = 0u; repeat < cli.repetitions; repeat++) { 
-
                 // Progress. 
                 printProgress(modelName, counter, totalSimulations, agentCount, repeat);
-                // @todo - Do i need to use a different seed for each repetition? Probably should do both...
+                // @todo - different seeds? same init differnt device? or both diff?
                 const uint64_t seed = cli.seed;
                 
-                // Call the fn to run this simulation witht his pop for this rep. 
-                // @todo get timing info to save for alter.
+                // Run the simulation, capturing values for output.
                 const RunSimulationInputs runInputs = {modelName, seed, agentCount, cli.steps, cli.device};
                 RunSimulationOutputs runOutputs = {};
                 modelFunction(runInputs, runOutputs);
-
 
                 // Add a row to the row per simulation csv file
                 fprintf(fp_rowPerSimulation, "%s,%d,%d,%s,%u,%u,%u,%.3f,%.3f,%.3f,%.3f,%.3f\n", deviceName.c_str(), RELEASE_MODE, SEATBELTS_ON, modelName.c_str(), cli.steps, agentCount, repeat, runOutputs.ms_rtc, runOutputs.ms_simulation, runOutputs.ms_init, runOutputs.ms_exit, runOutputs.ms_stepMean); 
@@ -172,9 +161,6 @@ int main(int argc, const char ** argv) {
     std::fclose(fp_rowPerSimulation);
     fp_rowPerSimulation = nullptr;
 }
-
-
-
 
 void print_cli_help(const int argc, const char ** argv ) {
     printf("usage: %s", argv[0]);
@@ -256,7 +242,6 @@ custom_cli parse_custom_cli(const int argc, const char ** argv) {
             }
         }
     }
-
     return values;
 }
 
@@ -265,14 +250,13 @@ custom_cli parse_custom_cli(const int argc, const char ** argv) {
 // Todo:
 
 /* 
-+ [ ] Change the order of loops so pops are first, toa llow early exit.
++ [x] Change the order of loops so pops are first, toa llow early exit.
 + [x] RTC bruteforce
 + [ ] Move pop gen to init fn? so it gets timed.
 + [x] RTC Spatial
-+ [ ] Better disk io? 
-    + [ ] Combine the per-step time files somehow? Maybe even just cat them into a very tall, repettitive csv?
++ [x] Better disk io? 
 + [ ] Better error checking. 
-+ [ ] Plotting (.py)
++ [x] Plotting (.py)
     + [ ] Headless plotting.
 + [ ] density experiment
 + [ ] Individual visualistion
