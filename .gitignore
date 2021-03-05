@@ -1,3 +1,9 @@
+# Images etc.
+
+*.png
+*.csv
+
+
 # Model output files
 *.xml
 *.bin

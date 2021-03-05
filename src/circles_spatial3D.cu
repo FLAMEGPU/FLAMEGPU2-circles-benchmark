@@ -99,7 +99,7 @@ void run_circles_spatial3D(const RunSimulationInputs runInputs, RunSimulationOut
     {   // Location message
         MsgSpatial3D::Description &message = model.newMessage<MsgSpatial3D>("location");
         message.newVariable<int>("id");
-        message.setRadius(COMM_RADIUS);
+        message.setRadius(runInputs.COMM_RADIUS);
         message.setMin(0, 0, 0);
         message.setMax(ENV_MAX, ENV_MAX, ENV_MAX);
     }

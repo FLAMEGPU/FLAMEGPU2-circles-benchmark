@@ -19,7 +19,7 @@ cmake .. -DCMAKE_BUILD_TYPE=Release -DSEATBELTS=OFF -DBUILD_SWIG_PYTHON=OFF -DCU
 make -j `nproc`
 
 # Run and generate csv files
-./bin/linux-x64/Release/circles-benchmarking
+FLAMEGPU2_INC_DIR=./_deps/flamegpu2-src/include/ ./bin/linux-x64/Release/circles-benchmarking 
 # Generte plots
 ../plot.py row-per-simulation.csv 
 ```

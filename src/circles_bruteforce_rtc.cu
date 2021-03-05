@@ -108,7 +108,7 @@ void run_circles_bruteforce_rtc(const RunSimulationInputs runInputs, RunSimulati
     {
         EnvironmentDescription &env = model.Environment();
         env.newProperty("repulse", ENV_REPULSE);
-        env.newProperty("radius", COMM_RADIUS);
+        env.newProperty("radius", runInputs.COMM_RADIUS);
     }
 
     // Organise the model. 

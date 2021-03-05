@@ -6,7 +6,6 @@
 #define CIRCLES_VALIDATION 0
 
 // Constant applied across all implementations?
-#define COMM_RADIUS 2.0f
 #define ENV_REPULSE 0.05f
 
 const unsigned long long int DEFAULT_SEED = 123u;
@@ -28,6 +27,7 @@ struct RunSimulationInputs {
     const uint32_t AGENT_COUNT;
     const uint32_t STEPS;
     const int32_t CUDA_DEVICE;
+    const float COMM_RADIUS;
 };
 
 
