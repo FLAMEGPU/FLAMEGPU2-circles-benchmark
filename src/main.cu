@@ -142,15 +142,15 @@ bool run_experiment(
 
 bool experiment_total_scale_all(custom_cli cli){
     // Name the experiment - this will end up in filenames/paths.
-    const std::string EXPERIMENT_LABEL="fixed-comm-radius";
+    const std::string EXPERIMENT_LABEL="fixed-comm-volume";
 
-    // Select comm radius value(s)
-    const float COMM_RADIUS = 2.0f;
+    // Select comm volume fraction. This is not a ctually a fixed density anymore @todo
+    const float COMM_VOLUME_FRACTION = 0.001f;
 
     // Select population sizes.
     std::vector<uint32_t> POPULATION_SIZES = {};
-    const uint32_t imin = 14u; 
-    const uint32_t imax = 15u;
+    const uint32_t imin = 8u; 
+    const uint32_t imax = 22u;
     for(uint32_t i = imin; i < imax; i++){
         POPULATION_SIZES.push_back((1 << i));
         if(i < imax -1){
@@ -160,10 +160,10 @@ bool experiment_total_scale_all(custom_cli cli){
 
     // Select the models to execute.
     std::map<std::string, std::function<void(const RunSimulationInputs, RunSimulationOutputs&)>> MODELS = {
-        // {std::string("circles_spatial3D"), run_circles_spatial3D},
-        // {std::string("circles_spatial3D_rtc"), run_circles_spatial3D_rtc},
-        // {std::string("circles_bruteforce"), run_circles_bruteforce},
-        // {std::string("circles_bruteforce_rtc"), run_circles_bruteforce_rtc},
+        {std::string("circles_spatial3D"), run_circles_spatial3D},
+        {std::string("circles_spatial3D_rtc"), run_circles_spatial3D_rtc},
+        {std::string("circles_bruteforce"), run_circles_bruteforce},
+        {std::string("circles_bruteforce_rtc"), run_circles_bruteforce_rtc},
     };
 
     // Construct the vector of RunSimulationInputs to pass to the run_experiment method.
@@ -175,7 +175,7 @@ bool experiment_total_scale_all(custom_cli cli){
             popSize, 
             cli.steps, 
             cli.device,
-            COMM_RADIUS
+            COMM_VOLUME_FRACTION
         });
     }
 
@@ -194,13 +194,14 @@ bool experiment_total_scale_all(custom_cli cli){
 
 bool experiment_density_spatial(const custom_cli cli) {
     // Name the experiment - this will end up in filenames/paths.
-    const std::string EXPERIMENT_LABEL="variable-comm-radius";
+    const std::string EXPERIMENT_LABEL="variable-comm-volume";
 
-    // Select comm radius value(s). 2.0f is default. Com radius is related to cuberoot of population....
-    std::vector<float> COMM_RADII = {.1f, .5f, .1f, .15f, .20f, .25f, .3f, .4f, .5f, .6f, .7f, .8f, .9f, 1.f};
+    // 
+    // std::vector<float> COMM_VOLUME_FRACTIONS = {.1f, .5f, .1f, .15f, .20f, .25f, .3f, .4f, .5f, .6f, .7f, .8f, .9f, 1.f};
+    std::vector<float> COMM_VOLUME_FRACTIONS = {.005f, .01f, .05f, .1f, .15f, .20f, .25f, .3f, .35f, .4f, .45f, .5f, .55f, .6f, .65f, .7f, .75f, .8f, .85f, .9f, .95f, 1.f};
 
     // std::vector<uint32_t> POPULATION_SIZES = {1<<14, 1<<16, 1<<18};
-    std::vector<uint32_t> POPULATION_SIZES = {1<<14, 1<<16};
+    std::vector<uint32_t> POPULATION_SIZES = {1<<10, 1<<12, 1<<14, 1<<16, 1<<18};
 
     // Select population sizes.
     // std::vector<uint32_t> POPULATION_SIZES = {};
@@ -215,7 +216,7 @@ bool experiment_density_spatial(const custom_cli cli) {
 
     // Select the models to execute.
     std::map<std::string, std::function<void(const RunSimulationInputs, RunSimulationOutputs&)>> MODELS = {
-        // {std::string("circles_spatial3D"), run_circles_spatial3D},
+        {std::string("circles_spatial3D"), run_circles_spatial3D},
         {std::string("circles_spatial3D_rtc"), run_circles_spatial3D_rtc},
         // {std::string("circles_bruteforce"), run_circles_bruteforce},
         // {std::string("circles_bruteforce_rtc"), run_circles_bruteforce_rtc},
@@ -224,7 +225,7 @@ bool experiment_density_spatial(const custom_cli cli) {
     // Construct the vector of RunSimulationInputs to pass to the run_experiment method.
     auto INPUTS_STRUCTS = std::vector<RunSimulationInputs>();
     for(const auto& popSize : POPULATION_SIZES ){
-        for(const auto& commRadius : COMM_RADII) {
+        for(const auto& commRadius : COMM_VOLUME_FRACTIONS) {
             INPUTS_STRUCTS.push_back({
                 "@todo-modelName", 
                 cli.seed,
