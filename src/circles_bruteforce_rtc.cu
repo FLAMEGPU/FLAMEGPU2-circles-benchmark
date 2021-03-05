@@ -79,13 +79,12 @@ FLAMEGPU_STEP_FUNCTION(Validation) {
 
 }
 
-// @todo - ad a way to visualise a single run of a single simulator somehow? maybe -v/--visualise <model_name> <pop>
-
 // Run an individual simulation, using 
 void run_circles_bruteforce_rtc(const RunSimulationInputs runInputs, RunSimulationOutputs &runOutputs){
-
     ModelDescription model(runInputs.modelName);
     const float ENV_MAX = static_cast<float>(floor(cbrt(runInputs.AGENT_COUNT)));
+    // Calc the comm radius based on the incoming fraction of volume.
+    const float COMM_RADIUS = static_cast<float>(cbrt(ENV_MAX * ENV_MAX * ENV_MAX * runInputs.COMM_VOLUME_FRACTION)) / 3.f;
     {   // Location message
         MsgBruteForce::Description &message = model.newMessage<MsgBruteForce>("location");
         message.newVariable<int>("id");
@@ -108,7 +107,7 @@ void run_circles_bruteforce_rtc(const RunSimulationInputs runInputs, RunSimulati
     {
         EnvironmentDescription &env = model.Environment();
         env.newProperty("repulse", ENV_REPULSE);
-        env.newProperty("radius", runInputs.COMM_RADIUS);
+        env.newProperty("radius", COMM_RADIUS);
     }
 
     // Organise the model. 

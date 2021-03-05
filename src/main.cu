@@ -46,11 +46,11 @@ bool run_experiment(
 
     // Output the CSV header for each output CSV file.
     if (fp_perSimulationCSV) {
-        fprintf(fp_perSimulationCSV, "GPU,release_mode,seatbelts_on,model,steps,agent_count,comm_radius,repeat,mean_messageCount,ms_rtc,ms_simulation,ms_init,ms_exit,ms_step_mean\n");
+        fprintf(fp_perSimulationCSV, "GPU,release_mode,seatbelts_on,model,steps,agent_count,comm_volume_fraction,repeat,comm_radius,mean_message_count,ms_rtc,ms_simulation,ms_init,ms_exit,ms_step_mean\n");
     }
         
     if (fp_perStepPerSimulationCSV) {
-        fprintf(fp_perStepPerSimulationCSV, "GPU,release_mode,seatbelts_on,model,steps,agent_count,comm_radius,repeat,step,ms_step\n");
+        fprintf(fp_perStepPerSimulationCSV, "GPU,release_mode,seatbelts_on,model,steps,agent_count,comm_volume_fraction,repeat,comm_radius,step,ms_step\n");
     }
 
 
@@ -67,7 +67,7 @@ bool run_experiment(
             auto const& modelFunction = modelNameFunctionPair.second; 
             for (uint32_t repeatIdx = 0u; repeatIdx < REPETITIONS; repeatIdx++){
                 // Output progress
-                printProgress(modelName, simulationIdx, totalSimulationCount, inputStruct.AGENT_COUNT, inputStruct.COMM_RADIUS, repeatIdx);
+                printProgress(modelName, simulationIdx, totalSimulationCount, inputStruct.AGENT_COUNT, inputStruct.COMM_VOLUME_FRACTION, repeatIdx);
 
                 // Run the simulation, capturing values for output.
                 const RunSimulationInputs runInputs = {
@@ -76,7 +76,7 @@ bool run_experiment(
                     inputStruct.AGENT_COUNT, 
                     inputStruct.STEPS, 
                     DEVICE,
-                    inputStruct.COMM_RADIUS
+                    inputStruct.COMM_VOLUME_FRACTION
                 };
                 RunSimulationOutputs runOutputs = {};
                 modelFunction(runInputs, runOutputs);
@@ -85,15 +85,16 @@ bool run_experiment(
                 if (fp_perSimulationCSV) {
                     fprintf(
                         fp_perSimulationCSV, 
-                        "%s,%d,%d,%s,%u,%u,%.3f,%u,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f\n",
+                        "%s,%d,%d,%s,%u,%u,%.3f,%u,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f\n",
                         deviceName.c_str(),
                         isReleaseMode(),
                         isSeatbeltsON(),
                         modelName.c_str(),
                         inputStruct.STEPS,
                         inputStruct.AGENT_COUNT,
-                        inputStruct.COMM_RADIUS,
+                        inputStruct.COMM_VOLUME_FRACTION,
                         repeatIdx,
+                        runOutputs.commRadius,
                         runOutputs.mean_messageCount,
                         runOutputs.ms_rtc,
                         runOutputs.ms_simulation,
@@ -106,15 +107,16 @@ bool run_experiment(
                     for(uint32_t step = 0; step < runOutputs.ms_per_step->size(); step++){
                         auto& ms_step = runOutputs.ms_per_step->at(step);
                         fprintf(fp_perStepPerSimulationCSV,
-                            "%s,%d,%d,%s,%u,%u,%.3f,%u,%u,%.3f\n",
+                            "%s,%d,%d,%s,%u,%u,%.3f,%u,%.3f,%u,%.3f\n",
                             deviceName.c_str(),
                             isReleaseMode(),
                             isSeatbeltsON(),
                             modelName.c_str(),
                             inputStruct.STEPS,
                             inputStruct.AGENT_COUNT,
-                            inputStruct.COMM_RADIUS,
+                            inputStruct.COMM_VOLUME_FRACTION,
                             repeatIdx,
+                            runOutputs.commRadius,
                             step,
                             ms_step);
                     }
@@ -159,7 +161,7 @@ bool experiment_total_scale_all(custom_cli cli){
     // Select the models to execute.
     std::map<std::string, std::function<void(const RunSimulationInputs, RunSimulationOutputs&)>> MODELS = {
         // {std::string("circles_spatial3D"), run_circles_spatial3D},
-        {std::string("circles_spatial3D_rtc"), run_circles_spatial3D_rtc},
+        // {std::string("circles_spatial3D_rtc"), run_circles_spatial3D_rtc},
         // {std::string("circles_bruteforce"), run_circles_bruteforce},
         // {std::string("circles_bruteforce_rtc"), run_circles_bruteforce_rtc},
     };
@@ -168,7 +170,7 @@ bool experiment_total_scale_all(custom_cli cli){
     auto INPUTS_STRUCTS = std::vector<RunSimulationInputs>();
     for(const auto& popSize : POPULATION_SIZES ){
         INPUTS_STRUCTS.push_back({
-            "@todo-modelName", 
+            "not-used", 
             cli.seed,
             popSize, 
             cli.steps, 
@@ -195,10 +197,10 @@ bool experiment_density_spatial(const custom_cli cli) {
     const std::string EXPERIMENT_LABEL="variable-comm-radius";
 
     // Select comm radius value(s). 2.0f is default. Com radius is related to cuberoot of population....
-    std::vector<float> COMM_RADII = {0.25f, 0.5f, 1.0f, 2.0f, 4.0f};
+    std::vector<float> COMM_RADII = {.1f, .5f, .1f, .15f, .20f, .25f, .3f, .4f, .5f, .6f, .7f, .8f, .9f, 1.f};
 
-    std::vector<uint32_t> POPULATION_SIZES = {1<<14, 1<<16, 1<<18};
-    // std::vector<uint32_t> POPULATION_SIZES = {1<<16};
+    // std::vector<uint32_t> POPULATION_SIZES = {1<<14, 1<<16, 1<<18};
+    std::vector<uint32_t> POPULATION_SIZES = {1<<14, 1<<16};
 
     // Select population sizes.
     // std::vector<uint32_t> POPULATION_SIZES = {};
@@ -293,3 +295,5 @@ int main(int argc, const char ** argv) {
 + [ ] limit the scale of some simulators - i.e. bruteforce cpp is horribly slow, so don't push the pops as far. 
 + [x] Have each agent store the message count it read. Exit fn that reduces theses and adds min/max/mean to the output data and CSVs. This might be useful
 */
+
+// @todo - ad a way to visualise a single run of a single simulator somehow? maybe -v/--visualise <model_name> <pop>

@@ -27,7 +27,7 @@ struct RunSimulationInputs {
     const uint32_t AGENT_COUNT;
     const uint32_t STEPS;
     const int32_t CUDA_DEVICE;
-    const float COMM_RADIUS;
+    const float COMM_VOLUME_FRACTION;
 };
 
 
@@ -39,4 +39,5 @@ struct RunSimulationOutputs {
     float ms_exit = 0.f;
     float ms_stepMean = 0.f;
     float mean_messageCount = 0.f;
+    float commRadius = 0.f;
 };

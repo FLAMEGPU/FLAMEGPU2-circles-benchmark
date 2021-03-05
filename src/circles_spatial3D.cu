@@ -89,17 +89,17 @@ FLAMEGPU_STEP_FUNCTION(Validation) {
 
 }  // namespace
 
-// @todo - ad a way to visualise a single run of a single simulator somehow? maybe -v/--visualise <model_name> <pop>
-
 // Run an individual simulation, using 
 void run_circles_spatial3D(const RunSimulationInputs runInputs, RunSimulationOutputs &runOutputs){
-
     ModelDescription model(runInputs.modelName);
     const float ENV_MAX = static_cast<float>(floor(cbrt(runInputs.AGENT_COUNT)));
+    // Calc the comm radius based on the incoming fraction of volume.
+    const float COMM_RADIUS = static_cast<float>(cbrt(ENV_MAX * ENV_MAX * ENV_MAX * runInputs.COMM_VOLUME_FRACTION)) / 3.f;
+    runOutputs.commRadius = COMM_RADIUS;
     {   // Location message
         MsgSpatial3D::Description &message = model.newMessage<MsgSpatial3D>("location");
         message.newVariable<int>("id");
-        message.setRadius(runInputs.COMM_RADIUS);
+        message.setRadius(COMM_RADIUS);
         message.setMin(0, 0, 0);
         message.setMax(ENV_MAX, ENV_MAX, ENV_MAX);
     }
