@@ -72,7 +72,7 @@ bool run_experiment(
                 // Run the simulation, capturing values for output.
                 const RunSimulationInputs runInputs = {
                     modelName, 
-                    inputStruct.HOST_SEED,
+                    inputStruct.HOST_SEED + repeatIdx, // Mutate the seed.
                     inputStruct.AGENT_COUNT, 
                     inputStruct.STEPS, 
                     DEVICE,
@@ -158,7 +158,7 @@ bool experiment_total_scale_all(custom_cli cli){
 
     // Select the models to execute.
     std::map<std::string, std::function<void(const RunSimulationInputs, RunSimulationOutputs&)>> MODELS = {
-        {std::string("circles_spatial3D"), run_circles_spatial3D},
+        // {std::string("circles_spatial3D"), run_circles_spatial3D},
         {std::string("circles_spatial3D_rtc"), run_circles_spatial3D_rtc},
         // {std::string("circles_bruteforce"), run_circles_bruteforce},
         // {std::string("circles_bruteforce_rtc"), run_circles_bruteforce_rtc},
@@ -198,6 +198,7 @@ bool experiment_density_spatial(const custom_cli cli) {
     std::vector<float> COMM_RADII = {0.25f, 0.5f, 1.0f, 2.0f, 4.0f};
 
     std::vector<uint32_t> POPULATION_SIZES = {1<<14, 1<<16, 1<<18};
+    // std::vector<uint32_t> POPULATION_SIZES = {1<<16};
 
     // Select population sizes.
     // std::vector<uint32_t> POPULATION_SIZES = {};
