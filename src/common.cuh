@@ -22,12 +22,12 @@ struct custom_cli {
 };
 
 struct RunSimulationInputs {
-    std::string modelName;
+    const int32_t CUDA_DEVICE;
+    const uint32_t STEPS;
     const uint64_t HOST_SEED;
     const uint32_t AGENT_COUNT;
-    const uint32_t STEPS;
-    const int32_t CUDA_DEVICE;
-    const float COMM_VOLUME_FRACTION;
+    const float ENV_WIDTH;
+    const float COMM_RADIUS;
 };
 
 
@@ -39,5 +39,5 @@ struct RunSimulationOutputs {
     float ms_exit = 0.f;
     float ms_stepMean = 0.f;
     float mean_messageCount = 0.f;
-    float commRadius = 0.f;
+    float agentDensity = 0.f;
 };

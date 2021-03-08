@@ -4,11 +4,10 @@
 #include <ctime>
 
 #include "flamegpu/flame_api.h"
-
-// Include the bruteforce implementation
-
 #include "common.cuh"
 #include "util.cuh"
+
+#define SEED_PRIME 97
 
 // Prototypes for methods from other .cu files
 void run_circles_bruteforce(const RunSimulationInputs runInputs, RunSimulationOutputs &runOutputs);
@@ -46,11 +45,11 @@ bool run_experiment(
 
     // Output the CSV header for each output CSV file.
     if (fp_perSimulationCSV) {
-        fprintf(fp_perSimulationCSV, "GPU,release_mode,seatbelts_on,model,steps,agent_count,comm_volume_fraction,repeat,comm_radius,mean_message_count,ms_rtc,ms_simulation,ms_init,ms_exit,ms_step_mean\n");
+        fprintf(fp_perSimulationCSV, "GPU,release_mode,seatbelts_on,model,steps,agent_count,env_width,comm_radius,repeat,agent_density,mean_message_count,ms_rtc,ms_simulation,ms_init,ms_exit,ms_step_mean\n");
     }
         
     if (fp_perStepPerSimulationCSV) {
-        fprintf(fp_perStepPerSimulationCSV, "GPU,release_mode,seatbelts_on,model,steps,agent_count,comm_volume_fraction,repeat,comm_radius,step,ms_step\n");
+        fprintf(fp_perStepPerSimulationCSV, "GPU,release_mode,seatbelts_on,model,steps,agent_count,env_width,comm_radius,repeat,agent_density,step,ms_step\n");
     }
 
 
@@ -67,16 +66,23 @@ bool run_experiment(
             auto const& modelFunction = modelNameFunctionPair.second; 
             for (uint32_t repeatIdx = 0u; repeatIdx < REPETITIONS; repeatIdx++){
                 // Output progress
-                printProgress(modelName, simulationIdx, totalSimulationCount, inputStruct.AGENT_COUNT, inputStruct.COMM_VOLUME_FRACTION, repeatIdx);
+                printProgress(
+                    modelName, 
+                    simulationIdx, 
+                    totalSimulationCount, 
+                    inputStruct.AGENT_COUNT, 
+                    inputStruct.ENV_WIDTH, 
+                    inputStruct.COMM_RADIUS, 
+                    repeatIdx);
 
                 // Run the simulation, capturing values for output.
                 const RunSimulationInputs runInputs = {
-                    modelName, 
-                    inputStruct.HOST_SEED + repeatIdx, // Mutate the seed.
-                    inputStruct.AGENT_COUNT, 
-                    inputStruct.STEPS, 
                     DEVICE,
-                    inputStruct.COMM_VOLUME_FRACTION
+                    inputStruct.STEPS, 
+                    inputStruct.HOST_SEED + (repeatIdx * SEED_PRIME), // Mutate the seed.
+                    inputStruct.AGENT_COUNT, 
+                    inputStruct.ENV_WIDTH,
+                    inputStruct.COMM_RADIUS
                 };
                 RunSimulationOutputs runOutputs = {};
                 modelFunction(runInputs, runOutputs);
@@ -85,16 +91,17 @@ bool run_experiment(
                 if (fp_perSimulationCSV) {
                     fprintf(
                         fp_perSimulationCSV, 
-                        "%s,%d,%d,%s,%u,%u,%.3f,%u,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f\n",
+                        "%s,%d,%d,%s,%u,%u,%.3f,%.3f,%u,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f\n",
                         deviceName.c_str(),
                         isReleaseMode(),
                         isSeatbeltsON(),
                         modelName.c_str(),
                         inputStruct.STEPS,
                         inputStruct.AGENT_COUNT,
-                        inputStruct.COMM_VOLUME_FRACTION,
+                        inputStruct.ENV_WIDTH,
+                        inputStruct.COMM_RADIUS,
                         repeatIdx,
-                        runOutputs.commRadius,
+                        runOutputs.agentDensity,
                         runOutputs.mean_messageCount,
                         runOutputs.ms_rtc,
                         runOutputs.ms_simulation,
@@ -107,16 +114,17 @@ bool run_experiment(
                     for(uint32_t step = 0; step < runOutputs.ms_per_step->size(); step++){
                         auto& ms_step = runOutputs.ms_per_step->at(step);
                         fprintf(fp_perStepPerSimulationCSV,
-                            "%s,%d,%d,%s,%u,%u,%.3f,%u,%.3f,%u,%.3f\n",
+                            "%s,%d,%d,%s,%u,%u,%.3f,%.3f,%u,%.3f,%u,%.3f\n",
                             deviceName.c_str(),
                             isReleaseMode(),
                             isSeatbeltsON(),
                             modelName.c_str(),
                             inputStruct.STEPS,
                             inputStruct.AGENT_COUNT,
-                            inputStruct.COMM_VOLUME_FRACTION,
+                            inputStruct.ENV_WIDTH,
+                            inputStruct.COMM_RADIUS,
                             repeatIdx,
-                            runOutputs.commRadius,
+                            runOutputs.agentDensity,
                             step,
                             ms_step);
                     }
@@ -142,21 +150,18 @@ bool run_experiment(
 
 bool experiment_total_scale_all(custom_cli cli){
     // Name the experiment - this will end up in filenames/paths.
-    const std::string EXPERIMENT_LABEL="fixed-comm-volume";
+    const std::string EXPERIMENT_LABEL="fixed-density";
 
-    // Select comm volume fraction. This is not a ctually a fixed density anymore @todo
-    const float COMM_VOLUME_FRACTION = 0.001f;
+    // Fixed comm radius 
+    const float COMM_RADIUS = 2.f;
+    // Fixed density
+    const float DENSITY = 1.0f; 
 
-    // Select population sizes.
-    std::vector<uint32_t> POPULATION_SIZES = {};
-    const uint32_t imin = 8u; 
-    const uint32_t imax = 22u;
-    for(uint32_t i = imin; i < imax; i++){
-        POPULATION_SIZES.push_back((1 << i));
-        if(i < imax -1){
-            POPULATION_SIZES.push_back((1 << i) + (1 << (i-1)));
-        }
-    }
+    // Sweep over environment widths, which lead to scaled 
+    // Env width needs to be atleast 5 * comm_radius to not read all messages? (so that there are bins in atleast each dim?)
+    // @density 1, 8 width = 512 pop. 16 = 4k, 20 = 8k, 40 width = 64k pop, 100 = 1million.
+    const std::vector<float> ENV_WIDTHS = {8.f, 12.f, 16.f, 20.f};
+    // const std::vector<float> ENV_WIDTHS = {8.f, 12.f, 16.f, 20.f, 30.f, 40.f, 50.f, 60.f, 70.f, 80.f, 90.f, 100.f};
 
     // Select the models to execute.
     std::map<std::string, std::function<void(const RunSimulationInputs, RunSimulationOutputs&)>> MODELS = {
@@ -168,14 +173,18 @@ bool experiment_total_scale_all(custom_cli cli){
 
     // Construct the vector of RunSimulationInputs to pass to the run_experiment method.
     auto INPUTS_STRUCTS = std::vector<RunSimulationInputs>();
-    for(const auto& popSize : POPULATION_SIZES ){
+    // for(const auto& popSize : POPULATION_SIZES ){
+        // const float envWidth = static_cast<float>(ceil(cbrt(popSize)));
+    for(const auto& envWidth : ENV_WIDTHS ){
+        const uint32_t popSize = static_cast<float>(ceil((envWidth * envWidth * envWidth) * DENSITY)); 
+        // Envwidth is scaled with population size.
         INPUTS_STRUCTS.push_back({
-            "not-used", 
-            cli.seed,
-            popSize, 
-            cli.steps, 
             cli.device,
-            COMM_VOLUME_FRACTION
+            cli.steps,
+            cli.seed,
+            popSize,
+            envWidth,
+            COMM_RADIUS
         });
     }
 
@@ -194,25 +203,22 @@ bool experiment_total_scale_all(custom_cli cli){
 
 bool experiment_density_spatial(const custom_cli cli) {
     // Name the experiment - this will end up in filenames/paths.
-    const std::string EXPERIMENT_LABEL="variable-comm-volume";
+    const std::string EXPERIMENT_LABEL="variable-density";
 
-    // 
-    // std::vector<float> COMM_VOLUME_FRACTIONS = {.1f, .5f, .1f, .15f, .20f, .25f, .3f, .4f, .5f, .6f, .7f, .8f, .9f, 1.f};
-    std::vector<float> COMM_VOLUME_FRACTIONS = {.005f, .01f, .05f, .1f, .15f, .20f, .25f, .3f, .35f, .4f, .45f, .5f, .55f, .6f, .65f, .7f, .75f, .8f, .85f, .9f, .95f, 1.f};
+    // Vary the density / environment width for several agent populations.
+    std::vector<float> COMM_VOLUME_FRACTIONS = {};
 
-    // std::vector<uint32_t> POPULATION_SIZES = {1<<14, 1<<16, 1<<18};
-    std::vector<uint32_t> POPULATION_SIZES = {1<<10, 1<<12, 1<<14, 1<<16, 1<<18};
+    // Fixed comm radius 
+    const float COMM_RADIUS = 2.f;
 
-    // Select population sizes.
-    // std::vector<uint32_t> POPULATION_SIZES = {};
-    // const uint32_t imin = 14u; 
-    // const uint32_t imax = 15u;
-    // for(uint32_t i = imin; i < imax; i++){
-    //     POPULATION_SIZES.push_back((1 << i));
-    //     if(i < imax -1){
-    //         POPULATION_SIZES.push_back((1 << i) + (1 << (i-1)));
-    //     }
-    // }
+    // Sweep over densities.
+    std::vector<float> DENSITIES = {1.f, 2.f, 4.f, 8.f}; 
+    // std::vector<float> DENSITIES = {1.f, 2.f, 3.f, 4.f, 5.f, 6.f, 8.f, 9.f, 10.f}; 
+    
+    // Sweep over environment widths, which lead to scaled 
+    std::vector<float> ENV_WIDTHS = {8.f, 20.f, 40.f};
+    // const std::vector<float> ENV_WIDTHS = {8.f, 12.f, 16.f, 20.f, 30.f, 40.f, 50.f, 60.f, 70.f, 80.f, 90.f, 100.f};
+
 
     // Select the models to execute.
     std::map<std::string, std::function<void(const RunSimulationInputs, RunSimulationOutputs&)>> MODELS = {
@@ -224,15 +230,17 @@ bool experiment_density_spatial(const custom_cli cli) {
 
     // Construct the vector of RunSimulationInputs to pass to the run_experiment method.
     auto INPUTS_STRUCTS = std::vector<RunSimulationInputs>();
-    for(const auto& popSize : POPULATION_SIZES ){
-        for(const auto& commRadius : COMM_VOLUME_FRACTIONS) {
+    for(const auto& envWidth : ENV_WIDTHS ){
+        for(const auto& density : DENSITIES ){
+            const uint32_t popSize = static_cast<float>(ceil((envWidth * envWidth * envWidth) * density)); 
+            // Envwidth is scaled with population size.
             INPUTS_STRUCTS.push_back({
-                "@todo-modelName", 
-                cli.seed,
-                popSize, 
-                cli.steps, 
                 cli.device,
-                commRadius
+                cli.steps,
+                cli.seed,
+                popSize,
+                envWidth,
+                COMM_RADIUS
             });
         }
     }
@@ -251,8 +259,6 @@ bool experiment_density_spatial(const custom_cli cli) {
 }
 
 
-// @todo - actual device poower state warmup? Maybe run the 0th sim twice and only use the second one?
-// @todo deal with what happens if a simulation throws an exception?
 int main(int argc, const char ** argv) {
     // Custom arg parsing, to prevent the current F2 arg parsing from occuring. 
     // @todo - improve arg parsing within F2. 
@@ -273,28 +279,27 @@ int main(int argc, const char ** argv) {
     return success_1 && success_2 ? EXIT_SUCCESS : EXIT_FAILURE;
 }
 
-
-// Todo:
-
 /* 
+// Todo:
 + [x] Change the order of loops so pops are first, toa llow early exit.
 + [x] RTC bruteforce
-+ [ ] Move pop gen to init fn? so it gets timed.
++ [ ] Move pop gen to init fn? so it gets timed? Agent vec in init would be good.
 + [x] RTC Spatial
-+ [x] Better disk io? 
++ [ ] Output to a specified directory (which may or may not exist?)
 + [ ] Better error checking. 
+    + [ ] if a simulation throws an exception?
+    + [ ] If could not create the csv file
 + [x] Plotting (.py)
-    + [ ] Headless plotting.
++ [x] Headless plotting.
 + [x] density experiment
 + [ ] Individual visualistion
 + [ ] Comments
-+ [ ] Seeding?
++ [x] Seeding?
 + [ ] readme
 + [ ] Check initialisation 
 + [ ] Decide on parameters to use, number of reps
-+ [ ] V100 (bessemer) script(s) / trial run. Don't commit these to the public rpo.
++ [x] V100 (bessemer) script(s) / trial run. Don't commit these to the public rpo.
 + [ ] limit the scale of some simulators - i.e. bruteforce cpp is horribly slow, so don't push the pops as far. 
 + [x] Have each agent store the message count it read. Exit fn that reduces theses and adds min/max/mean to the output data and CSVs. This might be useful
++ [ ]actual device poower state warmup? Maybe run the 0th sim twice and only use the second one?
 */
-
-// @todo - ad a way to visualise a single run of a single simulator somehow? maybe -v/--visualise <model_name> <pop>

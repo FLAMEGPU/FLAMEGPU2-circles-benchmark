@@ -72,16 +72,17 @@ FLAMEGPU_STEP_FUNCTION(Validation) {
     printf("%.2f%% Drift correct\n", 100 * driftDropped / static_cast<float>(driftDropped + driftIncreased));
 }
 #endif 
-
-}
+}  // namespace
 
 // Run an individual simulation, using 
 void run_circles_bruteforce(const RunSimulationInputs runInputs, RunSimulationOutputs &runOutputs){
-    ModelDescription model(runInputs.modelName);
-    const float ENV_MAX = static_cast<float>(floor(cbrt(runInputs.AGENT_COUNT)));
-    // Calc the comm radius based on the incoming fraction of volume.
-    const float COMM_RADIUS = static_cast<float>(cbrt(ENV_MAX * ENV_MAX * ENV_MAX * runInputs.COMM_VOLUME_FRACTION)) / 3.f;
-    runOutputs.commRadius = COMM_RADIUS;
+    ModelDescription model("circles_bruteforce");
+    // Calculate environment bounds.
+    const float ENV_WIDTH = runInputs.ENV_WIDTH;
+    const float ENV_MIN = -0.5 * ENV_WIDTH;
+    const float ENV_MAX = ENV_MIN + ENV_WIDTH;
+    // Compute the actual density and return it.
+    runOutputs.agentDensity = runInputs.AGENT_COUNT / (ENV_WIDTH * ENV_WIDTH * ENV_WIDTH);
     {   // Location message
         MsgBruteForce::Description &message = model.newMessage<MsgBruteForce>("location");
         message.newVariable<int>("id");
@@ -104,7 +105,7 @@ void run_circles_bruteforce(const RunSimulationInputs runInputs, RunSimulationOu
     {
         EnvironmentDescription &env = model.Environment();
         env.newProperty("repulse", ENV_REPULSE);
-        env.newProperty("radius", COMM_RADIUS);
+        env.newProperty("radius", runInputs.COMM_RADIUS);
     }
 
     // Organise the model. 
@@ -136,7 +137,7 @@ void run_circles_bruteforce(const RunSimulationInputs runInputs, RunSimulationOu
 
     // Generate the initial population
     std::default_random_engine rng(runInputs.HOST_SEED);
-    std::uniform_real_distribution<float> dist(0.0f, ENV_MAX);
+    std::uniform_real_distribution<float> dist(ENV_MIN, ENV_MAX);
     AgentVector population(model.Agent("Circle"), runInputs.AGENT_COUNT);
     for (unsigned int i = 0; i < runInputs.AGENT_COUNT; i++) {
         AgentVector::Agent instance = population[i];

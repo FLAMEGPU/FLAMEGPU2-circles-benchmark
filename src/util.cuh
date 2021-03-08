@@ -7,13 +7,14 @@ void printProgress(
     const uint32_t count, 
     const uint32_t total, 
     const uint32_t agentCount, 
+    const float envWidth, 
     const float commRadius,
     const uint32_t repeat
 ){
     std::time_t now = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
     char buf[sizeof "2011-10-08T07:07:09Z"];
     std::strftime(buf, sizeof buf, "%FT%TZ", std::gmtime(&now));
-    fprintf(stdout, "%s: %u/%u: %s %u %f %u\n", buf, count + 1, total, modelName.c_str(), agentCount, commRadius, repeat);
+    fprintf(stdout, "%s: %u/%u: %s %u %f %f %u\n", buf, count + 1, total, modelName.c_str(), agentCount, envWidth, commRadius, repeat);
 }
 
 std::string getGPUName(int device){

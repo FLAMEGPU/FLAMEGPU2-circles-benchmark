@@ -21,28 +21,36 @@ FIGSIZE_INCHES = (16, 9)
 
 # CSV files that should be preset in the input directory.
 EXPECTED_CSV_FILES=[
-    "fixed-comm-volume_perSimulationCSV.csv",
-    "fixed-comm-volume_perStepPerSimulationCSV.csv",
-    "variable-comm-volume_perSimulationCSV.csv",
-    "variable-comm-volume_perStepPerSimulationCSV.csv"
+    "fixed-density_perSimulationCSV.csv",
+    "fixed-density_perStepPerSimulationCSV.csv",
+    "variable-density_perSimulationCSV.csv",
+    "variable-density_perStepPerSimulationCSV.csv"
 ]
 
+
+
+# input cols for per step per sim
+# GPU,release_mode,seatbelts_on,model,steps,agent_count,env_width,comm_radius,repeat,agent_density,step,ms_step
+
+# Input cols for per sim.
+# GPU,release_mode,seatbelts_on,model,steps,agent_count,env_width,comm_radius,repeat,agent_density,mean_message_count,ms_rtc,ms_simulation,ms_init,ms_exit,ms_step_mean
+
 # input csv columns which identify a row as a duplicate of another repetition for aggregation, for per-step per-sim csvs
-GROUP_BY_COLUMNS_PER_STEP_PER_SIM = ["GPU","release_mode","seatbelts_on","model","steps","agent_count","comm_volume_fraction","step"]
+GROUP_BY_COLUMNS_PER_STEP_PER_SIM = ["GPU","release_mode","seatbelts_on","model","steps","agent_count","env_width","comm_radius","step"]
 
 # input csv columns which identify a row as a duplicate of another repetition for aggregation, for per-sim csv
-GROUP_BY_COLUMNS_PER_SIM = ["GPU","release_mode","seatbelts_on","model","steps","agent_count","comm_volume_fraction"]
+GROUP_BY_COLUMNS_PER_SIM = ["GPU","release_mode","seatbelts_on","model","steps","agent_count","env_width","comm_radius"]
 
 
 # Aggregate operations to apply across grouped csv rows, for the per-step per-sim csvs
 AGGREGATIONS_PER_STEP_PER_SIM = {
-    'comm_radius': ['mean'],
+    'agent_density': ['mean'],
     'ms_step': ['mean'],
 }
 
 # Aggregate operations to apply across grouped csv rows, for the per-sim csvs
 AGGREGATIONS_PER_SIM = {
-    'comm_radius': ['mean'],
+    'agent_density': ['mean'],
     'mean_message_count': ['mean'],
     'ms_rtc': ['mean'],
     'ms_simulation': ['mean'],
@@ -387,16 +395,23 @@ class PlotOptions:
 
 # Define the figures to generate for each input CSV.
 PLOTS_PER_CSV={
-    "fixed-comm-volume_perSimulationCSV.csv": [
+    "fixed-density_perSimulationCSV.csv": [
         PlotOptions(
             plot_type="lineplot",
             xkey="agent_count",
             ykey="mean_ms_step_mean",
             huekey="model",
             stylekey="model"
+        ),
+         PlotOptions(
+            plot_type="lineplot",
+            xkey="env_width",
+            ykey="mean_ms_step_mean",
+            huekey="model",
+            stylekey="model"
         )
     ],
-    "fixed-comm-volume_perStepPerSimulationCSV.csv": [
+    "fixed-density_perStepPerSimulationCSV.csv": [
         PlotOptions(
             plot_type="scatterplot",
             xkey="step",
@@ -416,18 +431,18 @@ PLOTS_PER_CSV={
         )
 
     ],
-    "variable-comm-volume_perSimulationCSV.csv": [
+    "variable-density_perSimulationCSV.csv": [
         PlotOptions(
             plot_type="lineplot",
-            xkey="comm_volume_fraction",
+            xkey="env_width",
             ykey="mean_mean_message_count",
-            huekey="agent_count",
+            huekey="mean_agent_density",
             stylekey="model",
         ),
         PlotOptions(
             plot_type="lineplot",
-            xkey="comm_volume_fraction",
-            ykey="mean_comm_radius",
+            xkey="env_width",
+            ykey="mean_agent_density",
             huekey="agent_count",
             stylekey="model",
         ),
@@ -435,11 +450,11 @@ PLOTS_PER_CSV={
             plot_type="lineplot",
             xkey="agent_count",
             ykey="mean_ms_step_mean",
-            huekey="comm_volume_fraction",
+            huekey="env_width",
             stylekey="model",
         )
     ],
-    "variable-comm-volume_perStepPerSimulationCSV.csv": [
+    "variable-density_perStepPerSimulationCSV.csv": [
 
     ]
 }

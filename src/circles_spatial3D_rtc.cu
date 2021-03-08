@@ -17,10 +17,10 @@ FLAMEGPU_AGENT_FUNCTION(output_message, MsgNone, MsgSpatial3D) {
 )###";
 
 const char * move = R"###(
-    FLAMEGPU_AGENT_FUNCTION(move, MsgSpatial3D, MsgNone) {
-        const int ID = FLAMEGPU->getVariable<int>("id");
-        const float REPULSE_FACTOR = FLAMEGPU->environment.getProperty<float>("repulse");
-        const float RADIUS = FLAMEGPU->message_in.radius();
+FLAMEGPU_AGENT_FUNCTION(move, MsgSpatial3D, MsgNone) {
+    const int ID = FLAMEGPU->getVariable<int>("id");
+    const float REPULSE_FACTOR = FLAMEGPU->environment.getProperty<float>("repulse");
+    const float RADIUS = FLAMEGPU->message_in.radius();
     float fx = 0.0;
     float fy = 0.0;
     float fz = 0.0;
@@ -90,21 +90,23 @@ FLAMEGPU_STEP_FUNCTION(Validation) {
     printf("%.2f%% Drift correct\n", 100 * driftDropped / static_cast<float>(driftDropped + driftIncreased));
 }
 #endif
-
 }  // namespace
 
 // Run an individual simulation, using 
 void run_circles_spatial3D_rtc(const RunSimulationInputs runInputs, RunSimulationOutputs &runOutputs){
-    ModelDescription model(runInputs.modelName);
-    const float ENV_MAX = static_cast<float>(floor(cbrt(runInputs.AGENT_COUNT)));
-    // Calc the comm radius based on the incoming fraction of volume.
-    const float COMM_RADIUS = static_cast<float>(cbrt(ENV_MAX * ENV_MAX * ENV_MAX * runInputs.COMM_VOLUME_FRACTION)) / 3.f;
-    runOutputs.commRadius = COMM_RADIUS;
+    ModelDescription model("circles_spatial3D_rtc");
+    // Calculate environment bounds.
+    const float ENV_WIDTH = runInputs.ENV_WIDTH;
+    const float ENV_MIN = -0.5 * ENV_WIDTH;
+    const float ENV_MAX = ENV_MIN + ENV_WIDTH;
+    // Compute the actual density and return it.
+    runOutputs.agentDensity = runInputs.AGENT_COUNT / (ENV_WIDTH * ENV_WIDTH * ENV_WIDTH);
+
     {   // Location message
         MsgSpatial3D::Description &message = model.newMessage<MsgSpatial3D>("location");
         message.newVariable<int>("id");
-        message.setRadius(COMM_RADIUS);
-        message.setMin(0, 0, 0);
+        message.setRadius(runInputs.COMM_RADIUS);
+        message.setMin(ENV_MIN, ENV_MIN, ENV_MIN);
         message.setMax(ENV_MAX, ENV_MAX, ENV_MAX);
     }
     {   // Circle agent
@@ -157,7 +159,7 @@ void run_circles_spatial3D_rtc(const RunSimulationInputs runInputs, RunSimulatio
 
     // Generate the initial population
     std::default_random_engine rng(runInputs.HOST_SEED);
-    std::uniform_real_distribution<float> dist(0.0f, ENV_MAX);
+    std::uniform_real_distribution<float> dist(ENV_MIN, ENV_MAX);
     AgentVector population(model.Agent("Circle"), runInputs.AGENT_COUNT);
     for (unsigned int i = 0; i < runInputs.AGENT_COUNT; i++) {
         AgentVector::Agent instance = population[i];
