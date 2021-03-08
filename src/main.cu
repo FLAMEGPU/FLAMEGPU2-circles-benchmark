@@ -160,8 +160,8 @@ bool experiment_total_scale_all(custom_cli cli){
     // Sweep over environment widths, which lead to scaled 
     // Env width needs to be atleast 5 * comm_radius to not read all messages? (so that there are bins in atleast each dim?)
     // @density 1, 8 width = 512 pop. 16 = 4k, 20 = 8k, 40 width = 64k pop, 100 = 1million.
-    const std::vector<float> ENV_WIDTHS = {8.f, 12.f, 16.f, 20.f};
-    // const std::vector<float> ENV_WIDTHS = {8.f, 12.f, 16.f, 20.f, 30.f, 40.f, 50.f, 60.f, 70.f, 80.f, 90.f, 100.f};
+    // const std::vector<float> ENV_WIDTHS = {8.f, 12.f, 16.f, 20.f};
+    const std::vector<float> ENV_WIDTHS = {8.f, 12.f, 16.f, 20.f, 30.f, 40.f, 50.f, 60.f, 70.f, 80.f, 90.f, 100.f};
 
     // Select the models to execute.
     std::map<std::string, std::function<void(const RunSimulationInputs, RunSimulationOutputs&)>> MODELS = {
@@ -212,12 +212,12 @@ bool experiment_density_spatial(const custom_cli cli) {
     const float COMM_RADIUS = 2.f;
 
     // Sweep over densities.
-    std::vector<float> DENSITIES = {1.f, 2.f, 4.f, 8.f}; 
-    // std::vector<float> DENSITIES = {1.f, 2.f, 3.f, 4.f, 5.f, 6.f, 8.f, 9.f, 10.f}; 
+    // std::vector<float> DENSITIES = {1.f, 2.f, 4.f, 8.f}; 
+    std::vector<float> DENSITIES = {1.f, 2.f, 3.f, 4.f, 5.f, 6.f, 8.f, 9.f, 10.f}; 
     
     // Sweep over environment widths, which lead to scaled 
-    std::vector<float> ENV_WIDTHS = {8.f, 20.f, 40.f};
-    // const std::vector<float> ENV_WIDTHS = {8.f, 12.f, 16.f, 20.f, 30.f, 40.f, 50.f, 60.f, 70.f, 80.f, 90.f, 100.f};
+    // std::vector<float> ENV_WIDTHS = {8.f, 20.f, 40.f};
+    const std::vector<float> ENV_WIDTHS = {8.f, 12.f, 16.f, 20.f, 30.f, 40.f, 50.f, 60.f, 70.f, 80.f, 90.f, 100.f};
 
 
     // Select the models to execute.
