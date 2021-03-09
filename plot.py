@@ -516,6 +516,13 @@ PLOTS_PER_CSV={
             ykey="mean_ms_step_mean",
             huekey="mean_agent_density",
             stylekey="model",
+        ),
+        PlotOptions(
+            plot_type="lineplot",
+            xkey="mean_agent_density",
+            ykey="mean_ms_step_mean",
+            huekey="env_volume",
+            stylekey="model",
         )
     ],
     "variable-density_perStepPerSimulationCSV.csv": [

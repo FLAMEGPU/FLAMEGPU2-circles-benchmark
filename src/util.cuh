@@ -14,7 +14,9 @@ void printProgress(
     std::time_t now = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
     char buf[sizeof "2011-10-08T07:07:09Z"];
     std::strftime(buf, sizeof buf, "%FT%TZ", std::gmtime(&now));
-    fprintf(stdout, "%s: %u/%u: %s %u %f %f %u\n", buf, count + 1, total, modelName.c_str(), agentCount, envWidth, commRadius, repeat);
+    float envVolume = envWidth * envWidth * envWidth;
+    float agentDensity = agentCount / envVolume;
+    fprintf(stdout, "%s: %u/%u: %s %u %f %f %f %f %u\n", buf, count + 1, total, modelName.c_str(), agentCount, envWidth, envVolume, agentDensity, commRadius, repeat);
 }
 
 std::string getGPUName(int device){
@@ -72,6 +74,7 @@ void print_cli_help(const int argc, const char ** argv ) {
     printf("  -s, --steps <steps>             Number of simulation iterations\n");
     printf("  -d, --device <device>           CUDA device to use\n");
     printf("      --repetitions <repetitions> The number of benchmark repetitions to perform\n");
+    printf("      --dry                       Dry run, don't actually run the sims.\n");
 }
 
 custom_cli parse_custom_cli(const int argc, const char ** argv) {
@@ -138,6 +141,8 @@ custom_cli parse_custom_cli(const int argc, const char ** argv) {
                 print_cli_help(argc, argv);
                 exit(EXIT_FAILURE);
             }
+        } else if(arg.compare("--dry") == 0) {
+            values.dry = true;
         }
     }
     return values;

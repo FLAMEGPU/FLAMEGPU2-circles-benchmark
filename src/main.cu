@@ -8,6 +8,7 @@
 #include "util.cuh"
 
 #define SEED_PRIME 97
+#define DRY_RUN 0
 
 // Prototypes for methods from other .cu files
 void run_circles_bruteforce(const RunSimulationInputs runInputs, RunSimulationOutputs &runOutputs);
@@ -22,7 +23,8 @@ bool run_experiment(
     const uint64_t SEED,
     const uint32_t REPETITIONS,
     std::vector<RunSimulationInputs> INPUTS_STRUCTS,
-    std::map<std::string, std::function<void(const RunSimulationInputs, RunSimulationOutputs&)>> MODELS
+    std::map<std::string, std::function<void(const RunSimulationInputs, RunSimulationOutputs&)>> MODELS,
+    const bool dry 
 ) { 
     printf("Running experiment %s - %zu configs, %zu simulators, %u repetitions\n", LABEL.c_str(), INPUTS_STRUCTS.size(), MODELS.size(), REPETITIONS);
 
@@ -74,6 +76,11 @@ bool run_experiment(
                     inputStruct.ENV_WIDTH, 
                     inputStruct.COMM_RADIUS, 
                     repeatIdx);
+
+                // Only print the progress if a dry run.
+                if (dry) { 
+                    continue;
+                }
 
                 // Run the simulation, capturing values for output.
                 const RunSimulationInputs runInputs = {
@@ -161,7 +168,19 @@ bool experiment_total_scale_all(custom_cli cli){
     // Env width needs to be atleast 5 * comm_radius to not read all messages? (so that there are bins in atleast each dim?)
     // @density 1, 8 width = 512 pop. 16 = 4k, 20 = 8k, 40 width = 64k pop, 100 = 1million.
     // const std::vector<float> ENV_WIDTHS = {8.f, 12.f, 16.f, 20.f};
-    const std::vector<float> ENV_WIDTHS = {8.f, 12.f, 16.f, 20.f, 30.f, 40.f, 50.f, 60.f, 70.f, 80.f, 90.f, 100.f};
+    // const std::vector<float> ENV_WIDTHS = {8.f, 12.f, 16.f, 20.f, 30.f, 40.f, 50.f, 60.f, 70.f, 80.f, 90.f, 100.f};
+    std::vector<float> ENV_WIDTHS = {};
+
+
+    const std::vector<float> TARGET_ENV_VOLUMES = {10000, 20000, 30000, 40000, 50000, 60000, 70000, 80000, 90000, 100000, 200000, 300000, 400000, 500000, 600000, 700000, 800000, 900000, 1000000};
+    for(const float& targetVolume : TARGET_ENV_VOLUMES){
+        const float envWidth = round(cbrt(targetVolume));
+        const float actualVolume = envWidth * envWidth * envWidth;
+        const float badness = (actualVolume - targetVolume) / targetVolume;
+        ENV_WIDTHS.push_back(envWidth);
+        // printf("targetVolume %f actualVolume %f width %f, volumeBadness %f\n", targetVolume, actualVolume, envWidth, badness);
+    }
+
 
     // Select the models to execute.
     std::map<std::string, std::function<void(const RunSimulationInputs, RunSimulationOutputs&)>> MODELS = {
@@ -195,7 +214,8 @@ bool experiment_total_scale_all(custom_cli cli){
         cli.seed,
         cli.repetitions,
         INPUTS_STRUCTS,
-        MODELS
+        MODELS,
+        cli.dry
     );
 
     return success;
@@ -213,11 +233,24 @@ bool experiment_density_spatial(const custom_cli cli) {
 
     // Sweep over densities.
     // std::vector<float> DENSITIES = {1.f, 2.f, 4.f, 8.f}; 
-    std::vector<float> DENSITIES = {1.f, 2.f, 3.f, 4.f, 5.f, 6.f, 8.f, 9.f, 10.f}; 
+    // std::vector<float> DENSITIES = {1.f, 2.f, 3.f, 4.f, 5.f, 6.f, 8.f, 9.f, 10.f}; 
     
     // Sweep over environment widths, which lead to scaled 
     // std::vector<float> ENV_WIDTHS = {8.f, 20.f, 40.f};
-    const std::vector<float> ENV_WIDTHS = {8.f, 12.f, 16.f, 20.f, 30.f, 40.f, 50.f, 60.f, 70.f, 80.f, 90.f, 100.f};
+    // const std::vector<float> ENV_WIDTHS = {8.f, 12.f, 16.f, 20.f, 30.f, 40.f, 50.f, 60.f, 70.f, 80.f, 90.f, 100.f};
+    // const std::vector<float> ENV_WIDTHS = {40, 50, 60, 70};
+
+    std::vector<float> DENSITIES = {1.f, 2.f, 3.f, 4.f}; 
+    const std::vector<float> TARGET_ENV_VOLUMES = {10000, 20000, 30000, 40000, 50000, 60000, 70000, 80000, 90000, 100000, 150000, 200000, 250000, 300000,  350000, 400000, 450000, 500000};
+    std::vector<float> ENV_WIDTHS = {};
+    for(const float& targetVolume : TARGET_ENV_VOLUMES){
+        const float envWidth = round(cbrt(targetVolume));
+        const float actualVolume = envWidth * envWidth * envWidth;
+        const float badness = (actualVolume - targetVolume) / targetVolume;
+        ENV_WIDTHS.push_back(envWidth);
+        // printf("targetVolume %f actualVolume %f width %f, volumeBadness %f\n", targetVolume, actualVolume, envWidth, badness);
+    }
+
 
 
     // Select the models to execute.
@@ -252,7 +285,8 @@ bool experiment_density_spatial(const custom_cli cli) {
         cli.seed,
         cli.repetitions,
         INPUTS_STRUCTS,
-        MODELS
+        MODELS,
+        cli.dry
     );
 
     return success;

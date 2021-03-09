@@ -19,6 +19,7 @@ struct custom_cli {
     unsigned int steps = DEFAULT_STEPS;
     unsigned int repetitions = DEFAULT_REPETITIONS;
     int device = DEFAULT_DEVICE;
+    bool dry = false;
 };
 
 struct RunSimulationInputs {
