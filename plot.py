@@ -194,6 +194,8 @@ def process_data(input_dataframes, verbose):
         # Reset the index, 
         grouped_df = grouped_df.reset_index()
 
+        grouped_df["env_volume"] = grouped_df["env_width"] * grouped_df["env_width"] * grouped_df["env_width"]
+
         if verbose:
             print(f"output columns:")
             for column in grouped_df.columns:
@@ -342,10 +344,9 @@ class PlotOptions:
         if self.logx:
             ax.set(xscale="log")
         if self.minx is not None:
-            print("minx ", self.minx)
             ax.set_xlim(left=self.minx)
         if self.maxx is not None:
-            ax.set_xmax(right=self.maxx)
+            ax.set_xlim(right=self.maxx)
 
         # adjust y axis if required.
         if self.logy:
@@ -353,7 +354,7 @@ class PlotOptions:
         if self.miny is not None:
             ax.set_ylim(bottom=self.miny)
         if self.maxy is not None:
-            ax.set_xmax(top=self.maxy)
+            ax.set_ylim(top=self.maxy)
 
         # Disable scientific notation on axes
         ax.ticklabel_format(useOffset=False, style='plain')
@@ -401,14 +402,63 @@ PLOTS_PER_CSV={
             xkey="agent_count",
             ykey="mean_ms_step_mean",
             huekey="model",
-            stylekey="model"
+            stylekey="model",
+            minx=0,
+            miny=0
         ),
-         PlotOptions(
+        PlotOptions(
             plot_type="lineplot",
             xkey="env_width",
             ykey="mean_ms_step_mean",
             huekey="model",
-            stylekey="model"
+            stylekey="model",
+            minx=0,
+            miny=0
+        ),
+        PlotOptions(
+            plot_type="lineplot",
+            xkey="env_volume",
+            ykey="mean_ms_step_mean",
+            huekey="model",
+            stylekey="model",
+            minx=0,
+            miny=0
+        ),
+        PlotOptions(
+            plot_type="lineplot",
+            xkey="agent_count",
+            ykey="mean_ms_step_mean",
+            huekey="model",
+            stylekey="model",
+            # df_query="model == 'circles_spatial3D' or model == 'circles_spatial3D_rtc'",
+            minx=0,
+            miny=0,
+            maxy=200,
+            filename="agent_count_step_ms_model_model_circles_only.png"
+        ),
+        PlotOptions(
+            plot_type="lineplot",
+            xkey="env_width",
+            ykey="mean_ms_step_mean",
+            huekey="model",
+            stylekey="model",
+            # df_query="model == 'circles_spatial3D' or model == 'circles_spatial3D_rtc'",
+            minx=0,
+            miny=0,
+            maxy=200,
+            filename="env_step_ms_model_model_circles_only.png"
+        ),
+        PlotOptions(
+            plot_type="lineplot",
+            xkey="env_volume",
+            ykey="mean_ms_step_mean",
+            huekey="model",
+            stylekey="model",
+            # df_query="model == 'circles_spatial3D' or model == 'circles_spatial3D_rtc'",
+            minx=0,
+            miny=0,
+            maxy=200,
+            filename="env_volume_step_ms_model_model_circles_only.png"
         )
     ],
     "fixed-density_perStepPerSimulationCSV.csv": [
@@ -451,6 +501,20 @@ PLOTS_PER_CSV={
             xkey="agent_count",
             ykey="mean_ms_step_mean",
             huekey="env_width",
+            stylekey="model",
+        ),
+        PlotOptions(
+            plot_type="lineplot",
+            xkey="env_width",
+            ykey="mean_ms_step_mean",
+            huekey="mean_agent_density",
+            stylekey="model",
+        ),
+        PlotOptions(
+            plot_type="lineplot",
+            xkey="env_volume",
+            ykey="mean_ms_step_mean",
+            huekey="mean_agent_density",
             stylekey="model",
         )
     ],
