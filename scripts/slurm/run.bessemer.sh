@@ -24,6 +24,10 @@ PROJECT_ROOT=../..
 cd $PROJECT_ROOT
 cd build
 
+# Set FLAMEGPU2_INC_DIR poiinting at the included dependency, relative to the build dir where execution is occuring.
+# Long term this should not be requied
+export FLAMEGPU2_INC_DIR=_deps/flamegpu2-src/include
+
 # Output some GPU information into the Log
 echo $CUDA_VISIBLE_DEVICES
 nvidia-smi
