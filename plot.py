@@ -214,7 +214,6 @@ def store_processed_data(input_dataframes, processed_dataframes, output_dir, for
         output_dir = pathlib.Path(output_dir)
         for csv_name, processed_df in processed_dataframes.items():
             output_csv_path = output_dir / f"processed_{csv_name}"
-
             if not output_csv_path.exists() or force:
                 try:
                     if verbose:
@@ -240,6 +239,41 @@ def store_processed_data(input_dataframes, processed_dataframes, output_dir, for
             print(f"{csv_name}: max_ms_rtc {max_ms_rtc:.3f}, mean_ms_rtc {mean_ms_rtc:.3f}")
 
     return success
+
+MANUAL_PRETTY_CSV_KEY_MAP = {
+    "step": "Step",
+    "GPU": "GPU",
+    "release_mode": "Release Mode",
+    "seatbelts_on": "Seatbelts On",
+    "model": "Model",
+    "steps": "Steps",
+    "agent_count": "Agent Count",
+    "env_width": "Environment Width",
+    "comm_radius": "Communication Radius",
+    "repeat": "Repeat",
+    "agent_density": "Agent Density",
+    "mean_message_count": "Average Message Count",
+    "ms_rtc": "RTC Time (ms)",
+    "ms_simulation": "Simulation Time (ms)",
+    "ms_init": "Init Function Time (ms)",
+    "ms_exit": "Exit Function Time (ms)",
+    "ms_step_mean": "Average Step Time (ms)",
+    "ms_step": "Step Time (ms)",
+    "mean_ms_rtc": "Average RTC Time (ms)",
+    "mean_ms_simulation": "Average Simulation Time (ms)",
+    "mean_ms_init": "Average Init Function Time (ms)",
+    "mean_ms_exit": "Average Exit Function Time (ms)",
+    "mean_ms_step_mean": "Average Step Time (ms)",
+    "mean_ms_step": "Average Step Time (ms)",
+    "mean_agent_density": "Agent Density",
+    "env_volume": "Environment Volume",
+}
+
+def pretty_csv_key(csv_key):
+    pretty_key = csv_key.replace("_", " ")
+    if csv_key in MANUAL_PRETTY_CSV_KEY_MAP:
+        pretty_key = MANUAL_PRETTY_CSV_KEY_MAP[csv_key]
+    return pretty_key
 
 # Dataclass requires py 3.7, but saves a bunch of effort.
 @dataclass 
@@ -271,13 +305,32 @@ class PlotOptions:
     def plot(self, df_in, output_prefix, output_dir, dpi, force, show, verbose):
         df = df_in
 
+        # Set a filename if needed. 
+        if self.filename is None:
+            self.filename = f"{self.plot_type}--{self.xkey}--{self.ykey}--{self.huekey}--{self.stylekey}"
+
         # Use some seaborn deafault for fontsize etc.
         sns.set_context(self.sns_context, rc={"lines.linewidth": 2.5})  
-        # Set palette.
-        sns.set_palette(sns.color_palette(self.sns_palette))
 
         # Set the general style.
         sns.set_style(self.sns_style)
+
+        # Filter the data using pandas queries if required.
+        if self.df_query is not None and len(self.df_query):
+            df = df.query(self.df_query)
+            
+        # If the df is empty, skip.
+        if df.shape[0] == 0:
+            print(f"Skipping plot {self.filename} - 0 rows of data")
+            return False
+
+        # Get the number of palette values required.
+        huecount = len(df[self.huekey].unique())
+
+        # Set palette.
+        palette = sns.color_palette(self.sns_palette, huecount)
+        sns.set_palette(palette)
+
 
         # create a matplotlib figure and axis, for a single plot.
         # Use constrained layout for better legend placement.
@@ -288,25 +341,20 @@ class PlotOptions:
 
 
         # Generate labels / titles etc.
-        print("@todo - pretty labels / titles")
-        xlabel = f"{self.xkey}"
-        ylabel = f"{self.ykey}"
-        huelabel = f"{self.huekey}"
-        stylelabel = f"{self.stylekey}"
-        figtitle = f"{ylabel} vs {xlabel} ({huelabel},{stylelabel})"
+        xlabel = f"{pretty_csv_key(self.xkey)}"
+        ylabel = f"{pretty_csv_key(self.ykey)}"
+        huelabel = f"{pretty_csv_key(self.huekey)}"
+        stylelabel = f"{pretty_csv_key(self.stylekey)}"
+        hs_label = f"{huelabel} x {stylelabel}" if huelabel != stylelabel else f"{huelabel}"
+        figtitle = f"{ylabel} vs {xlabel} (hs_label)"
 
         # @todo - validate keys.
 
         # Decide if using internal legend.
         external_legend = self.legend_outside
 
-        # Filter the data using pandas queries if required.
-        if self.df_query is not None and len(self.df_query):
-            df = df.query(self.df_query)
-
         g = None
         if self.plot_type == "lineplot":
-
             # plot the data @todo - lineplot vs scatter?
             g = sns.lineplot(
                 data=df, 
@@ -317,9 +365,9 @@ class PlotOptions:
                 markers=True,
                 ax=ax,
                 # size=6,
-                legend=self.sns_legend
+                legend=self.sns_legend,
+                palette=palette,
             )
-
         elif self.plot_type == "scatterplot":
             g = sns.scatterplot(
                 data=df, 
@@ -330,17 +378,29 @@ class PlotOptions:
                 markers=True,
                 ax=ax,
                 # size=6,
-                legend=self.sns_legend
+                legend=self.sns_legend,
+                palette=palette,
             )
         else:
             raise Exception(f"Bad plot_type {self.plot_type}")
+
+
+        legend_handles, legend_labels = ax.get_legend_handles_labels()
+        print(legend_handles)
+        print(legend_labels)
+
+        # new_title = 'My title'
+        # g._legend.set_title(new_title)
+        # new_labels = ['label 1', 'label 2']
+        # for t, l in zip(g._legend.texts, new_labels): t.set_text(l)
+
 
         # Set a title
         if len(figtitle):
             plt.title(figtitle)
 
-
         # adjust x axis if required.
+        ax.set(xlabel=xlabel)
         if self.logx:
             ax.set(xscale="log")
         if self.minx is not None:
@@ -349,6 +409,7 @@ class PlotOptions:
             ax.set_xlim(right=self.maxx)
 
         # adjust y axis if required.
+        ax.set(ylabel=ylabel)
         if self.logy:
             ax.set(yscale="log")
         if self.miny is not None:
@@ -365,17 +426,14 @@ class PlotOptions:
 
         # if an output directory is provided, save the figure to disk. 
         if output_dir is not None:
-            # If the filename is not set, generate one. 
-            if self.filename is None:
-                # x, y, h, s
-                self.filename = f"{self.xkey}--{self.ykey}--{self.huekey}--{self.stylekey}"
+            output_dir = pathlib.Path(output_dir)
             # Prefix the filename with the experiment prefix.
             output_filename = f"{output_prefix}--{self.filename}"
 
             # Get the path for output 
-            output_filepath = pathlib.Path(output_dir) / output_filename
+            output_filepath = output_dir / output_filename
             # If the file does not exist, or force is true write the otuput file, otherwise error.
-            if not output_filepath.exists or force:
+            if not output_filepath.exists() or force:
                 try:
                     if verbose:
                         print(f"writing figure to {output_filepath}")
@@ -393,25 +451,20 @@ class PlotOptions:
 
         return True
 
+QUALITATIVE_PALETTE = "viridis"
+SEQUENTIAL_PALETTE = "viridis"
 
 # Define the figures to generate for each input CSV.
 PLOTS_PER_CSV={
+    # No need for sequential colour pallete 
     "fixed-density_perSimulationCSV.csv": [
         PlotOptions(
             plot_type="lineplot",
-            xkey="agent_count",
+            xkey="env_volume",
             ykey="mean_ms_step_mean",
             huekey="model",
             stylekey="model",
-            minx=0,
-            miny=0
-        ),
-        PlotOptions(
-            plot_type="lineplot",
-            xkey="env_width",
-            ykey="mean_ms_step_mean",
-            huekey="model",
-            stylekey="model",
+            sns_palette=QUALITATIVE_PALETTE,
             minx=0,
             miny=0
         ),
@@ -421,39 +474,7 @@ PLOTS_PER_CSV={
             ykey="mean_ms_step_mean",
             huekey="model",
             stylekey="model",
-            minx=0,
-            miny=0
-        ),
-        PlotOptions(
-            plot_type="lineplot",
-            xkey="agent_count",
-            ykey="mean_ms_step_mean",
-            huekey="model",
-            stylekey="model",
-            # df_query="model == 'circles_spatial3D' or model == 'circles_spatial3D_rtc'",
-            minx=0,
-            miny=0,
-            maxy=200,
-            filename="agent_count_step_ms_model_model_circles_only.png"
-        ),
-        PlotOptions(
-            plot_type="lineplot",
-            xkey="env_width",
-            ykey="mean_ms_step_mean",
-            huekey="model",
-            stylekey="model",
-            # df_query="model == 'circles_spatial3D' or model == 'circles_spatial3D_rtc'",
-            minx=0,
-            miny=0,
-            maxy=200,
-            filename="env_step_ms_model_model_circles_only.png"
-        ),
-        PlotOptions(
-            plot_type="lineplot",
-            xkey="env_volume",
-            ykey="mean_ms_step_mean",
-            huekey="model",
-            stylekey="model",
+            sns_palette=QUALITATIVE_PALETTE,
             # df_query="model == 'circles_spatial3D' or model == 'circles_spatial3D_rtc'",
             minx=0,
             miny=0,
@@ -463,59 +484,67 @@ PLOTS_PER_CSV={
     ],
     "fixed-density_perStepPerSimulationCSV.csv": [
         PlotOptions(
+            filename="scatterplot--step--mean_ms_step--volume--volume--spatial3D-rtc-only.png",
             plot_type="scatterplot",
             xkey="step",
             ykey="mean_ms_step",
-            huekey="agent_count",
-            stylekey="model",
-            df_query="agent_count == 4096",
-            sns_legend="full"
-        ),
-        PlotOptions(
-            plot_type="scatterplot",
-            xkey="step",
-            ykey="mean_ms_step",
-            huekey="agent_count",
-            stylekey="model",
+            huekey="env_volume",
+            stylekey="env_volume",
             df_query="model == 'circles_spatial3D_rtc'",
+            sns_palette=SEQUENTIAL_PALETTE,
         )
 
     ],
+    # Worth using a sequential colour pallette here.
     "variable-density_perSimulationCSV.csv": [
-        PlotOptions(
-            plot_type="lineplot",
-            xkey="env_width",
-            ykey="mean_mean_message_count",
-            huekey="mean_agent_density",
-            stylekey="model",
-        ),
-        PlotOptions(
-            plot_type="lineplot",
-            xkey="env_width",
-            ykey="mean_agent_density",
-            huekey="agent_count",
-            stylekey="model",
-        ),
+        # PlotOptions(
+        #     plot_type="lineplot",
+        #     xkey="agent_count",
+        #     ykey="mean_ms_step_mean",
+        #     huekey="env_volume",
+        #     stylekey="model",
+        # ),
+        # PlotOptions(
+        #     plot_type="lineplot",
+        #     xkey="env_volume",
+        #     ykey="mean_ms_step_mean",
+        #     huekey="mean_agent_density",
+        #     stylekey="model",
+        # ),
+        # PlotOptions(
+        #     plot_type="lineplot",
+        #     xkey="mean_agent_density",
+        #     ykey="mean_ms_step_mean",
+        #     huekey="env_volume",
+        #     stylekey="model",
+        # ),
+
         PlotOptions(
             plot_type="lineplot",
             xkey="agent_count",
             ykey="mean_ms_step_mean",
-            huekey="env_width",
-            stylekey="model",
-        ),
-        PlotOptions(
-            plot_type="lineplot",
-            xkey="env_width",
-            ykey="mean_ms_step_mean",
-            huekey="mean_agent_density",
-            stylekey="model",
+            huekey="env_volume",
+            stylekey="env_volume",
+            df_query="model == 'circles_spatial3D_rtc'",
+            sns_palette=SEQUENTIAL_PALETTE,
         ),
         PlotOptions(
             plot_type="lineplot",
             xkey="env_volume",
             ykey="mean_ms_step_mean",
             huekey="mean_agent_density",
-            stylekey="model",
+            stylekey="mean_agent_density",
+            df_query="model == 'circles_spatial3D_rtc'",
+            sns_palette=SEQUENTIAL_PALETTE,
+        ),
+        PlotOptions(
+            plot_type="lineplot",
+            xkey="mean_agent_density",
+            ykey="mean_ms_step_mean",
+            huekey="env_volume",
+            stylekey="env_volume",
+            df_query="model == 'circles_spatial3D_rtc'",
+            sns_palette=SEQUENTIAL_PALETTE,
         ),
         PlotOptions(
             plot_type="lineplot",
@@ -523,6 +552,8 @@ PLOTS_PER_CSV={
             ykey="mean_ms_step_mean",
             huekey="env_volume",
             stylekey="model",
+            df_query="model == 'circles_spatial3D_rtc'",
+            sns_palette=SEQUENTIAL_PALETTE,
         )
     ],
     "variable-density_perStepPerSimulationCSV.csv": [
@@ -541,9 +572,10 @@ def plot_figures(processed_dataframes, output_dir, dpi, force, show, verbose):
             output_prefix = f"{output_prefix}_perStep"
 
         # Get the list of figures to generate, based on the type of csv / the csv name?
-        plots_to_generate = PLOTS_PER_CSV[csv_name] if csv_name in PLOTS_PER_CSV else []
-        for plot_options in plots_to_generate:
-            plotted = plot_options.plot(processed_df, output_prefix, output_dir, dpi, force, show, verbose)
+        if csv_name in PLOTS_PER_CSV:
+            plots_to_generate = PLOTS_PER_CSV[csv_name]
+            for plot_options in plots_to_generate:
+                plotted = plot_options.plot(processed_df, output_prefix, output_dir, dpi, force, show, verbose)
     
 
 def main():
