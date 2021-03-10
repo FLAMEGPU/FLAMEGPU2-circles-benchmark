@@ -27,10 +27,19 @@ FLAMEGPU2_INC_DIR=./_deps/flamegpu2-src/include/ ./bin/linux-x64/Release/circles
 ## Benchmark Results 
 
 > @todo - Hardware / software versions used
++ Titan V
++ CUDA 11.x ?
 
 > @todo - link to committed raw data. 
 
+`sample/data/*.csv`
+
 > @todo - figure(s).
+
+![Fixed Density Benchmark](sample/figures/fixed-density--volume--step-ms--model--all.png)
+![Fixed Density Benchmark Zoomed](sample/figures/fixed-density--volume--step-ms--model--zoomed.png)
+<!-- ![variable-density density](sample/figures/variable-density--densit--step-ms--volume--3drtc.png) -->
+![variable-density volume](sample/figures/variable-density--volume--step-ms--density--3drtc.png)
 
 ## Dependencies 
 
