@@ -7,6 +7,7 @@ import pathlib
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+import matplotlib.patches as mpatches
 import seaborn as sns
 from dataclasses import dataclass
 
@@ -15,6 +16,8 @@ from dataclasses import dataclass
 MAX_SANE_DPI = 1000
 # Default DPI
 DEFAULT_DPI = 96
+
+LEGEND_BORDER_PAD = 0.5
 
 # Size of figures in inches
 FIGSIZE_INCHES = (16, 9)
@@ -245,7 +248,7 @@ MANUAL_PRETTY_CSV_KEY_MAP = {
     "GPU": "GPU",
     "release_mode": "Release Mode",
     "seatbelts_on": "Seatbelts On",
-    "model": "Model",
+    "model": "Implementation",
     "steps": "Steps",
     "agent_count": "Agent Count",
     "env_width": "Environment Width",
@@ -270,6 +273,8 @@ MANUAL_PRETTY_CSV_KEY_MAP = {
 }
 
 def pretty_csv_key(csv_key):
+    if csv_key is None:
+        return None
     pretty_key = csv_key.replace("_", " ")
     if csv_key in MANUAL_PRETTY_CSV_KEY_MAP:
         pretty_key = MANUAL_PRETTY_CSV_KEY_MAP[csv_key]
@@ -294,7 +299,7 @@ class PlotOptions:
     # “auto”, “brief”, “full”, or False
     sns_legend: str = "auto"
     legend_outside: bool = True
-    legend_y_offset: float = -0.01
+    legend_y_offset: float = -0.00
     df_query: str = None
     sns_palette: str = "Dark2"
     sns_style: str = "darkgrid"
@@ -325,7 +330,7 @@ class PlotOptions:
             return False
 
         # Get the number of palette values required.
-        huecount = len(df[self.huekey].unique())
+        huecount = len(df[self.huekey].unique()) if self.huekey is not None else 1 
 
         # Set palette.
         palette = sns.color_palette(self.sns_palette, huecount)
@@ -384,20 +389,10 @@ class PlotOptions:
         else:
             raise Exception(f"Bad plot_type {self.plot_type}")
 
-
-        legend_handles, legend_labels = ax.get_legend_handles_labels()
-        print(legend_handles)
-        print(legend_labels)
-
-        # new_title = 'My title'
-        # g._legend.set_title(new_title)
-        # new_labels = ['label 1', 'label 2']
-        # for t, l in zip(g._legend.texts, new_labels): t.set_text(l)
-
-
         # Set a title
-        if len(figtitle):
-            plt.title(figtitle)
+        # @disabled for now.
+        # if len(figtitle):
+        #     plt.title(figtitle)
 
         # adjust x axis if required.
         ax.set(xlabel=xlabel)
@@ -420,9 +415,38 @@ class PlotOptions:
         # Disable scientific notation on axes
         ax.ticklabel_format(useOffset=False, style='plain')
 
-        # Set legend placement if not internal.
-        if external_legend:
-            legend = plt.legend(loc='upper left', bbox_to_anchor=(1, 1 - self.legend_y_offset))
+        # If there is reason to have a legend, do some extra processing.
+        if ax.get_legend() is not None:
+            legend = ax.get_legend()
+            loc = None
+            bbox_to_anchor = None
+            if external_legend:
+                # Set legend placement if not internal.
+                loc = "upper left"
+                # @todo - y offset should be LEGNED_BORDER_PAD trasnformed from font units to bbox.
+                bbox_to_anchor = (1, 1 - self.legend_y_offset)
+
+            # Get the handles and labels for the legend
+            handles, labels = ax.get_legend_handles_labels()
+
+            # Iterate the labels in the legend, looking for the huekey or stylekey as values
+            # If either were found, replace with the pretty version
+            found_count = 0
+            for i, label in enumerate(labels):
+                if label == self.huekey: 
+                    labels[i] = huelabel
+                    found_count += 1
+                elif label == self.stylekey:
+                    labels[i] = stylelabel
+                    found_count += 1
+
+            # If neither were found, set a legend title.
+            if found_count == 0:
+                # add an invisble patch with the appropriate label, like how seaborn does if multiple values are provided.
+                handles.insert(0, mpatches.Rectangle((0,0), 1, 1, fill=False, edgecolor='none', visible=False, label=hs_label))
+                labels.insert(0, hs_label)
+                pass
+            ax.legend(handles=handles, labels=labels, loc=loc, bbox_to_anchor=bbox_to_anchor, borderaxespad=LEGEND_BORDER_PAD)
 
         # if an output directory is provided, save the figure to disk. 
         if output_dir is not None:
@@ -451,7 +475,7 @@ class PlotOptions:
 
         return True
 
-QUALITATIVE_PALETTE = "viridis"
+QUALITATIVE_PALETTE = "Dark2"
 SEQUENTIAL_PALETTE = "viridis"
 
 # Define the figures to generate for each input CSV.
@@ -459,6 +483,7 @@ PLOTS_PER_CSV={
     # No need for sequential colour pallete 
     "fixed-density_perSimulationCSV.csv": [
         PlotOptions(
+            filename="volume--step-ms--model--all.png",
             plot_type="lineplot",
             xkey="env_volume",
             ykey="mean_ms_step_mean",
@@ -469,6 +494,7 @@ PLOTS_PER_CSV={
             miny=0
         ),
         PlotOptions(
+            filename="volume--step-ms--model--zoomed.png",
             plot_type="lineplot",
             xkey="env_volume",
             ykey="mean_ms_step_mean",
@@ -479,21 +505,32 @@ PLOTS_PER_CSV={
             minx=0,
             miny=0,
             maxy=200,
-            filename="env_volume_step_ms_model_model_circles_only.png"
-        )
+        ),
+        # PlotOptions(
+        #     filename="volume--message-count--model--zoomed.png",
+        #     plot_type="lineplot",
+        #     xkey="env_volume",
+        #     ykey="mean_mean_message_count",
+        #     huekey="model",
+        #     stylekey="model",
+        #     sns_palette=QUALITATIVE_PALETTE,
+        #     # df_query="model == 'circles_spatial3D' or model == 'circles_spatial3D_rtc'",
+        #     minx=0,
+        #     miny=0,
+        #     maxy=1000,
+        # )
     ],
     "fixed-density_perStepPerSimulationCSV.csv": [
-        PlotOptions(
-            filename="scatterplot--step--mean_ms_step--volume--volume--spatial3D-rtc-only.png",
-            plot_type="scatterplot",
-            xkey="step",
-            ykey="mean_ms_step",
-            huekey="env_volume",
-            stylekey="env_volume",
-            df_query="model == 'circles_spatial3D_rtc'",
-            sns_palette=SEQUENTIAL_PALETTE,
-        )
-
+        # PlotOptions(
+        #     filename="scatterplot--step--mean_ms_step--volume--volume--spatial3D-rtc-only.png",
+        #     plot_type="scatterplot",
+        #     xkey="step",
+        #     ykey="mean_ms_step",
+        #     huekey="env_volume",
+        #     stylekey="env_volume",
+        #     df_query="model == 'circles_spatial3D_rtc'",
+        #     sns_palette=SEQUENTIAL_PALETTE,
+        # )
     ],
     # Worth using a sequential colour pallette here.
     "variable-density_perSimulationCSV.csv": [
@@ -502,33 +539,12 @@ PLOTS_PER_CSV={
         #     xkey="agent_count",
         #     ykey="mean_ms_step_mean",
         #     huekey="env_volume",
-        #     stylekey="model",
+        #     stylekey="env_volume",
+        #     df_query="model == 'circles_spatial3D_rtc'",
+        #     sns_palette=SEQUENTIAL_PALETTE,
         # ),
-        # PlotOptions(
-        #     plot_type="lineplot",
-        #     xkey="env_volume",
-        #     ykey="mean_ms_step_mean",
-        #     huekey="mean_agent_density",
-        #     stylekey="model",
-        # ),
-        # PlotOptions(
-        #     plot_type="lineplot",
-        #     xkey="mean_agent_density",
-        #     ykey="mean_ms_step_mean",
-        #     huekey="env_volume",
-        #     stylekey="model",
-        # ),
-
         PlotOptions(
-            plot_type="lineplot",
-            xkey="agent_count",
-            ykey="mean_ms_step_mean",
-            huekey="env_volume",
-            stylekey="env_volume",
-            df_query="model == 'circles_spatial3D_rtc'",
-            sns_palette=SEQUENTIAL_PALETTE,
-        ),
-        PlotOptions(
+            filename="volume--step-ms--density--3drtc.png",
             plot_type="lineplot",
             xkey="env_volume",
             ykey="mean_ms_step_mean",
@@ -538,20 +554,12 @@ PLOTS_PER_CSV={
             sns_palette=SEQUENTIAL_PALETTE,
         ),
         PlotOptions(
+            filename="densit--step-ms--volume--3drtc.png",
             plot_type="lineplot",
             xkey="mean_agent_density",
             ykey="mean_ms_step_mean",
             huekey="env_volume",
             stylekey="env_volume",
-            df_query="model == 'circles_spatial3D_rtc'",
-            sns_palette=SEQUENTIAL_PALETTE,
-        ),
-        PlotOptions(
-            plot_type="lineplot",
-            xkey="mean_agent_density",
-            ykey="mean_ms_step_mean",
-            huekey="env_volume",
-            stylekey="model",
             df_query="model == 'circles_spatial3D_rtc'",
             sns_palette=SEQUENTIAL_PALETTE,
         )
