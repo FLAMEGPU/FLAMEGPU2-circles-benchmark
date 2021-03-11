@@ -9,8 +9,6 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 import seaborn as sns
-from dataclasses import dataclass
-
 
 # Maximum DPI
 MAX_SANE_DPI = 1000
@@ -280,31 +278,50 @@ def pretty_csv_key(csv_key):
         pretty_key = MANUAL_PRETTY_CSV_KEY_MAP[csv_key]
     return pretty_key
 
-# Dataclass requires py 3.7, but saves a bunch of effort.
-@dataclass 
+# No longer using @dataclass for py < 3.7
 class PlotOptions:
     """Class for options for a single plot"""
-    xkey: str
-    ykey: str
-    huekey: str = None
-    stylekey: str = None
-    plot_type: str = "lineplot"
-    filename: str = None
-    logx: bool = False
-    logy: bool = False
-    minx: int = None
-    maxx: int = None
-    miny: int = None
-    maxy: int = None
-    # “auto”, “brief”, “full”, or False
-    sns_legend: str = "auto"
-    legend_outside: bool = True
-    legend_y_offset: float = -0.00
-    df_query: str = None
-    sns_palette: str = "Dark2"
-    sns_style: str = "darkgrid"
-    # notebook, talk, paper or poster
-    sns_context: str = "talk"
+    def __init__(
+        self, 
+        xkey: str,
+        ykey: str,
+        huekey: str = None,
+        stylekey: str = None,
+        plot_type: str = "lineplot",
+        filename: str = None,
+        logx: bool = False,
+        logy: bool = False,
+        minx: int = None,
+        maxx: int = None,
+        miny: int = None,
+        maxy: int = None,
+        sns_legend: str = "auto",
+        legend_outside: bool = True,
+        legend_y_offset: float = -0.00,
+        df_query: str = None,
+        sns_palette: str = "Dark2",
+        sns_style: str = "darkgrid",
+        sns_context: str = "talk"
+        ):
+        self.xkey = xkey
+        self.ykey = ykey
+        self.huekey = huekey
+        self.stylekey = stylekey
+        self.plot_type = plot_type
+        self.filename = filename
+        self.logx = logx
+        self.logy = logy
+        self.minx = minx
+        self.maxx = maxx
+        self.miny = miny
+        self.maxy = maxy
+        self.sns_legend = sns_legend
+        self.legend_outside = legend_outside
+        self.legend_y_offset = legend_y_offset
+        self.df_query = df_query
+        self.sns_palette = sns_palette
+        self.sns_style = sns_style
+        self.sns_context = sns_context
 
 
     def plot(self, df_in, output_prefix, output_dir, dpi, force, show, verbose):

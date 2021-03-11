@@ -61,7 +61,7 @@ The raw data in the [`sample/data`](sample/data) directory and the figures below
         + Visual Studio 2019
         + CUDA `>= 11.0` recommended
 + Plotting
-    + Python >= 3.7
+    + Python 3
     + numpy
     + pandas
     + matplotlib
