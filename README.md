@@ -1,66 +1,104 @@
 # FLAMEGPU2 Circles Benchmark
 
 
-This repository contains performance benchmarking of the Circles implemented using FLAME GPU 2 at various population scales.
+This repository contains performance benchmarking of a [FLAME GPU 2](https://github.com/FLAMEGPU/FLAMEGPU2_dev) implementation of the Circles agent based model at various population scales and densities.
 
+In the Circles model is an abstract benchmark model which is used to evaluate neighbourhood search, with agents interacting with other agents within their local neighbourhood. 
+For a more complete description of the model, see:
 
-
-> **@todo** - Complete the readme.
-
-## Temp instructions
-
-**These are short term instructions that WILL change as things are refined**
-
-```
-# Compile
-mkdir -p build
-cd build
-cmake .. -DCMAKE_BUILD_TYPE=Release -DSEATBELTS=OFF -DBUILD_SWIG_PYTHON=OFF -DCUDA_ARCH=61,70
-make -j `nproc`
-
-# Run and generate csv files
-FLAMEGPU2_INC_DIR=./_deps/flamegpu2-src/include/ ./bin/linux-x64/Release/circles-benchmarking 
-# Generte plots
-../plot.py row-per-simulation.csv 
-```
+[Chisholm, Robert, Paul Richmond, and Steve Maddock. "A standardised benchmark for assessing the performance of fixed radius near neighbours." European Conference on Parallel Processing. Springer, Cham, 2016.](https://doi.org/10.1007/978-3-319-58943-5_25), ([pdf](https://eprints.whiterose.ac.uk/104079/1/paper.pdf)).
 
 ## Benchmark Results 
 
-> @todo - Hardware / software versions used
-+ Titan V
-+ CUDA 11.x ?
 
-> @todo - link to committed raw data. 
+Two experiments are carried out:
 
-`sample/data/*.csv`
++ Fixed Density
+    + Communication Radius is fixed to `2.0`
+    + Agent Density is fixed to `1` agent per unit of volume 
+    + Environment Volume is varied, with values of up to `1000000` units of volume
+    + 4 Implementations are compared
+        + Bruteforce messaging 
+        + Bruteforce messaging with RTC (run time compilation)
+        + Spatial3D messaging 
+        + Spatial3D messaging with RTC (run time compilation) 
++ Variable Density
+    + Communication Radius is fixed to `2.0`
+    + Agent Density is varied per unit of volume, from `1` to `4`
+    + Environment Volume is varied upto `~ 500000` units of volume.
+    + A single implementation is benchmarked
+        + Spatial3D messaging with RTC (run time compilation)
 
-> @todo - figure(s).
 
-![Fixed Density Benchmark](sample/figures/fixed-density--volume--step-ms--model--all.png)
-![Fixed Density Benchmark Zoomed](sample/figures/fixed-density--volume--step-ms--model--zoomed.png)
-<!-- ![variable-density density](sample/figures/variable-density--densit--step-ms--volume--3drtc.png) -->
-![variable-density volume](sample/figures/variable-density--volume--step-ms--density--3drtc.png)
+The raw data in the [`sample/data`](sample/data) directory and the figures below were generated using:
+
++ NVIDIA Titan V GPU
++ CUDA 11.2.142
++ NVIDIA Driver 460.39
++ GCC 7.5.0
++ Ubuntu 18.04.5 LTS
++ AMD Ryzen Threadripper 2950X 16-Core Processor (using a single core)
++ FLAME GPU 2 @ [`08628be`](https://github.com/FLAMEGPU/FLAMEGPU2_dev/tree/08628be)
+
+### Fixed Density Benchmark
+
+[![Fixed Density Benchmark](sample/figures/fixed-density--volume--step-ms--model--all.png)](sample/figures/fixed-density--volume--step-ms--model--all.png)
+[![Fixed Density Benchmark Zoomed](sample/figures/fixed-density--volume--step-ms--model--zoomed.png)](sample/figures/fixed-density--volume--step-ms--model--zoomed.png)
+
+### Variable Density Benchmark
+[![variable-density volume](sample/figures/variable-density--volume--step-ms--density--3drtc.png)](sample/figures/variable-density--volume--step-ms--density--3drtc.png)
 
 ## Dependencies 
 
-> @todo
-
++ Model Compilation
+    + [CMake](https://cmake.org/) `>= 3.15`
+    + [CUDA Toolkit](https://developer.nvidia.com/cuda-toolkit) `>= 10.0`
+    + [git](https://git-scm.com/) (Used for dependency management)
+    + *Linux:*
+    + [make](https://www.gnu.org/software/make/)
+        + gcc/g++ `>= 7` (version requirements [here](https://docs.nvidia.com/cuda/cuda-installation-guide-linux/index.html#system-requirements))
+    + *Windows:*
+        + Visual Studio 2019
+        + CUDA `>= 11.0` recommended
++ Plotting
+    + Python >= 3.7
+    + numpy
+    + pandas
+    + matplotlib
+    + seaborn
 ## Running the Benchmark
 
-### Compilation
+### Compilation via Cmake
 
-> @todo  - 
+These instructions are for execution on Volta (`SM_70`) GPUs under linux.
 
 ```
-cmake . -B build -DCMAKE_BUILD_TYPE=Release -DSEATBELTS=OFF -DBUILD_SWIG_PYTHON=OFF -DCUDA_ARCH=61,70
+cmake . -B build -DCMAKE_BUILD_TYPE=Release -DSEATBELTS=OFF -DBUILD_SWIG_PYTHON=OFF -DCUDA_ARCH=70
 cmake --build build -j`nproc` 
 ```
 
 
 ### Execution / Data generation
 
-> @todo 
+```
+cd build
+FLAMEGPU2_INC_DIR=./_deps/flamegpu2-src/include/ ./bin/linux-x64/Release/circles-benchmarking 
+# Generte plots
+```
+
+This will produce 4 `.csv` files in the `build` directory.
 
 ### Data plotting.
 
-> @todo - plotting data.
+```
+cd build
+python3 ../plot.py . -o figures
+```
+
+This will generate figures in `build/figures`
+
+The sample figures were generated from the root directory using
+
+```
+python3 plot.py sample/data/ -o sample/data-figures
+```
