@@ -172,7 +172,7 @@ bool experiment_total_scale_all(custom_cli cli){
     std::vector<float> ENV_WIDTHS = {};
 
 
-    const std::vector<float> TARGET_ENV_VOLUMES = {10000, 20000, 30000, 40000, 50000, 60000, 70000, 80000, 90000, 100000, 200000, 300000, 400000, 500000, 600000, 700000, 800000, 900000, 1000000};
+    const std::vector<float> TARGET_ENV_VOLUMES = {10000, 20000, 30000, 40000, 50000, 60000, 70000, 80000, 90000, 100000, 150000, 200000, 250000, 300000, 350000, 400000, 450000, 500000, 550000, 600000, 650000, 700000, 750000, 800000, 850000, 900000, 950000, 1000000};
     for(const float& targetVolume : TARGET_ENV_VOLUMES){
         const float envWidth = round(cbrt(targetVolume));
         const float actualVolume = envWidth * envWidth * envWidth;
@@ -240,7 +240,7 @@ bool experiment_density_spatial(const custom_cli cli) {
     // const std::vector<float> ENV_WIDTHS = {8.f, 12.f, 16.f, 20.f, 30.f, 40.f, 50.f, 60.f, 70.f, 80.f, 90.f, 100.f};
     // const std::vector<float> ENV_WIDTHS = {40, 50, 60, 70};
 
-    std::vector<float> DENSITIES = {1.f, 2.f, 3.f, 4.f}; 
+    std::vector<float> DENSITIES = {1.f, 2.f, 3.f, 4.f, 5.f, 6.f, 7.f, 8.f}; 
     const std::vector<float> TARGET_ENV_VOLUMES = {10000, 20000, 30000, 40000, 50000, 60000, 70000, 80000, 90000, 100000, 150000, 200000, 250000, 300000,  350000, 400000, 450000, 500000};
     std::vector<float> ENV_WIDTHS = {};
     for(const float& targetVolume : TARGET_ENV_VOLUMES){
@@ -255,7 +255,7 @@ bool experiment_density_spatial(const custom_cli cli) {
 
     // Select the models to execute.
     std::map<std::string, std::function<void(const RunSimulationInputs, RunSimulationOutputs&)>> MODELS = {
-        {std::string("circles_spatial3D"), run_circles_spatial3D},
+//        {std::string("circles_spatial3D"), run_circles_spatial3D},
         {std::string("circles_spatial3D_rtc"), run_circles_spatial3D_rtc},
         // {std::string("circles_bruteforce"), run_circles_bruteforce},
         // {std::string("circles_bruteforce_rtc"), run_circles_bruteforce_rtc},
