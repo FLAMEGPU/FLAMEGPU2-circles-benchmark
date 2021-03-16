@@ -94,39 +94,14 @@ bool run_experiment(
                 RunSimulationOutputs runOutputs = {};
                 modelFunction(runInputs, runOutputs);
 
-                // Add a row to the row per simulation csv file
-                if (fp_perSimulationCSV) {
-                    fprintf(
-                        fp_perSimulationCSV, 
-                        "%s,%d,%d,%s,%u,%u,%.3f,%.3f,%u,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%zu,%zu,%zu,%zu\n",
-                        deviceName.c_str(),
-                        isReleaseMode(),
-                        isSeatbeltsON(),
-                        modelName.c_str(),
-                        inputStruct.STEPS,
-                        inputStruct.AGENT_COUNT,
-                        inputStruct.ENV_WIDTH,
-                        inputStruct.COMM_RADIUS,
-                        repeatIdx,
-                        runOutputs.agentDensity,
-                        runOutputs.mean_messageCount,
-                        runOutputs.ms_rtc,
-                        runOutputs.ms_simulation,
-                        runOutputs.ms_init,
-                        runOutputs.ms_exit,
-                        runOutputs.ms_stepMean,
-                        runOutputs.preFlameUsedBytes,
-                        runOutputs.preFlameFreeBytes,
-                        runOutputs.flameUsedBytes,
-                        runOutputs.flameFreeBytes); 
-                    fflush(fp_perSimulationCSV);
-                }
-                // Add a row to the per step per simulation CSV
-                if (fp_perStepPerSimulationCSV) {
-                    for(uint32_t step = 0; step < runOutputs.ms_per_step->size(); step++){
-                        auto& ms_step = runOutputs.ms_per_step->at(step);
-                        fprintf(fp_perStepPerSimulationCSV,
-                            "%s,%d,%d,%s,%u,%u,%.3f,%.3f,%u,%.3f,%u,%.3f\n",
+                // If the run was successful, output csv, otherwise skip.
+                // @todo - ideally this would also not attempt to run any larger sims, but oh well.
+                if(runOutputs.completed) {
+                    // Add a row to the row per simulation csv file
+                    if (fp_perSimulationCSV) {
+                        fprintf(
+                            fp_perSimulationCSV, 
+                            "%s,%d,%d,%s,%u,%u,%.3f,%.3f,%u,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%zu,%zu,%zu,%zu\n",
                             deviceName.c_str(),
                             isReleaseMode(),
                             isSeatbeltsON(),
@@ -137,9 +112,38 @@ bool run_experiment(
                             inputStruct.COMM_RADIUS,
                             repeatIdx,
                             runOutputs.agentDensity,
-                            step,
-                            ms_step);
-                        fflush(fp_perStepPerSimulationCSV);
+                            runOutputs.mean_messageCount,
+                            runOutputs.ms_rtc,
+                            runOutputs.ms_simulation,
+                            runOutputs.ms_init,
+                            runOutputs.ms_exit,
+                            runOutputs.ms_stepMean,
+                            runOutputs.preFlameUsedBytes,
+                            runOutputs.preFlameFreeBytes,
+                            runOutputs.flameUsedBytes,
+                            runOutputs.flameFreeBytes); 
+                        fflush(fp_perSimulationCSV);
+                    }
+                    // Add a row to the per step per simulation CSV
+                    if (fp_perStepPerSimulationCSV) {
+                        for(uint32_t step = 0; step < runOutputs.ms_per_step->size(); step++){
+                            auto& ms_step = runOutputs.ms_per_step->at(step);
+                            fprintf(fp_perStepPerSimulationCSV,
+                                "%s,%d,%d,%s,%u,%u,%.3f,%.3f,%u,%.3f,%u,%.3f\n",
+                                deviceName.c_str(),
+                                isReleaseMode(),
+                                isSeatbeltsON(),
+                                modelName.c_str(),
+                                inputStruct.STEPS,
+                                inputStruct.AGENT_COUNT,
+                                inputStruct.ENV_WIDTH,
+                                inputStruct.COMM_RADIUS,
+                                repeatIdx,
+                                runOutputs.agentDensity,
+                                step,
+                                ms_step);
+                            fflush(fp_perStepPerSimulationCSV);
+                        }
                     }
                 }
                 simulationIdx++;
@@ -214,7 +218,7 @@ bool experiment_total_scale_all(custom_cli cli){
         // {std::string("circles_spatial3D"), run_circles_spatial3D},
         {std::string("circles_spatial3D_rtc"), run_circles_spatial3D_rtc},
         // {std::string("circles_bruteforce"), run_circles_bruteforce},
-        // {std::string("circles_bruteforce_rtc"), run_circles_bruteforce_rtc},
+        {std::string("circles_bruteforce_rtc"), run_circles_bruteforce_rtc},
     };
 
     // Construct the vector of RunSimulationInputs to pass to the run_experiment method.

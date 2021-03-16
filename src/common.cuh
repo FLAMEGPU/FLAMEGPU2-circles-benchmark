@@ -45,4 +45,5 @@ struct RunSimulationOutputs {
     size_t preFlameFreeBytes = 0u;
     size_t flameUsedBytes = 0u;
     size_t flameFreeBytes = 0u;
+    bool completed = true;
 };

@@ -29,7 +29,7 @@ FLAMEGPU_AGENT_FUNCTION(move, MsgSpatial3D, MsgNone) {
     const float z1 = FLAMEGPU->getVariable<float>("z");
     int count = 0;
     int messageCount = 0;
-    for (const auto &message : FLAMEGPU->message_in(x1, y1, z1)) {
+    /*for (const auto &message : FLAMEGPU->message_in(x1, y1, z1)) {
         if (message.getVariable<int>("id") != ID) {
             const float x2 = message.getVariable<float>("x");
             const float y2 = message.getVariable<float>("y");
@@ -51,7 +51,7 @@ FLAMEGPU_AGENT_FUNCTION(move, MsgSpatial3D, MsgNone) {
             }
         }
         messageCount++;
-    }
+    }*/
     fx /= count > 0 ? count : 1;
     fy /= count > 0 ? count : 1;
     fz /= count > 0 ? count : 1;
@@ -165,47 +165,54 @@ void run_circles_spatial3D_rtc(const RunSimulationInputs runInputs, RunSimulatio
         layer.addAgentFunction("Circle", "move");
     }
 
-    // Create the simulation object
-    CUDASimulation simulation(model);
+    try {
+        // Create the simulation object
+        CUDASimulation simulation(model);
 
-    // Set config configuraiton properties 
-    simulation.SimulationConfig().timing = false;
-    simulation.SimulationConfig().verbose = false;
-    simulation.SimulationConfig().random_seed = runInputs.HOST_SEED;  // @todo device seed != host seed? 
-    simulation.SimulationConfig().steps = runInputs.STEPS;
-    simulation.CUDAConfig().device_id = runInputs.CUDA_DEVICE;
+        // Set config configuraiton properties 
+        simulation.SimulationConfig().timing = false;
+        simulation.SimulationConfig().verbose = false;
+        simulation.SimulationConfig().random_seed = runInputs.HOST_SEED;  // @todo device seed != host seed? 
+        simulation.SimulationConfig().steps = runInputs.STEPS;
+        simulation.CUDAConfig().device_id = runInputs.CUDA_DEVICE;
 
-    // Generate the initial population
-    std::default_random_engine rng(runInputs.HOST_SEED);
-    std::uniform_real_distribution<float> dist(ENV_MIN, ENV_MAX);
-    AgentVector population(model.Agent("Circle"), runInputs.AGENT_COUNT);
-    for (unsigned int i = 0; i < runInputs.AGENT_COUNT; i++) {
-        AgentVector::Agent instance = population[i];
-        instance.setVariable<int>("id", i);
-        instance.setVariable<float>("x", dist(rng));
-        instance.setVariable<float>("y", dist(rng));
-        instance.setVariable<float>("z", dist(rng));
+        // Generate the initial population
+        std::default_random_engine rng(runInputs.HOST_SEED);
+        std::uniform_real_distribution<float> dist(ENV_MIN, ENV_MAX);
+        AgentVector population(model.Agent("Circle"), runInputs.AGENT_COUNT);
+        for (unsigned int i = 0; i < runInputs.AGENT_COUNT; i++) {
+            /* AgentVector::Agent instance = population[i];
+            instance.setVariable<int>("id", i);
+            instance.setVariable<float>("x", dist(rng));
+            instance.setVariable<float>("y", dist(rng));
+            instance.setVariable<float>("z", dist(rng)); */
+        }
+
+        // Set the population for the simulation.
+        simulation.setPopulationData(population);
+
+        // Execute 
+        simulation.simulate();
+
+        // Store timing information for later use.
+        runOutputs.ms_rtc = simulation.getElapsedTimeRTCInitialisation();
+        runOutputs.ms_simulation = simulation.getElapsedTimeSimulation();
+        runOutputs.ms_init = simulation.getElapsedTimeInitFunctions();
+        runOutputs.ms_exit = simulation.getElapsedTimeExitFunctions();
+        
+        std::vector<float> ms_steps = simulation.getElapsedTimeSteps();
+        runOutputs.ms_per_step = std::make_shared<std::vector<float>>(std::vector<float>(ms_steps.begin(), ms_steps.end()));
+        runOutputs.ms_stepMean = std::accumulate(ms_steps.begin(), ms_steps.end(), 0.f) / (float)simulation.getStepCounter();
+        runOutputs.mean_messageCount = meanMessageCount;
+
+        runOutputs.preFlameUsedBytes = preFlameUsedBytes;
+        runOutputs.preFlameFreeBytes = preFlameFreeBytes;
+        runOutputs.flameUsedBytes = flameUsedBytes;
+        runOutputs.flameFreeBytes = flameFreeBytes;
+        runOutputs.completed = true;
+    } catch (const std::exception& e) {
+        // An exception occured, so mark the run as a failure.
+        runOutputs.completed = false;
+        printf("An exception occured\n:  %s\n", e.what());
     }
-
-    // Set the population for the simulation.
-    simulation.setPopulationData(population);
-
-    // Execute 
-    simulation.simulate();
-
-    // Store timing information for later use.
-    runOutputs.ms_rtc = simulation.getElapsedTimeRTCInitialisation();
-    runOutputs.ms_simulation = simulation.getElapsedTimeSimulation();
-    runOutputs.ms_init = simulation.getElapsedTimeInitFunctions();
-    runOutputs.ms_exit = simulation.getElapsedTimeExitFunctions();
-    
-    std::vector<float> ms_steps = simulation.getElapsedTimeSteps();
-    runOutputs.ms_per_step = std::make_shared<std::vector<float>>(std::vector<float>(ms_steps.begin(), ms_steps.end()));
-    runOutputs.ms_stepMean = std::accumulate(ms_steps.begin(), ms_steps.end(), 0.f) / (float)simulation.getStepCounter();
-    runOutputs.mean_messageCount = meanMessageCount;
-
-    runOutputs.preFlameUsedBytes = preFlameUsedBytes;
-    runOutputs.preFlameFreeBytes = preFlameFreeBytes;
-    runOutputs.flameUsedBytes = flameUsedBytes;
-    runOutputs.flameFreeBytes = flameFreeBytes;
 }
