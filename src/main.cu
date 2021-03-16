@@ -47,7 +47,7 @@ bool run_experiment(
 
     // Output the CSV header for each output CSV file.
     if (fp_perSimulationCSV) {
-        fprintf(fp_perSimulationCSV, "GPU,release_mode,seatbelts_on,model,steps,agent_count,env_width,comm_radius,repeat,agent_density,mean_message_count,ms_rtc,ms_simulation,ms_init,ms_exit,ms_step_mean\n");
+        fprintf(fp_perSimulationCSV, "GPU,release_mode,seatbelts_on,model,steps,agent_count,env_width,comm_radius,repeat,agent_density,mean_message_count,ms_rtc,ms_simulation,ms_init,ms_exit,ms_step_mean,pre_flame_used_bytes,pre_flame_free_bytes,flame_used_bytes,flame_free_bytes\n");
     }
         
     if (fp_perStepPerSimulationCSV) {
@@ -98,7 +98,7 @@ bool run_experiment(
                 if (fp_perSimulationCSV) {
                     fprintf(
                         fp_perSimulationCSV, 
-                        "%s,%d,%d,%s,%u,%u,%.3f,%.3f,%u,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f\n",
+                        "%s,%d,%d,%s,%u,%u,%.3f,%.3f,%u,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%zu,%zu,%zu,%zu\n",
                         deviceName.c_str(),
                         isReleaseMode(),
                         isSeatbeltsON(),
@@ -114,7 +114,12 @@ bool run_experiment(
                         runOutputs.ms_simulation,
                         runOutputs.ms_init,
                         runOutputs.ms_exit,
-                        runOutputs.ms_stepMean); 
+                        runOutputs.ms_stepMean,
+                        runOutputs.preFlameUsedBytes,
+                        runOutputs.preFlameFreeBytes,
+                        runOutputs.flameUsedBytes,
+                        runOutputs.flameFreeBytes); 
+                    fflush(fp_perSimulationCSV);
                 }
                 // Add a row to the per step per simulation CSV
                 if (fp_perStepPerSimulationCSV) {
@@ -134,6 +139,7 @@ bool run_experiment(
                             runOutputs.agentDensity,
                             step,
                             ms_step);
+                        fflush(fp_perStepPerSimulationCSV);
                     }
                 }
                 simulationIdx++;
@@ -171,8 +177,28 @@ bool experiment_total_scale_all(custom_cli cli){
     // const std::vector<float> ENV_WIDTHS = {8.f, 12.f, 16.f, 20.f, 30.f, 40.f, 50.f, 60.f, 70.f, 80.f, 90.f, 100.f};
     std::vector<float> ENV_WIDTHS = {};
 
+    // @todo - need to try catch calls to simulate() if I want to sample multiple repetitions, and output some kind of error value (and then abort any larger sizes.)
 
-    const std::vector<float> TARGET_ENV_VOLUMES = {10000, 20000, 30000, 40000, 50000, 60000, 70000, 80000, 90000, 100000, 200000, 300000, 400000, 500000, 600000, 700000, 800000, 900000, 1000000};
+    // const std::vector<float> TARGET_ENV_VOLUMES = {10000, 20000, 30000, 40000, 50000, 60000, 70000, 80000, 90000, 100000, 200000, 300000, 400000, 500000, 600000, 700000, 800000, 900000, 1000000};
+
+    // Start with some small target volumes to get some sampling at the low end.
+    std::vector<float> TARGET_ENV_VOLUMES = {1, 32, 128, 256, 512, 1024, 4096, 16000, 32000, 64000};
+    // Then sample at every 100k upto 1 million.
+    for(uint32_t i = 1; i < 10; i++){
+        const float scaleFactor = 100000.f;
+        TARGET_ENV_VOLUMES.push_back(i * scaleFactor);
+    }
+    // Then sample at every 1million upto 10 milliion 
+    for(uint32_t i = 1; i < 10; i++){
+        const float scaleFactor = 1000000.f;
+        TARGET_ENV_VOLUMES.push_back(i * scaleFactor);
+    }
+    // Then sample at every 10 million upto 200 million.
+    for(uint32_t i = 1; i < 21; i++){
+        const float scaleFactor = 10000000.f;
+        TARGET_ENV_VOLUMES.push_back(i * scaleFactor);
+    }
+
     for(const float& targetVolume : TARGET_ENV_VOLUMES){
         const float envWidth = round(cbrt(targetVolume));
         const float actualVolume = envWidth * envWidth * envWidth;
@@ -180,14 +206,15 @@ bool experiment_total_scale_all(custom_cli cli){
         ENV_WIDTHS.push_back(envWidth);
         // printf("targetVolume %f actualVolume %f width %f, volumeBadness %f\n", targetVolume, actualVolume, envWidth, badness);
     }
+    // exit(1);
 
 
     // Select the models to execute.
     std::map<std::string, std::function<void(const RunSimulationInputs, RunSimulationOutputs&)>> MODELS = {
-        {std::string("circles_spatial3D"), run_circles_spatial3D},
+        // {std::string("circles_spatial3D"), run_circles_spatial3D},
         {std::string("circles_spatial3D_rtc"), run_circles_spatial3D_rtc},
-        {std::string("circles_bruteforce"), run_circles_bruteforce},
-        {std::string("circles_bruteforce_rtc"), run_circles_bruteforce_rtc},
+        // {std::string("circles_bruteforce"), run_circles_bruteforce},
+        // {std::string("circles_bruteforce_rtc"), run_circles_bruteforce_rtc},
     };
 
     // Construct the vector of RunSimulationInputs to pass to the run_experiment method.
@@ -255,8 +282,8 @@ bool experiment_density_spatial(const custom_cli cli) {
 
     // Select the models to execute.
     std::map<std::string, std::function<void(const RunSimulationInputs, RunSimulationOutputs&)>> MODELS = {
-        {std::string("circles_spatial3D"), run_circles_spatial3D},
-        {std::string("circles_spatial3D_rtc"), run_circles_spatial3D_rtc},
+        // {std::string("circles_spatial3D"), run_circles_spatial3D},
+        // {std::string("circles_spatial3D_rtc"), run_circles_spatial3D_rtc},
         // {std::string("circles_bruteforce"), run_circles_bruteforce},
         // {std::string("circles_bruteforce_rtc"), run_circles_bruteforce_rtc},
     };

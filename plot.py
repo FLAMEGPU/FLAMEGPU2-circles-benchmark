@@ -58,6 +58,10 @@ AGGREGATIONS_PER_SIM = {
     'ms_init': ['mean'],
     'ms_exit': ['mean'],
     'ms_step_mean': ['mean'],
+    'pre_flame_used_bytes': ['mean'],
+    'pre_flame_free_bytes': ['mean'],
+    'flame_used_bytes': ['mean'],
+    'flame_free_bytes': ['mean'],
 }
 
 
@@ -175,6 +179,10 @@ def process_data(input_dataframes, verbose):
             for column in input_df.columns:
                 print(f"  {column}")
 
+        # If there are no rows, cannot aggregate.
+        if input_df.empty:
+            continue
+
         # If its a per-step file, use one set of operations, otherwise us a different set of operations.
 
         csv_is_per_step = "perStep" in csv_name
@@ -184,7 +192,9 @@ def process_data(input_dataframes, verbose):
 
         # fetch the appropriate list of aggregate operations to apply.
         aggregations = AGGREGATIONS_PER_STEP_PER_SIM if csv_is_per_step else AGGREGATIONS_PER_SIM
-
+        print(aggregations)
+        print(input_df)
+        print(input_df.columns)
         # New names for each aggregated column, by flattening the dict of lists.
         new_column_labels = [f"{op}_{col}" for col, ops in aggregations.items() for op in ops]
 
@@ -268,6 +278,10 @@ MANUAL_PRETTY_CSV_KEY_MAP = {
     "mean_ms_step": "Average Step Time (ms)",
     "mean_agent_density": "Agent Density",
     "env_volume": "Environment Volume",
+    "mean_pre_flame_used_bytes": "Average Used bytes pre FLAMEGPU",
+    "mean_pre_flame_free_bytes": "Average Free bytes pre FLAMEGPU",
+    "mean_flame_used_bytes": "Average Used bytes FLAMEGPU",
+    "mean_flame_free_bytes": "Average Free bytes FLAMEGPU",
 }
 
 def pretty_csv_key(csv_key):
@@ -499,30 +513,30 @@ SEQUENTIAL_PALETTE = "viridis"
 PLOTS_PER_CSV={
     # No need for sequential colour pallete 
     "fixed-density_perSimulationCSV.csv": [
-        PlotOptions(
-            filename="volume--step-ms--model--all.png",
-            plot_type="lineplot",
-            xkey="env_volume",
-            ykey="mean_ms_step_mean",
-            huekey="model",
-            stylekey="model",
-            sns_palette=QUALITATIVE_PALETTE,
-            minx=0,
-            miny=0
-        ),
-        PlotOptions(
-            filename="volume--step-ms--model--zoomed.png",
-            plot_type="lineplot",
-            xkey="env_volume",
-            ykey="mean_ms_step_mean",
-            huekey="model",
-            stylekey="model",
-            sns_palette=QUALITATIVE_PALETTE,
-            # df_query="model == 'circles_spatial3D' or model == 'circles_spatial3D_rtc'",
-            minx=0,
-            miny=0,
-            maxy=200,
-        ),
+        # PlotOptions(
+        #     filename="volume--step-ms--model--all.png",
+        #     plot_type="lineplot",
+        #     xkey="env_volume",
+        #     ykey="mean_ms_step_mean",
+        #     huekey="model",
+        #     stylekey="model",
+        #     sns_palette=QUALITATIVE_PALETTE,
+        #     minx=0,
+        #     miny=0
+        # ),
+        # PlotOptions(
+        #     filename="volume--step-ms--model--zoomed.png",
+        #     plot_type="lineplot",
+        #     xkey="env_volume",
+        #     ykey="mean_ms_step_mean",
+        #     huekey="model",
+        #     stylekey="model",
+        #     sns_palette=QUALITATIVE_PALETTE,
+        #     # df_query="model == 'circles_spatial3D' or model == 'circles_spatial3D_rtc'",
+        #     minx=0,
+        #     miny=0,
+        #     maxy=200,
+        # ),
         # PlotOptions(
         #     filename="volume--message-count--model--zoomed.png",
         #     plot_type="lineplot",
@@ -535,7 +549,36 @@ PLOTS_PER_CSV={
         #     minx=0,
         #     miny=0,
         #     maxy=1000,
-        # )
+        # ),
+        PlotOptions(
+            filename="agent_count--memory_used_bytes--model.png",
+            plot_type="lineplot",
+            xkey="agent_count",
+            ykey="mean_flame_used_bytes",
+            huekey="model",
+            stylekey="model",
+            sns_palette=QUALITATIVE_PALETTE,
+            # df_query="model == 'circles_spatial3D' or model == 'circles_spatial3D_rtc'",
+            minx=0,
+            miny=0,
+        ),
+        PlotOptions(
+            filename="agent_count--mean_ms_step_mean--model.png",
+            plot_type="lineplot",
+            xkey="agent_count",
+            ykey="mean_ms_step_mean",
+            huekey="model",
+            stylekey="model",
+            sns_palette=QUALITATIVE_PALETTE,
+            # df_query="model == 'circles_spatial3D' or model == 'circles_spatial3D_rtc'",
+            minx=0,
+            miny=0,
+        ),
+
+# mean_pre_flame_used_bytes
+# mean_pre_flame_free_bytes
+# mean_flame_used_bytes
+# mean_flame_free_bytes
     ],
     "fixed-density_perStepPerSimulationCSV.csv": [
         # PlotOptions(
@@ -560,26 +603,26 @@ PLOTS_PER_CSV={
         #     df_query="model == 'circles_spatial3D_rtc'",
         #     sns_palette=SEQUENTIAL_PALETTE,
         # ),
-        PlotOptions(
-            filename="volume--step-ms--density--3drtc.png",
-            plot_type="lineplot",
-            xkey="env_volume",
-            ykey="mean_ms_step_mean",
-            huekey="mean_agent_density",
-            stylekey="mean_agent_density",
-            df_query="model == 'circles_spatial3D_rtc'",
-            sns_palette=SEQUENTIAL_PALETTE,
-        ),
-        PlotOptions(
-            filename="densit--step-ms--volume--3drtc.png",
-            plot_type="lineplot",
-            xkey="mean_agent_density",
-            ykey="mean_ms_step_mean",
-            huekey="env_volume",
-            stylekey="env_volume",
-            df_query="model == 'circles_spatial3D_rtc'",
-            sns_palette=SEQUENTIAL_PALETTE,
-        )
+        # PlotOptions(
+        #     filename="volume--step-ms--density--3drtc.png",
+        #     plot_type="lineplot",
+        #     xkey="env_volume",
+        #     ykey="mean_ms_step_mean",
+        #     huekey="mean_agent_density",
+        #     stylekey="mean_agent_density",
+        #     df_query="model == 'circles_spatial3D_rtc'",
+        #     sns_palette=SEQUENTIAL_PALETTE,
+        # ),
+        # PlotOptions(
+        #     filename="densit--step-ms--volume--3drtc.png",
+        #     plot_type="lineplot",
+        #     xkey="mean_agent_density",
+        #     ykey="mean_ms_step_mean",
+        #     huekey="env_volume",
+        #     stylekey="env_volume",
+        #     df_query="model == 'circles_spatial3D_rtc'",
+        #     sns_palette=SEQUENTIAL_PALETTE,
+        # )
     ],
     "variable-density_perStepPerSimulationCSV.csv": [
 

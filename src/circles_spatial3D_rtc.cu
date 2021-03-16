@@ -66,11 +66,24 @@ FLAMEGPU_AGENT_FUNCTION(move, MsgSpatial3D, MsgNone) {
 )###";
 
 static float meanMessageCount = 0.f;
+static size_t preFlameUsedBytes = 0u;
+static size_t preFlameFreeBytes = 0u;
+static size_t flameUsedBytes = 0u;
+static size_t flameFreeBytes = 0u;
+
 FLAMEGPU_EXIT_FUNCTION(getMeanMessageCount) {
-
+    
     const float totalMessageCount = FLAMEGPU->agent("Circle").sum<float>("totalMessageCount") / FLAMEGPU->agent("Circle").count();
-
+    
     meanMessageCount = totalMessageCount / FLAMEGPU->getStepCounter();
+    
+    size_t totalBytes = 0u;
+    static size_t usedBytes = 0u;
+    cudaMemGetInfo(&flameFreeBytes, &totalBytes);
+    usedBytes = totalBytes - flameFreeBytes;
+    flameUsedBytes = usedBytes - preFlameUsedBytes;
+    // printf("Exit free %zu, total %zu, used %zu, flame used %zu\n", flameFreeBytes, totalBytes, usedBytes, flameUsedBytes);
+
 }
 
 #if defined(CIRCLES_VALIDATION) && CIRCLES_VALIDATION
@@ -94,6 +107,11 @@ FLAMEGPU_STEP_FUNCTION(Validation) {
 
 // Run an individual simulation, using 
 void run_circles_spatial3D_rtc(const RunSimulationInputs runInputs, RunSimulationOutputs &runOutputs){
+    size_t totalBytes = 0u;
+    cudaMemGetInfo(&preFlameFreeBytes, &totalBytes);
+    preFlameUsedBytes = totalBytes - preFlameFreeBytes;
+    // printf("Init free %zu, total %zu used %zu\n", preFlameFreeBytes, totalBytes, preFlameUsedBytes);
+    
     ModelDescription model("circles_spatial3D_rtc");
     // Calculate environment bounds.
     const float ENV_WIDTH = runInputs.ENV_WIDTH;
@@ -185,4 +203,9 @@ void run_circles_spatial3D_rtc(const RunSimulationInputs runInputs, RunSimulatio
     runOutputs.ms_per_step = std::make_shared<std::vector<float>>(std::vector<float>(ms_steps.begin(), ms_steps.end()));
     runOutputs.ms_stepMean = std::accumulate(ms_steps.begin(), ms_steps.end(), 0.f) / (float)simulation.getStepCounter();
     runOutputs.mean_messageCount = meanMessageCount;
+
+    runOutputs.preFlameUsedBytes = preFlameUsedBytes;
+    runOutputs.preFlameFreeBytes = preFlameFreeBytes;
+    runOutputs.flameUsedBytes = flameUsedBytes;
+    runOutputs.flameFreeBytes = flameFreeBytes;
 }

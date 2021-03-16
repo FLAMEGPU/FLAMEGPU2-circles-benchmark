@@ -9,7 +9,7 @@
 #define ENV_REPULSE 0.05f
 
 const unsigned long long int DEFAULT_SEED = 123u;
-const unsigned int DEFAULT_STEPS = 200u;
+const unsigned int DEFAULT_STEPS = 1u;
 const unsigned int DEFAULT_REPETITIONS = 3u;
 const int DEFAULT_DEVICE = 0;
 
@@ -41,4 +41,8 @@ struct RunSimulationOutputs {
     float ms_stepMean = 0.f;
     float mean_messageCount = 0.f;
     float agentDensity = 0.f;
+    size_t preFlameUsedBytes = 0u;
+    size_t preFlameFreeBytes = 0u;
+    size_t flameUsedBytes = 0u;
+    size_t flameFreeBytes = 0u;
 };

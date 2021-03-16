@@ -55,6 +55,22 @@ FLAMEGPU_AGENT_FUNCTION(move, MsgBruteForce, MsgNone) {
     return ALIVE;
 }
 
+static size_t preFlameUsedBytes = 0u;
+static size_t preFlameFreeBytes = 0u;
+static size_t flameUsedBytes = 0u;
+static size_t flameFreeBytes = 0u;
+
+FLAMEGPU_EXIT_FUNCTION(getMeanMessageCount) {
+    
+    size_t totalBytes = 0u;
+    static size_t usedBytes = 0u;
+    cudaMemGetInfo(&flameFreeBytes, &totalBytes);
+    usedBytes = totalBytes - flameFreeBytes;
+    flameUsedBytes = usedBytes - preFlameUsedBytes;
+    // printf("Exit free %zu, total %zu, used %zu, flame used %zu\n", flameFreeBytes, totalBytes, usedBytes, flameUsedBytes);
+
+}
+
 #if defined(CIRCLES_VALIDATION) && CIRCLES_VALIDATION
 FLAMEGPU_STEP_FUNCTION(Validation) {
     static float prevTotalDrift = FLT_MAX;
@@ -76,6 +92,11 @@ FLAMEGPU_STEP_FUNCTION(Validation) {
 
 // Run an individual simulation, using 
 void run_circles_bruteforce(const RunSimulationInputs runInputs, RunSimulationOutputs &runOutputs){
+    size_t totalBytes = 0u;
+    cudaMemGetInfo(&preFlameFreeBytes, &totalBytes);
+    preFlameUsedBytes = totalBytes - preFlameFreeBytes;
+    // printf("Init free %zu, total %zu used %zu\n", preFlameFreeBytes, totalBytes, preFlameUsedBytes);
+
     ModelDescription model("circles_bruteforce");
     // Calculate environment bounds.
     const float ENV_WIDTH = runInputs.ENV_WIDTH;
@@ -109,6 +130,7 @@ void run_circles_bruteforce(const RunSimulationInputs runInputs, RunSimulationOu
     }
 
     // Organise the model. 
+    model.addExitFunction(getMeanMessageCount);
 
 #if defined(CIRCLES_VALIDATION) && CIRCLES_VALIDATION
     {   // Attach init/step/exit functions and exit condition
@@ -163,4 +185,9 @@ void run_circles_bruteforce(const RunSimulationInputs runInputs, RunSimulationOu
     runOutputs.ms_per_step = std::make_shared<std::vector<float>>(std::vector<float>(ms_steps.begin(), ms_steps.end()));
     runOutputs.ms_stepMean = std::accumulate(ms_steps.begin(), ms_steps.end(), 0.f) / (float)simulation.getStepCounter();
     runOutputs.mean_messageCount = runInputs.AGENT_COUNT;
+
+    runOutputs.preFlameUsedBytes = preFlameUsedBytes;
+    runOutputs.preFlameFreeBytes = preFlameFreeBytes;
+    runOutputs.flameUsedBytes = flameUsedBytes;
+    runOutputs.flameFreeBytes = flameFreeBytes;
 }
