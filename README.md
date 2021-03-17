@@ -32,13 +32,12 @@ Two experiments are carried out:
 
 The raw data in the [`sample/data`](sample/data) directory and the figures below were generated using:
 
-+ NVIDIA Titan V GPU
-+ CUDA 11.2.142
-+ NVIDIA Driver 460.39
-+ GCC 7.5.0
-+ Ubuntu 18.04.5 LTS
-+ AMD Ryzen Threadripper 2950X 16-Core Processor (using a single core)
-+ FLAME GPU 2 @ [`08628be`](https://github.com/FLAMEGPU/FLAMEGPU2_dev/tree/08628be)
++ Tesla V100-SXM2-32GB
++ NVIDIA Driver 460.32.03
++ CUDA 10.2.98
++ GCC 8.3.0
++ CentOS 7.9.2009
++ FLAME GPU 2 @ [`d238333`](https://github.com/FLAMEGPU/FLAMEGPU2_dev/tree/d238333)
 
 ### Fixed Density Benchmark
 

@@ -3,11 +3,12 @@
 ## Data
 The sample data in this folder was generated using:
 
-+ CUDA 11.2
-+ NVIDIA Titan V GPU
-+ 100 iterations
-+ FLAME GPU commit `@todo`
-+ Repository commit `@todo`
++ Tesla V100-SXM2-32GB
++ NVIDIA Driver 460.32.03
++ CUDA 10.2.98
++ GCC 8.3.0
++ CentOS 7.9.2009
++ FLAME GPU 2 @ [`d238333`](https://github.com/FLAMEGPU/FLAMEGPU2_dev/tree/d238333)
 
 
 ## Figures 
@@ -19,10 +20,10 @@ python3 ../plot.py data/ -o figures/ -f
 ```
 
 Which output the following to `stdout`.
-The RTC cache had not been cleared prior to execution.
 ```
-fixed-density_perSimulationCSV.csv: max_ms_rtc 8.493, mean_ms_rtc 3.990
-variable-density_perSimulationCSV.csv: max_ms_rtc 8.966, mean_ms_rtc 3.989
+fixed-density_perSimulationCSV.csv: max_ms_rtc 12919.013, mean_ms_rtc 118.152
+variable-density_perSimulationCSV.csv: max_ms_rtc 18.127, mean_ms_rtc 6.395
+
 
 ```
 
@@ -60,6 +61,5 @@ Communication / interaction radius is fixed to `2.0f` for all benchmarks, corres
 + Larger populations above this require multiple waves to complete, but spatial is non-linear
     + Larger environments have larger bin counts, PBM construction takes more time
     + local density can increase beyond initial values.
-        + Average message count over all steps is ~ 200 (see csv's)
-+ 0th iteration includes some one-time costs, otherwise its relatively stable over 100 iterations
++ 0th iteration includes some one-time costs, otherwise its relatively stable over 200 iterations
     + Once the model converges runtime changes based on how dense the densest areas are.
