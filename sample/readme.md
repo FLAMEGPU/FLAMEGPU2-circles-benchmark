@@ -8,7 +8,7 @@ The sample data in this folder was generated using:
 + CUDA 10.2.98
 + GCC 8.3.0
 + CentOS 7.9.2009
-+ FLAME GPU 2 @ [`d238333`](https://github.com/FLAMEGPU/FLAMEGPU2_dev/tree/d238333)
++ FLAME GPU 2 @ [`d238333`](https://github.com/FLAMEGPU/FLAMEGPU2/tree/d238333)
 
 
 ## Figures 

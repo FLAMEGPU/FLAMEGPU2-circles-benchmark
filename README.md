@@ -1,7 +1,7 @@
 # FLAMEGPU2 Circles Benchmark
 
 
-This repository contains performance benchmarking of a [FLAME GPU 2](https://github.com/FLAMEGPU/FLAMEGPU2_dev) implementation of the Circles agent based model at various population scales and densities.
+This repository contains performance benchmarking of a [FLAME GPU 2](https://github.com/FLAMEGPU/FLAMEGPU2) implementation of the Circles agent based model at various population scales and densities.
 
 In the Circles model is an abstract benchmark model which is used to evaluate neighbourhood search, with agents interacting with other agents within their local neighbourhood. 
 For a more complete description of the model, see:
@@ -37,7 +37,7 @@ The raw data in the [`sample/data`](sample/data) directory and the figures below
 + CUDA 10.2.98
 + GCC 8.3.0
 + CentOS 7.9.2009
-+ FLAME GPU 2 @ [`d238333`](https://github.com/FLAMEGPU/FLAMEGPU2_dev/tree/d238333)
++ FLAME GPU 2 @ [`d238333`](https://github.com/FLAMEGPU/FLAMEGPU2/tree/d238333)
 
 ### Fixed Density Benchmark
 
