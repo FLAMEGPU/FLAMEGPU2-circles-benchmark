@@ -26,6 +26,13 @@ Two experiments are carried out:
     + Environment Volume is varied upto `~ 500000` units of volume.
     + A single implementation is benchmarked
         + Spatial3D messaging with RTC (run time compilation)
++ Variable Communication Radius
+    + `circles_spatial3d_rtc` and `circles_bruteforce_rtc`
+    + Varied communication radius - shown on the X axis
+    + Model differentiated by marker
+    + Agent count is fixed at 64,000
+    + Environment width is fixed at 40
+    + Agent Density is `1.0f`
 
 The raw data in the [`sample/data`](sample/data) directory and the figures below were generated using:
 
@@ -44,7 +51,18 @@ The raw data in the [`sample/data`](sample/data) directory and the figures below
 ### Variable Density Benchmark
 [![variable-density volume](sample/figures/variable-density--volume--step-ms--density--3drtc.png)](sample/figures/variable-density--volume--step-ms--density--3drtc.png)
 
-## Dependencies
+The figure below was generated using:
+
++ Titan V 12GB
++ NVIDIA Driver 455.23.05
++ CUDA 10.2.89
++ GCC 7.5.0
++ Ubuntu 16.04.7 LTS
+
+### Variable Communication Radius Benchmark
+[![Variable Communication Radius Benchmark](sample/figures/comm-radius--lineplot-spatial3D-bruteforce-rtc-only.png)](sample/figures/comm-radius--lineplot-spatial3D-bruteforce-rtc-only.png)
+
+## Dependencies 
 
 + Model Compilation
     + [CMake](https://cmake.org/download/) `>= 3.18`

@@ -25,7 +25,9 @@ EXPECTED_CSV_FILES=[
     "fixed-density_perSimulationCSV.csv",
     "fixed-density_perStepPerSimulationCSV.csv",
     "variable-density_perSimulationCSV.csv",
-    "variable-density_perStepPerSimulationCSV.csv"
+    "variable-density_perStepPerSimulationCSV.csv",
+    "comm-radius_perSimulationCSV.csv",
+    "comm-radius_perStepPerSimulationCSV.csv"
 ]
 
 
@@ -197,6 +199,8 @@ def process_data(input_dataframes, verbose):
 
         grouped_df["env_volume"] = grouped_df["env_width"] * grouped_df["env_width"] * grouped_df["env_width"]
 
+        grouped_df["comm_radius_as_percentage_env_width"] = grouped_df["comm_radius"] / grouped_df["env_width"] * 100
+
         if verbose:
             print(f"output columns:")
             for column in grouped_df.columns:
@@ -251,6 +255,7 @@ MANUAL_PRETTY_CSV_KEY_MAP = {
     "agent_count": "Agent Count",
     "env_width": "Environment Width",
     "comm_radius": "Communication Radius",
+    "comm_radius_as_percentage_env_width": "Communication Radius as a Percentage of Environment Width (%)",
     "repeat": "Repeat",
     "agent_density": "Agent Density",
     "mean_message_count": "Average Message Count",
@@ -480,7 +485,7 @@ class PlotOptions:
                         print(f"writing figure to {output_filepath}")
                     fig.savefig(output_filepath, dpi=dpi, bbox_inches='tight')
                 except Exception as e:
-                    print(f"Error: could not write to {output_filepath}")
+                    print(f"Error: could not write to {output_filepath} with exception {e}")
                     return False
             else:
                 print(f"Error: {output_filepath} already exists. Specify a different `-o/--output-dir` or use `-f/--force`")
@@ -620,6 +625,44 @@ PLOTS_PER_CSV={
     ],
     "variable-density_perStepPerSimulationCSV.csv": [
 
+    ],
+    "comm-radius_perSimulationCSV.csv": [
+        PlotOptions(
+            filename="lineplot-spatial3D-bruteforce-rtc-only.png",
+            plot_type="lineplot",
+            xkey="comm_radius_as_percentage_env_width",
+            ykey="mean_ms_step_mean",
+            huekey="model",
+            stylekey="model",
+            df_query="model == 'circles_spatial3D_rtc' or model == 'circles_bruteforce_rtc'",
+            miny=-5,
+            maxy=130,
+            sns_palette=SEQUENTIAL_PALETTE
+        ),
+        PlotOptions(
+            filename="lineplot-spatial3D-rtc-only.png",
+            plot_type="lineplot",
+            xkey="comm_radius_as_percentage_env_width",
+            ykey="mean_ms_step_mean",
+            huekey="model",
+            stylekey="model",
+            df_query="model == 'circles_spatial3D_rtc'",
+            miny=-5,
+            maxy=130,
+            sns_palette=SEQUENTIAL_PALETTE
+        ),
+        PlotOptions(
+            filename="lineplot-bruteforce-rtc-only.png",
+            plot_type="lineplot",
+            xkey="comm_radius_as_percentage_env_width",
+            ykey="mean_ms_step_mean",
+            huekey="model",
+            stylekey="model",
+            df_query="model == 'circles_bruteforce_rtc'",
+            miny=-5,
+            maxy=130,
+            sns_palette=SEQUENTIAL_PALETTE
+        )
     ]
 }
 
