@@ -1,7 +1,7 @@
 # Sample Data and figures
 
 ## Data
-The sample data in this folder was generated using:
+The sample data for fixed and variable densities in this folder was generated using:
 
 + Tesla V100-SXM2-32GB
 + NVIDIA Driver 460.32.03
@@ -10,6 +10,13 @@ The sample data in this folder was generated using:
 + CentOS 7.9.2009
 + FLAME GPU 2 @ [`d238333`](https://github.com/FLAMEGPU/FLAMEGPU2/tree/d238333)
 
+The sample data for variable communication radius in this folder was generated using:
+
++ Titan V 12GB
++ NVIDIA Driver 455.23.05
++ CUDA 10.2.89
++ GCC 7.5.0
++ Ubuntu 16.04.7 LTS
 
 ## Figures 
 
@@ -23,7 +30,7 @@ Which output the following to `stdout`.
 ```
 fixed-density_perSimulationCSV.csv: max_ms_rtc 12919.013, mean_ms_rtc 118.152
 variable-density_perSimulationCSV.csv: max_ms_rtc 18.127, mean_ms_rtc 6.395
-
+comm-radius_perSimulationCSV.csv: max_ms_rtc 9264.425, mean_ms_rtc 210.166
 
 ```
 
@@ -47,9 +54,16 @@ The generated figures:
     + Varied density - shown by hue and marker
     + Varied volume - shown on the X axis
     + agent count is volume * density.
++ `figures/comm-radius--lineplot-spatial3D-bruteforce-rtc-only.png`
+    + `circles_spatial3d_rtc` and `circles_bruteforce_rtc`
+    + Varied communication radius - shown on the X axis
+    + Model differentiated by marker
+    + Agent count is fixed at 64,000
+    + Environment width is fixed at 40
+    + Agent Density is `1.0f`
 
 
-Communication / interaction radius is fixed to `2.0f` for all benchmarks, corresponding to a spherical volume of `~33.5`, and a moores neighbourhood of `216`?
+Communication / interaction radius is fixed to `2.0f` for fixed density and variable density benchmarks, corresponding to a spherical volume of `~33.5`, and a moores neighbourhood of `216`?
 
 
 ## Key points 

@@ -292,6 +292,51 @@ bool experiment_density_spatial(const custom_cli cli) {
     return success;
 }
 
+bool experiment_comm_radius(custom_cli cli){
+    // Name the experiment - this will end up in filenames/paths.
+    const std::string EXPERIMENT_LABEL="comm-radius";
+    
+    const uint32_t popSize = 64000;
+    const float ENV_WIDTH = 40.0f;  
+
+    const std::vector<float> comm_radii = {2.0f, 4.0f, 6.0f, 8.0f, 10.0f, 12.0f, 14.0f, 16.0f, 18.0f, 20.0f};
+
+    // Select the models to execute.
+    std::map<std::string, std::function<void(const RunSimulationInputs, RunSimulationOutputs&)>> MODELS = {
+        {std::string("circles_spatial3D"), run_circles_spatial3D},
+        {std::string("circles_spatial3D_rtc"), run_circles_spatial3D_rtc},
+        {std::string("circles_bruteforce"), run_circles_bruteforce},
+        {std::string("circles_bruteforce_rtc"), run_circles_bruteforce_rtc},
+    };
+
+    // Construct the vector of RunSimulationInputs to pass to the run_experiment method.
+    auto INPUTS_STRUCTS = std::vector<RunSimulationInputs>();
+    for(const auto& comm_radius : comm_radii ){
+        // Envwidth is scaled with population size.
+        INPUTS_STRUCTS.push_back({
+            cli.device,
+            cli.steps,
+            cli.seed,
+            popSize,
+            ENV_WIDTH,
+            comm_radius
+        });
+    }
+
+    // Run the experriment
+    bool success = run_experiment(
+        EXPERIMENT_LABEL,
+        cli.device,
+        cli.seed,
+        cli.repetitions,
+        INPUTS_STRUCTS,
+        MODELS,
+        cli.dry
+    );
+
+    return success;
+}
+
 
 int main(int argc, const char ** argv) {
     // Custom arg parsing, to prevent the current F2 arg parsing from occuring. 
@@ -308,9 +353,10 @@ int main(int argc, const char ** argv) {
     // Launch each experiment.
     bool success_1 = experiment_total_scale_all(cli);
     bool success_2 = experiment_density_spatial(cli);
+    bool success_3 = experiment_comm_radius(cli);
 
     // exit code
-    return success_1 && success_2 ? EXIT_SUCCESS : EXIT_FAILURE;
+    return success_1 && success_2 && success_3 ? EXIT_SUCCESS : EXIT_FAILURE;
 }
 
 /* 
