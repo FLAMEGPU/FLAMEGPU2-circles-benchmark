@@ -3,7 +3,7 @@
 #include <chrono>
 #include <ctime>
 
-#include "flamegpu/flame_api.h"
+#include "flamegpu/flamegpu.h"
 #include "common.cuh"
 #include "util.cuh"
 

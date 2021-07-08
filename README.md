@@ -81,7 +81,7 @@ cmake --build build -j`nproc`
 
 ```
 cd build
-FLAMEGPU2_INC_DIR=./_deps/flamegpu2-src/include/ ./bin/linux-x64/Release/circles-benchmarking 
+FLAMEGPU2_INC_DIR=./_deps/flamegpu2-src/include/ ./bin/Release/circles-benchmarking 
 # Generte plots
 ```
 

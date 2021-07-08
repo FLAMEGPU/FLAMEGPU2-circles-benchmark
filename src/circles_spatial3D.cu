@@ -1,19 +1,19 @@
 #include <algorithm>
 
-#include "flamegpu/flame_api.h"
+#include "flamegpu/flamegpu.h"
 #include "common.cuh"
 
 namespace {
 
-FLAMEGPU_AGENT_FUNCTION(output_message, MsgNone, MsgSpatial3D) {
+FLAMEGPU_AGENT_FUNCTION(output_message, flamegpu::MsgNone, flamegpu::MsgSpatial3D) {
     FLAMEGPU->message_out.setVariable<int>("id", FLAMEGPU->getVariable<int>("id"));
     FLAMEGPU->message_out.setLocation(
         FLAMEGPU->getVariable<float>("x"),
         FLAMEGPU->getVariable<float>("y"),
         FLAMEGPU->getVariable<float>("z"));
-    return ALIVE;
+    return flamegpu::ALIVE;
 }
-FLAMEGPU_AGENT_FUNCTION(move, MsgSpatial3D, MsgNone) {
+FLAMEGPU_AGENT_FUNCTION(move, flamegpu::MsgSpatial3D, flamegpu::MsgNone) {
     const int ID = FLAMEGPU->getVariable<int>("id");
     const float REPULSE_FACTOR = FLAMEGPU->environment.getProperty<float>("repulse");
     const float RADIUS = FLAMEGPU->message_in.radius();
@@ -59,7 +59,7 @@ FLAMEGPU_AGENT_FUNCTION(move, MsgSpatial3D, MsgNone) {
 #endif
     float totalMessageCount = FLAMEGPU->getVariable<float>("totalMessageCount");
     FLAMEGPU->setVariable<float>("totalMessageCount", totalMessageCount + messageCount);
-    return ALIVE;
+    return flamegpu::ALIVE;
 }
 static float meanMessageCount = 0.f;
 FLAMEGPU_EXIT_FUNCTION(getMeanMessageCount) {
@@ -90,7 +90,7 @@ FLAMEGPU_STEP_FUNCTION(Validation) {
 
 // Run an individual simulation, using 
 void run_circles_spatial3D(const RunSimulationInputs runInputs, RunSimulationOutputs &runOutputs){
-    ModelDescription model("circles_spatial3D");
+    flamegpu::ModelDescription model("circles_spatial3D");
     // Calculate environment bounds.
     const float ENV_WIDTH = runInputs.ENV_WIDTH;
     const float ENV_MIN = -0.5 * ENV_WIDTH;
@@ -98,14 +98,14 @@ void run_circles_spatial3D(const RunSimulationInputs runInputs, RunSimulationOut
     // Compute the actual density and return it.
     runOutputs.agentDensity = runInputs.AGENT_COUNT / (ENV_WIDTH * ENV_WIDTH * ENV_WIDTH);
     {   // Location message
-        MsgSpatial3D::Description &message = model.newMessage<MsgSpatial3D>("location");
+        flamegpu::MsgSpatial3D::Description &message = model.newMessage<flamegpu::MsgSpatial3D>("location");
         message.newVariable<int>("id");
         message.setRadius(runInputs.COMM_RADIUS);
         message.setMin(ENV_MIN, ENV_MIN, ENV_MIN);
         message.setMax(ENV_MAX, ENV_MAX, ENV_MAX);
     }
     {   // Circle agent
-        AgentDescription &agent = model.newAgent("Circle");
+        flamegpu::AgentDescription &agent = model.newAgent("Circle");
         agent.newVariable<int>("id");
         agent.newVariable<float>("x");
         agent.newVariable<float>("y");
@@ -120,7 +120,7 @@ void run_circles_spatial3D(const RunSimulationInputs runInputs, RunSimulationOut
 
     // Global environment variables.
     {
-        EnvironmentDescription &env = model.Environment();
+        flamegpu::EnvironmentDescription &env = model.Environment();
         env.newProperty("repulse", ENV_REPULSE);
     }
 
@@ -135,16 +135,16 @@ void run_circles_spatial3D(const RunSimulationInputs runInputs, RunSimulationOut
 #endif  // CIRCLES_VALIDATION
 
     {   // Layer #1
-        LayerDescription &layer = model.newLayer();
+        flamegpu::LayerDescription &layer = model.newLayer();
         layer.addAgentFunction(output_message);
     }
     {   // Layer #2
-        LayerDescription &layer = model.newLayer();
+        flamegpu::LayerDescription &layer = model.newLayer();
         layer.addAgentFunction(move);
     }
 
     // Create the simulation object
-    CUDASimulation simulation(model);
+    flamegpu::CUDASimulation simulation(model);
 
     // Set config configuraiton properties 
     simulation.SimulationConfig().timing = false;
@@ -156,9 +156,9 @@ void run_circles_spatial3D(const RunSimulationInputs runInputs, RunSimulationOut
     // Generate the initial population
     std::default_random_engine rng(runInputs.HOST_SEED);
     std::uniform_real_distribution<float> dist(ENV_MIN, ENV_MAX);
-    AgentVector population(model.Agent("Circle"), runInputs.AGENT_COUNT);
+    flamegpu::AgentVector population(model.Agent("Circle"), runInputs.AGENT_COUNT);
     for (unsigned int i = 0; i < runInputs.AGENT_COUNT; i++) {
-        AgentVector::Agent instance = population[i];
+        flamegpu::AgentVector::Agent instance = population[i];
         instance.setVariable<int>("id", i);
         instance.setVariable<float>("x", dist(rng));
         instance.setVariable<float>("y", dist(rng));
