@@ -5,7 +5,7 @@
 
 namespace {
 
-FLAMEGPU_AGENT_FUNCTION(output_message, flamegpu::MsgNone, flamegpu::MsgSpatial3D) {
+FLAMEGPU_AGENT_FUNCTION(output_message, flamegpu::MessageNone, flamegpu::MessageSpatial3D) {
     FLAMEGPU->message_out.setVariable<int>("id", FLAMEGPU->getVariable<int>("id"));
     FLAMEGPU->message_out.setLocation(
         FLAMEGPU->getVariable<float>("x"),
@@ -13,7 +13,7 @@ FLAMEGPU_AGENT_FUNCTION(output_message, flamegpu::MsgNone, flamegpu::MsgSpatial3
         FLAMEGPU->getVariable<float>("z"));
     return flamegpu::ALIVE;
 }
-FLAMEGPU_AGENT_FUNCTION(move, flamegpu::MsgSpatial3D, flamegpu::MsgNone) {
+FLAMEGPU_AGENT_FUNCTION(move, flamegpu::MessageSpatial3D, flamegpu::MessageNone) {
     const int ID = FLAMEGPU->getVariable<int>("id");
     const float REPULSE_FACTOR = FLAMEGPU->environment.getProperty<float>("repulse");
     const float RADIUS = FLAMEGPU->message_in.radius();
@@ -98,7 +98,7 @@ void run_circles_spatial3D(const RunSimulationInputs runInputs, RunSimulationOut
     // Compute the actual density and return it.
     runOutputs.agentDensity = runInputs.AGENT_COUNT / (ENV_WIDTH * ENV_WIDTH * ENV_WIDTH);
     {   // Location message
-        flamegpu::MsgSpatial3D::Description &message = model.newMessage<flamegpu::MsgSpatial3D>("location");
+        flamegpu::MessageSpatial3D::Description &message = model.newMessage<flamegpu::MessageSpatial3D>("location");
         message.newVariable<int>("id");
         message.setRadius(runInputs.COMM_RADIUS);
         message.setMin(ENV_MIN, ENV_MIN, ENV_MIN);

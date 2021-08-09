@@ -5,7 +5,7 @@
 
 namespace {
 const char * output_message = R"###(
-FLAMEGPU_AGENT_FUNCTION(output_message, flamegpu::MsgNone, flamegpu::MsgBruteForce) {
+FLAMEGPU_AGENT_FUNCTION(output_message, flamegpu::MessageNone, flamegpu::MessageBruteForce) {
     FLAMEGPU->message_out.setVariable<int>("id", FLAMEGPU->getVariable<int>("id"));
     FLAMEGPU->message_out.setVariable<float>("x", FLAMEGPU->getVariable<float>("x"));
     FLAMEGPU->message_out.setVariable<float>("y", FLAMEGPU->getVariable<float>("y"));
@@ -15,7 +15,7 @@ FLAMEGPU_AGENT_FUNCTION(output_message, flamegpu::MsgNone, flamegpu::MsgBruteFor
 )###";
 
 const char * move = R"###(
-FLAMEGPU_AGENT_FUNCTION(move, flamegpu::MsgBruteForce, flamegpu::MsgNone) {
+FLAMEGPU_AGENT_FUNCTION(move, flamegpu::MessageBruteForce, flamegpu::MessageNone) {
     const int ID = FLAMEGPU->getVariable<int>("id");
     const float REPULSE_FACTOR = FLAMEGPU->environment.getProperty<float>("repulse");
     const float RADIUS = FLAMEGPU->environment.getProperty<float>("radius");
@@ -89,7 +89,7 @@ void run_circles_bruteforce_rtc(const RunSimulationInputs runInputs, RunSimulati
     runOutputs.agentDensity = runInputs.AGENT_COUNT / (ENV_WIDTH * ENV_WIDTH * ENV_WIDTH);
 
     {   // Location message
-        flamegpu::MsgBruteForce::Description &message = model.newMessage<flamegpu::MsgBruteForce>("location");
+        flamegpu::MessageBruteForce::Description &message = model.newMessage<flamegpu::MessageBruteForce>("location");
         message.newVariable<int>("id");
         message.newVariable<float>("x");
         message.newVariable<float>("y");
