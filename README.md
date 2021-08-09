@@ -1,6 +1,5 @@
 # FLAMEGPU2 Circles Benchmark
 
-
 This repository contains performance benchmarking of a [FLAME GPU 2](https://github.com/FLAMEGPU/FLAMEGPU2) implementation of the Circles agent based model at various population scales and densities.
 
 In the Circles model is an abstract benchmark model which is used to evaluate neighbourhood search, with agents interacting with other agents within their local neighbourhood. 
@@ -50,15 +49,16 @@ The raw data in the [`sample/data`](sample/data) directory and the figures below
 ## Dependencies 
 
 + Model Compilation
-    + [CMake](https://cmake.org/) `>= 3.15`
-    + [CUDA Toolkit](https://developer.nvidia.com/cuda-toolkit) `>= 10.0`
-    + [git](https://git-scm.com/) (Used for dependency management)
-    + *Linux:*
-    + [make](https://www.gnu.org/software/make/)
-        + gcc/g++ `>= 7` (version requirements [here](https://docs.nvidia.com/cuda/cuda-installation-guide-linux/index.html#system-requirements))
-    + *Windows:*
-        + Visual Studio 2019
-        + CUDA `>= 11.0` recommended
+    + [CMake](https://cmake.org/download/) `>= 3.18`
+        + CMake `>= 3.15` currently works, but support will be dropped in a future release.
+    + [CUDA](https://developer.nvidia.com/cuda-downloads) `>= 11.0` and a Compute Capability `>= 3.5` NVIDIA GPU.
+        + CUDA `>= 10.0` currently works, but support will be dropped in a future release.
+    + C++17 capable C++ compiler (host), compatible with the installed CUDA version
+        + [Microsoft Visual Studio 2019](https://visualstudio.microsoft.com/) (Windows)
+        + [make](https://www.gnu.org/software/make/) and either [GCC](https://gcc.gnu.org/) `>= 7` or [Clang](https://clang.llvm.org/) `>= 5` (Linux)
+        + Older C++ compilers which support C++14 may currently work, but support will be dropped in a future release.
+    + [git](https://git-scm.com/)
+
 + Plotting
     + Python 3
     + numpy
