@@ -2,13 +2,12 @@
 
 This repository contains performance benchmarking of a [FLAME GPU 2](https://github.com/FLAMEGPU/FLAMEGPU2) implementation of the Circles agent based model at various population scales and densities.
 
-In the Circles model is an abstract benchmark model which is used to evaluate neighbourhood search, with agents interacting with other agents within their local neighbourhood. 
+In the Circles model is an abstract benchmark model which is used to evaluate neighbourhood search, with agents interacting with other agents within their local neighbourhood.
 For a more complete description of the model, see:
 
 [Chisholm, Robert, Paul Richmond, and Steve Maddock. "A standardised benchmark for assessing the performance of fixed radius near neighbours." European Conference on Parallel Processing. Springer, Cham, 2016.](https://doi.org/10.1007/978-3-319-58943-5_25), ([pdf](https://eprints.whiterose.ac.uk/104079/1/paper.pdf)).
 
-## Benchmark Results 
-
+## Benchmark Results
 
 Two experiments are carried out:
 
@@ -28,7 +27,6 @@ Two experiments are carried out:
     + A single implementation is benchmarked
         + Spatial3D messaging with RTC (run time compilation)
 
-
 The raw data in the [`sample/data`](sample/data) directory and the figures below were generated using:
 
 + Tesla V100-SXM2-32GB
@@ -46,40 +44,39 @@ The raw data in the [`sample/data`](sample/data) directory and the figures below
 ### Variable Density Benchmark
 [![variable-density volume](sample/figures/variable-density--volume--step-ms--density--3drtc.png)](sample/figures/variable-density--volume--step-ms--density--3drtc.png)
 
-## Dependencies 
+## Dependencies
 
 + Model Compilation
     + [CMake](https://cmake.org/download/) `>= 3.18`
-        + CMake `>= 3.15` currently works, but support will be dropped in a future release.
     + [CUDA](https://developer.nvidia.com/cuda-downloads) `>= 11.0` and a Compute Capability `>= 3.5` NVIDIA GPU.
         + CUDA `>= 10.0` currently works, but support will be dropped in a future release.
     + C++17 capable C++ compiler (host), compatible with the installed CUDA version
         + [Microsoft Visual Studio 2019](https://visualstudio.microsoft.com/) (Windows)
-        + [make](https://www.gnu.org/software/make/) and either [GCC](https://gcc.gnu.org/) `>= 7` or [Clang](https://clang.llvm.org/) `>= 5` (Linux)
+        + [make](https://www.gnu.org/software/make/) and [GCC](https://gcc.gnu.org/) `>= 7` (Linux)
         + Older C++ compilers which support C++14 may currently work, but support will be dropped in a future release.
     + [git](https://git-scm.com/)
 
 + Plotting
-    + Python 3
-    + numpy
-    + pandas
-    + matplotlib
-    + seaborn
+    + Python `>= 3.6`
+    + `numpy`
+    + `pandas`
+    + `matplotlib`
+    + `seaborn`
+
 ## Running the Benchmark
 
 ### Compilation via Cmake
 
 These instructions are for execution on Volta (`SM_70`) GPUs under linux.
 
-```
+```bash
 cmake . -B build -DCMAKE_BUILD_TYPE=Release -DSEATBELTS=OFF -DBUILD_SWIG_PYTHON=OFF -DCUDA_ARCH=70
 cmake --build build -j`nproc` 
 ```
 
-
 ### Execution / Data generation
 
-```
+```bash
 cd build
 FLAMEGPU2_INC_DIR=./_deps/flamegpu2-src/include/ ./bin/Release/circles-benchmarking 
 # Generte plots
@@ -89,7 +86,7 @@ This will produce 4 `.csv` files in the `build` directory.
 
 ### Data plotting.
 
-```
+```bash
 cd build
 python3 ../plot.py . -o figures
 ```
@@ -98,6 +95,6 @@ This will generate figures in `build/figures`
 
 The sample figures were generated from the root directory using
 
-```
+```bash
 python3 plot.py sample/data/ -o sample/data-figures
 ```
