@@ -153,12 +153,12 @@ void run_circles_spatial3D_rtc(const RunSimulationInputs runInputs, RunSimulatio
     // Set config configuraiton properties 
     simulation.SimulationConfig().timing = false;
     simulation.SimulationConfig().verbose = false;
-    simulation.SimulationConfig().random_seed = runInputs.HOST_SEED;  // @todo device seed != host seed? 
+    simulation.SimulationConfig().random_seed = runInputs.SEED;
     simulation.SimulationConfig().steps = runInputs.STEPS;
     simulation.CUDAConfig().device_id = runInputs.CUDA_DEVICE;
 
     // Generate the initial population
-    std::default_random_engine rng(runInputs.HOST_SEED);
+    std::mt19937_64 rng(runInputs.SEED);
     std::uniform_real_distribution<float> dist(ENV_MIN, ENV_MAX);
     flamegpu::AgentVector population(model.Agent("Circle"), runInputs.AGENT_COUNT);
     for (unsigned int i = 0; i < runInputs.AGENT_COUNT; i++) {

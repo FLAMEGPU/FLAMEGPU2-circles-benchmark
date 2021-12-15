@@ -7,7 +7,6 @@
 #include "common.cuh"
 #include "util.cuh"
 
-#define SEED_PRIME 97
 #define DRY_RUN 0
 
 // Prototypes for methods from other .cu files
@@ -20,7 +19,6 @@ void run_circles_spatial3D_rtc(const RunSimulationInputs runInputs, RunSimulatio
 bool run_experiment(
     const std::string LABEL,
     const int DEVICE,
-    const uint64_t SEED,
     const uint32_t REPETITIONS,
     std::vector<RunSimulationInputs> INPUTS_STRUCTS,
     std::map<std::string, std::function<void(const RunSimulationInputs, RunSimulationOutputs&)>> MODELS,
@@ -86,7 +84,7 @@ bool run_experiment(
                 const RunSimulationInputs runInputs = {
                     DEVICE,
                     inputStruct.STEPS, 
-                    inputStruct.HOST_SEED + (repeatIdx * SEED_PRIME), // Mutate the seed.
+                    inputStruct.SEED + repeatIdx,
                     inputStruct.AGENT_COUNT, 
                     inputStruct.ENV_WIDTH,
                     inputStruct.COMM_RADIUS
@@ -211,7 +209,6 @@ bool experiment_total_scale_all(custom_cli cli){
     bool success = run_experiment(
         EXPERIMENT_LABEL,
         cli.device,
-        cli.seed,
         cli.repetitions,
         INPUTS_STRUCTS,
         MODELS,
@@ -282,7 +279,6 @@ bool experiment_density_spatial(const custom_cli cli) {
     bool success = run_experiment(
         EXPERIMENT_LABEL,
         cli.device,
-        cli.seed,
         cli.repetitions,
         INPUTS_STRUCTS,
         MODELS,
@@ -327,7 +323,6 @@ bool experiment_comm_radius(custom_cli cli){
     bool success = run_experiment(
         EXPERIMENT_LABEL,
         cli.device,
-        cli.seed,
         cli.repetitions,
         INPUTS_STRUCTS,
         MODELS,
