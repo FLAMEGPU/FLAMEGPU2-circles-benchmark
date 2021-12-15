@@ -335,15 +335,7 @@ bool experiment_comm_radius(custom_cli cli){
 
 int main(int argc, const char ** argv) {
     // Custom arg parsing, to prevent the current F2 arg parsing from occuring. 
-    // @todo - improve arg parsing within F2. 
     custom_cli cli = parse_custom_cli(argc, argv);
-
-    // Deal with the CSV output directory and abort if neccesary.
-    printf("@todo - output dir via cli (and use it).\n");
-    if(false){
-        fprintf(stderr, "bad output directory? @todo\n");
-        return EXIT_FAILURE;
-    }
 
     // Launch each experiment.
     bool success_1 = experiment_total_scale_all(cli);
@@ -353,28 +345,3 @@ int main(int argc, const char ** argv) {
     // exit code
     return success_1 && success_2 && success_3 ? EXIT_SUCCESS : EXIT_FAILURE;
 }
-
-/* 
-// Todo:
-+ [x] Change the order of loops so pops are first, toa llow early exit.
-+ [x] RTC bruteforce
-+ [ ] Move pop gen to init fn? so it gets timed? Agent vec in init would be good.
-+ [x] RTC Spatial
-+ [ ] Output to a specified directory (which may or may not exist?)
-+ [ ] Better error checking. 
-    + [ ] if a simulation throws an exception?
-    + [ ] If could not create the csv file
-+ [x] Plotting (.py)
-+ [x] Headless plotting.
-+ [x] density experiment
-+ [ ] Individual visualistion
-+ [ ] Comments
-+ [x] Seeding?
-+ [ ] readme
-+ [ ] Check initialisation 
-+ [ ] Decide on parameters to use, number of reps
-+ [x] V100 (bessemer) script(s) / trial run. Don't commit these to the public rpo.
-+ [ ] limit the scale of some simulators - i.e. bruteforce cpp is horribly slow, so don't push the pops as far. 
-+ [x] Have each agent store the message count it read. Exit fn that reduces theses and adds min/max/mean to the output data and CSVs. This might be useful
-+ [ ]actual device poower state warmup? Maybe run the 0th sim twice and only use the second one?
-*/

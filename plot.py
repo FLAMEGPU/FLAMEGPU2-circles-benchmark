@@ -232,12 +232,8 @@ def store_processed_data(input_dataframes, processed_dataframes, output_dir, for
                 success = False
 
     # Print out some key values to stdout.
-
-    # @todo - write to a summary txt file in the output dir, and / or stdout.
     for csv_name, input_df in input_dataframes.items():
-
         # Get the max rtc time from the input file, and also output the mean too for good measure.
-        # @todo - might be better to have a threshold cutoff?
         if "s_rtc" in input_df: 
             max_s_rtc = input_df["s_rtc"].max()
             mean_s_rtc = input_df["s_rtc"].mean()
@@ -382,7 +378,6 @@ class PlotOptions:
 
         g = None
         if self.plot_type == "lineplot":
-            # plot the data @todo - lineplot vs scatter?
             g = sns.lineplot(
                 data=df, 
                 x=self.xkey, 
@@ -445,7 +440,6 @@ class PlotOptions:
             if external_legend:
                 # Set legend placement if not internal.
                 loc = "upper left"
-                # @todo - y offset should be LEGNED_BORDER_PAD trasnformed from font units to bbox.
                 bbox_to_anchor = (1, 1 - self.legend_y_offset)
 
             # Get the handles and labels for the legend
@@ -684,8 +678,6 @@ def plot_figures(processed_dataframes, output_dir, dpi, force, show, verbose):
     
 
 def main():
-    # @todo - print some key info to stdout to complement the data? i.e. RTC time? This can just be fetched from the input csv.
-
     # Process the cli
     args = cli()
     # Validate cli
