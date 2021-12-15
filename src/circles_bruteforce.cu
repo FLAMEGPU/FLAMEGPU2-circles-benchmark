@@ -154,13 +154,13 @@ void run_circles_bruteforce(const RunSimulationInputs runInputs, RunSimulationOu
     simulation.simulate();
 
     // Store timing information for later use.
-    runOutputs.ms_rtc = simulation.getElapsedTimeRTCInitialisation();
-    runOutputs.ms_simulation = simulation.getElapsedTimeSimulation();
-    runOutputs.ms_init = simulation.getElapsedTimeInitFunctions();
-    runOutputs.ms_exit = simulation.getElapsedTimeExitFunctions();
+    runOutputs.s_rtc = simulation.getElapsedTimeRTCInitialisation();
+    runOutputs.s_simulation = simulation.getElapsedTimeSimulation();
+    runOutputs.s_init = simulation.getElapsedTimeInitFunctions();
+    runOutputs.s_exit = simulation.getElapsedTimeExitFunctions();
     
-    std::vector<float> ms_steps = simulation.getElapsedTimeSteps();
-    runOutputs.ms_per_step = std::make_shared<std::vector<float>>(std::vector<float>(ms_steps.begin(), ms_steps.end()));
-    runOutputs.ms_stepMean = std::accumulate(ms_steps.begin(), ms_steps.end(), 0.f) / (float)simulation.getStepCounter();
+    std::vector<double> s_steps = simulation.getElapsedTimeSteps();
+    runOutputs.s_per_step = std::make_shared<std::vector<double>>(std::vector<double>(s_steps.begin(), s_steps.end()));
+    runOutputs.s_stepMean = std::accumulate(s_steps.begin(), s_steps.end(), 0.f) / (double)simulation.getStepCounter();
     runOutputs.mean_messageCount = runInputs.AGENT_COUNT;
 }

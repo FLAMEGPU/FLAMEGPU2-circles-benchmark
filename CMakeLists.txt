@@ -5,7 +5,7 @@ project(circles-benchmarking CUDA CXX)
 
 # Optionaly set the version of flamegpu which should be used.
 # Use a branch name such as `master`, or a tagged version such as `v2.0.0-alpha` 
-set(FLAMEGPU_VERSION "v2.0.0-alpha.1" CACHE STRING "Git branch or tag to use")
+set(FLAMEGPU_VERSION "v2.0.0-alpha.2" CACHE STRING "Git branch or tag to use")
 
 # Our core dependency is FLAMEGPU2 lib, first lets find it
 include(${CMAKE_CURRENT_LIST_DIR}/cmake/flamegpu2.cmake)

@@ -33,10 +33,10 @@ EXPECTED_CSV_FILES=[
 
 
 # input cols for per step per sim
-# GPU,release_mode,seatbelts_on,model,steps,agent_count,env_width,comm_radius,repeat,agent_density,step,ms_step
+# GPU,release_mode,seatbelts_on,model,steps,agent_count,env_width,comm_radius,repeat,agent_density,step,s_step
 
 # Input cols for per sim.
-# GPU,release_mode,seatbelts_on,model,steps,agent_count,env_width,comm_radius,repeat,agent_density,mean_message_count,ms_rtc,ms_simulation,ms_init,ms_exit,ms_step_mean
+# GPU,release_mode,seatbelts_on,model,steps,agent_count,env_width,comm_radius,repeat,agent_density,mean_message_count,s_rtc,s_simulation,s_init,s_exit,s_step_mean
 
 # input csv columns which identify a row as a duplicate of another repetition for aggregation, for per-step per-sim csvs
 GROUP_BY_COLUMNS_PER_STEP_PER_SIM = ["GPU","release_mode","seatbelts_on","model","steps","agent_count","env_width","comm_radius","step"]
@@ -48,18 +48,18 @@ GROUP_BY_COLUMNS_PER_SIM = ["GPU","release_mode","seatbelts_on","model","steps",
 # Aggregate operations to apply across grouped csv rows, for the per-step per-sim csvs
 AGGREGATIONS_PER_STEP_PER_SIM = {
     'agent_density': ['mean'],
-    'ms_step': ['mean'],
+    's_step': ['mean'],
 }
 
 # Aggregate operations to apply across grouped csv rows, for the per-sim csvs
 AGGREGATIONS_PER_SIM = {
     'agent_density': ['mean'],
     'mean_message_count': ['mean'],
-    'ms_rtc': ['mean'],
-    'ms_simulation': ['mean'],
-    'ms_init': ['mean'],
-    'ms_exit': ['mean'],
-    'ms_step_mean': ['mean'],
+    's_rtc': ['mean'],
+    's_simulation': ['mean'],
+    's_init': ['mean'],
+    's_exit': ['mean'],
+    's_step_mean': ['mean'],
 }
 
 
@@ -238,10 +238,10 @@ def store_processed_data(input_dataframes, processed_dataframes, output_dir, for
 
         # Get the max rtc time from the input file, and also output the mean too for good measure.
         # @todo - might be better to have a threshold cutoff?
-        if "ms_rtc" in input_df: 
-            max_ms_rtc = input_df["ms_rtc"].max()
-            mean_ms_rtc = input_df["ms_rtc"].mean()
-            print(f"{csv_name}: max_ms_rtc {max_ms_rtc:.3f}, mean_ms_rtc {mean_ms_rtc:.3f}")
+        if "s_rtc" in input_df: 
+            max_s_rtc = input_df["s_rtc"].max()
+            mean_s_rtc = input_df["s_rtc"].mean()
+            print(f"{csv_name}: max_s_rtc {max_s_rtc:.3f}, mean_s_rtc {mean_s_rtc:.3f}")
 
     return success
 
@@ -259,18 +259,18 @@ MANUAL_PRETTY_CSV_KEY_MAP = {
     "repeat": "Repeat",
     "agent_density": "Agent Density",
     "mean_message_count": "Average Message Count",
-    "ms_rtc": "RTC Time (ms)",
-    "ms_simulation": "Simulation Time (ms)",
-    "ms_init": "Init Function Time (ms)",
-    "ms_exit": "Exit Function Time (ms)",
-    "ms_step_mean": "Average Step Time (ms)",
-    "ms_step": "Step Time (ms)",
-    "mean_ms_rtc": "Average RTC Time (ms)",
-    "mean_ms_simulation": "Average Simulation Time (ms)",
-    "mean_ms_init": "Average Init Function Time (ms)",
-    "mean_ms_exit": "Average Exit Function Time (ms)",
-    "mean_ms_step_mean": "Average Step Time (ms)",
-    "mean_ms_step": "Average Step Time (ms)",
+    "s_rtc": "RTC Time (s)",
+    "s_simulation": "Simulation Time (s)",
+    "s_init": "Init Function Time (s)",
+    "s_exit": "Exit Function Time (s)",
+    "s_step_mean": "Average Step Time (s)",
+    "s_step": "Step Time (s)",
+    "mean_s_rtc": "Average RTC Time (s)",
+    "mean_s_simulation": "Average Simulation Time (s)",
+    "mean_s_init": "Average Init Function Time (s)",
+    "mean_s_exit": "Average Exit Function Time (s)",
+    "mean_s_step_mean": "Average Step Time (s)",
+    "mean_s_step": "Average Step Time (s)",
     "mean_agent_density": "Agent Density",
     "env_volume": "Environment Volume",
 }
@@ -505,10 +505,10 @@ PLOTS_PER_CSV={
     # No need for sequential colour pallete 
     "fixed-density_perSimulationCSV.csv": [
         PlotOptions(
-            filename="volume--step-ms--model--all.png",
+            filename="volume--step-s--model--all.png",
             plot_type="lineplot",
             xkey="env_volume",
-            ykey="mean_ms_step_mean",
+            ykey="mean_s_step_mean",
             huekey="model",
             stylekey="model",
             sns_palette=QUALITATIVE_PALETTE,
@@ -516,10 +516,10 @@ PLOTS_PER_CSV={
             miny=0
         ),
         PlotOptions(
-            filename="volume--step-ms--model--zoomed.png",
+            filename="volume--step-s--model--zoomed.png",
             plot_type="lineplot",
             xkey="env_volume",
-            ykey="mean_ms_step_mean",
+            ykey="mean_s_step_mean",
             huekey="model",
             stylekey="model",
             sns_palette=QUALITATIVE_PALETTE,
@@ -542,10 +542,10 @@ PLOTS_PER_CSV={
         #     maxy=1000,
         # ),
         PlotOptions(
-            filename="agent_count--step-ms--model--all.png",
+            filename="agent_count--step-s--model--all.png",
             plot_type="lineplot",
             xkey="agent_count",
-            ykey="mean_ms_step_mean",
+            ykey="mean_s_step_mean",
             huekey="model",
             stylekey="model",
             sns_palette=QUALITATIVE_PALETTE,
@@ -553,10 +553,10 @@ PLOTS_PER_CSV={
             miny=0
         ),
         PlotOptions(
-            filename="agent_count--step-ms--model--zoomed.png",
+            filename="agent_count--step-s--model--zoomed.png",
             plot_type="lineplot",
             xkey="agent_count",
-            ykey="mean_ms_step_mean",
+            ykey="mean_s_step_mean",
             huekey="model",
             stylekey="model",
             sns_palette=QUALITATIVE_PALETTE,
@@ -581,10 +581,10 @@ PLOTS_PER_CSV={
     ],
     "fixed-density_perStepPerSimulationCSV.csv": [
         # PlotOptions(
-        #     filename="scatterplot--step--mean_ms_step--volume--volume--spatial3D-rtc-only.png",
+        #     filename="scatterplot--step--mean_s_step--volume--volume--spatial3D-rtc-only.png",
         #     plot_type="scatterplot",
         #     xkey="step",
-        #     ykey="mean_ms_step",
+        #     ykey="mean_s_step",
         #     huekey="env_volume",
         #     stylekey="env_volume",
         #     df_query="model == 'circles_spatial3D_rtc'",
@@ -596,27 +596,27 @@ PLOTS_PER_CSV={
         # PlotOptions(
         #     plot_type="lineplot",
         #     xkey="agent_count",
-        #     ykey="mean_ms_step_mean",
+        #     ykey="mean_s_step_mean",
         #     huekey="env_volume",
         #     stylekey="env_volume",
         #     df_query="model == 'circles_spatial3D_rtc'",
         #     sns_palette=SEQUENTIAL_PALETTE,
         # ),
         PlotOptions(
-            filename="volume--step-ms--density--3drtc.png",
+            filename="volume--step-s--density--3drtc.png",
             plot_type="lineplot",
             xkey="env_volume",
-            ykey="mean_ms_step_mean",
+            ykey="mean_s_step_mean",
             huekey="mean_agent_density",
             stylekey="mean_agent_density",
             df_query="model == 'circles_spatial3D_rtc'",
             sns_palette=SEQUENTIAL_PALETTE,
         ),
         PlotOptions(
-            filename="densit--step-ms--volume--3drtc.png",
+            filename="densit--step-s--volume--3drtc.png",
             plot_type="lineplot",
             xkey="mean_agent_density",
-            ykey="mean_ms_step_mean",
+            ykey="mean_s_step_mean",
             huekey="env_volume",
             stylekey="env_volume",
             df_query="model == 'circles_spatial3D_rtc'",
@@ -631,7 +631,7 @@ PLOTS_PER_CSV={
             filename="lineplot-spatial3D-bruteforce-rtc-only.png",
             plot_type="lineplot",
             xkey="comm_radius_as_percentage_env_width",
-            ykey="mean_ms_step_mean",
+            ykey="mean_s_step_mean",
             huekey="model",
             stylekey="model",
             df_query="model == 'circles_spatial3D_rtc' or model == 'circles_bruteforce_rtc'",
@@ -643,7 +643,7 @@ PLOTS_PER_CSV={
             filename="lineplot-spatial3D-rtc-only.png",
             plot_type="lineplot",
             xkey="comm_radius_as_percentage_env_width",
-            ykey="mean_ms_step_mean",
+            ykey="mean_s_step_mean",
             huekey="model",
             stylekey="model",
             df_query="model == 'circles_spatial3D_rtc'",
@@ -655,7 +655,7 @@ PLOTS_PER_CSV={
             filename="lineplot-bruteforce-rtc-only.png",
             plot_type="lineplot",
             xkey="comm_radius_as_percentage_env_width",
-            ykey="mean_ms_step_mean",
+            ykey="mean_s_step_mean",
             huekey="model",
             stylekey="model",
             df_query="model == 'circles_bruteforce_rtc'",
