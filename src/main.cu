@@ -45,11 +45,11 @@ bool run_experiment(
 
     // Output the CSV header for each output CSV file.
     if (fp_perSimulationCSV) {
-        fprintf(fp_perSimulationCSV, "GPU,release_mode,seatbelts_on,model,steps,agent_count,env_width,comm_radius,repeat,agent_density,mean_message_count,ms_rtc,ms_simulation,ms_init,ms_exit,ms_step_mean\n");
+        fprintf(fp_perSimulationCSV, "GPU,release_mode,seatbelts_on,model,steps,agent_count,env_width,comm_radius,repeat,agent_density,mean_message_count,s_rtc,s_simulation,s_init,s_exit,s_step_mean\n");
     }
         
     if (fp_perStepPerSimulationCSV) {
-        fprintf(fp_perStepPerSimulationCSV, "GPU,release_mode,seatbelts_on,model,steps,agent_count,env_width,comm_radius,repeat,agent_density,step,ms_step\n");
+        fprintf(fp_perStepPerSimulationCSV, "GPU,release_mode,seatbelts_on,model,steps,agent_count,env_width,comm_radius,repeat,agent_density,step,s_step\n");
     }
 
 
@@ -108,16 +108,16 @@ bool run_experiment(
                         repeatIdx,
                         runOutputs.agentDensity,
                         runOutputs.mean_messageCount,
-                        runOutputs.ms_rtc,
-                        runOutputs.ms_simulation,
-                        runOutputs.ms_init,
-                        runOutputs.ms_exit,
-                        runOutputs.ms_stepMean); 
+                        runOutputs.s_rtc,
+                        runOutputs.s_simulation,
+                        runOutputs.s_init,
+                        runOutputs.s_exit,
+                        runOutputs.s_stepMean); 
                 }
                 // Add a row to the per step per simulation CSV
                 if (fp_perStepPerSimulationCSV) {
-                    for(uint32_t step = 0; step < runOutputs.ms_per_step->size(); step++){
-                        auto& ms_step = runOutputs.ms_per_step->at(step);
+                    for(uint32_t step = 0; step < runOutputs.s_per_step->size(); step++){
+                        auto& s_step = runOutputs.s_per_step->at(step);
                         fprintf(fp_perStepPerSimulationCSV,
                             "%s,%d,%d,%s,%u,%u,%.3f,%.3f,%u,%.3f,%u,%.3f\n",
                             deviceName.c_str(),
@@ -131,7 +131,7 @@ bool run_experiment(
                             repeatIdx,
                             runOutputs.agentDensity,
                             step,
-                            ms_step);
+                            s_step);
                     }
                 }
                 simulationIdx++;

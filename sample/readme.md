@@ -28,9 +28,9 @@ python3 ../plot.py data/ -o figures/ -f
 
 Which output the following to `stdout`.
 ```
-fixed-density_perSimulationCSV.csv: max_ms_rtc 12919.013, mean_ms_rtc 118.152
-variable-density_perSimulationCSV.csv: max_ms_rtc 18.127, mean_ms_rtc 6.395
-comm-radius_perSimulationCSV.csv: max_ms_rtc 9264.425, mean_ms_rtc 210.166
+fixed-density_perSimulationCSV.csv: max_s_rtc 12919.013, mean_s_rtc 118.152
+variable-density_perSimulationCSV.csv: max_s_rtc 18.127, mean_s_rtc 6.395
+comm-radius_perSimulationCSV.csv: max_s_rtc 9264.425, mean_s_rtc 210.166
 
 ```
 

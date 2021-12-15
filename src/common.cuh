@@ -33,12 +33,12 @@ struct RunSimulationInputs {
 
 
 struct RunSimulationOutputs { 
-    std::shared_ptr<std::vector<float>> ms_per_step = nullptr;
-    float ms_rtc = 0.f;
-    float ms_simulation = 0.f;
-    float ms_init = 0.f;
-    float ms_exit = 0.f;
-    float ms_stepMean = 0.f;
+    std::shared_ptr<std::vector<double>> s_per_step = nullptr;
+    double s_rtc = 0.f;
+    double s_simulation = 0.f;
+    double s_init = 0.f;
+    double s_exit = 0.f;
+    double s_stepMean = 0.f;
     float mean_messageCount = 0.f;
     float agentDensity = 0.f;
 };
