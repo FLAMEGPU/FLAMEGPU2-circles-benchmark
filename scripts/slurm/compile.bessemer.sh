@@ -4,10 +4,11 @@
 #SBATCH --job-name=compile.bessemer.sh
 
 # Load modules for compilation
-module load CUDA/10.2.89-GCC-8.3.0 
+module use /usr/local/modulefiles/staging/eb/all/
+module load CUDA/11.0.2-GCC-9.3.0
 
 # Load cmake with matching glibc version. Alternatively use a cmake installed via pip into a local venv.
-module load CMake/3.15.3-GCCcore-8.3.0
+module load CMake/3.16.4-GCCcore-9.3.0
 
 # Load matching python too 
 # module load Python/3.7.4-GCCcore-8.3.0

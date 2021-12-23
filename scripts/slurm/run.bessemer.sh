@@ -9,7 +9,8 @@
 #SBATCH --ntasks=1
 
 # Load modules (with matching gcc versions)
-module load CUDA/10.2.89-GCC-8.3.0 
+module use /usr/local/modulefiles/staging/eb/all/
+module load CUDA/11.0.2-GCC-9.3.0
 # module load CMake/3.15.3-GCCcore-8.3.0
 # module load Python/3.7.4-GCCcore-8.3.0
 
