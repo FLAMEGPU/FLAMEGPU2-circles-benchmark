@@ -9,7 +9,11 @@ For a more complete description of the model, see:
 
 ## Benchmark Description and Results
 
-Three experiments are undertaken within this benchmark:
+Three experiments are undertaken within this benchmark. There is a range of raw data in the [`sample/data`](sample/data) directory with a description of the machine configurations used to generate it in each directory.
+
+The results below are from the V100 runs on the Bessemer HPC system at the University of Sheffield. Job submission scripts are included in the [`scripts/slurm`]() folder.
+
+### Fixed Density Benchmark
 
 + Fixed Density
     + Communication Radius is fixed to `2.0`
@@ -20,12 +24,23 @@ Three experiments are undertaken within this benchmark:
         + Bruteforce messaging with RTC (run time compilation)
         + Spatial3D messaging 
         + Spatial3D messaging with RTC (run time compilation) 
+
+[![Fixed Density Benchmark](sample/figures/v100-470.82.01/alpha.2-v100-11.0-beltsoff/fixed-density--volume--step-s--model--all.png)](sample/figures/v100-470.82.01/alpha.2-v100-11.0-beltsoff/fixed-density--volume--step-s--model--all.png)
+[![Fixed Density Benchmark Zoomed](sample/figures/v100-470.82.01/alpha.2-v100-11.0-beltsoff/fixed-density--volume--step-s--model--zoomed.png)](sample/figures/v100-470.82.01/alpha.2-v100-11.0-beltsoff/fixed-density--volume--step-s--model--zoomed.png)
+
+### Variable Density Benchmark
+
 + Variable Density
     + Communication Radius is fixed to `2.0`
     + Agent Density is varied per unit of volume, from `1` to `4`
     + Environment Volume is varied upto `~ 500000` units of volume.
     + A single implementation is benchmarked
         + Spatial3D messaging with RTC (run time compilation)
+		
+[![variable-density volume](sample/figures/v100-470.82.01/alpha.2-v100-11.0-beltsoff/variable-density--volume--step-s--density--3drtc.png)](sample/figures/v100-470.82.01/alpha.2-v100-11.0-beltsoff/variable-density--volume--step-s--density--3drtc.png)
+
+### Variable Communication Radius Benchmark
+
 + Variable Communication Radius
     + `circles_spatial3d_rtc` and `circles_bruteforce_rtc`
     + Varied communication radius - shown on the X axis
@@ -34,19 +49,7 @@ Three experiments are undertaken within this benchmark:
     + Environment width is fixed at 40
     + Agent Density is `1.0f`
 
-There is a range of raw data in the [`sample/data`](sample/data) directory with a description of the machine configurations used to generate it in each directory.
 
-The results below are from the V100 runs on the Bessemer HPC system at teh University of Sheffield. Job submission scripts are included in the [`scripts/slurm`]() folder.
-
-### Fixed Density Benchmark
-
-[![Fixed Density Benchmark](sample/figures/v100-470.82.01/alpha.2-v100-11.0-beltsoff/fixed-density--volume--step-s--model--all.png)](sample/figures/v100-470.82.01/alpha.2-v100-11.0-beltsoff/fixed-density--volume--step-s--model--all.png)
-[![Fixed Density Benchmark Zoomed](sample/figures/v100-470.82.01/alpha.2-v100-11.0-beltsoff/fixed-density--volume--step-s--model--zoomed.png)](sample/figures/v100-470.82.01/alpha.2-v100-11.0-beltsoff/fixed-density--volume--step-s--model--zoomed.png)
-
-### Variable Density Benchmark
-[![variable-density volume](sample/figures/v100-470.82.01/alpha.2-v100-11.0-beltsoff/variable-density--volume--step-s--density--3drtc.png)](sample/figures/v100-470.82.01/alpha.2-v100-11.0-beltsoff/variable-density--volume--step-s--density--3drtc.png)
-
-### Variable Communication Radius Benchmark
 [![Variable Communication Radius Benchmark](sample/figures/v100-470.82.01/alpha.2-v100-11.0-beltsoff/comm-radius--lineplot-spatial3D-bruteforce-rtc-only.png)](sample/figures/v100-470.82.01/alpha.2-v100-11.0-beltsoff/comm-radius--lineplot-spatial3D-bruteforce-rtc-only.png)
 
 ## Building and Running the Benchmark
