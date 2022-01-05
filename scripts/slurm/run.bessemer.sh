@@ -11,12 +11,6 @@
 # Load modules (with matching gcc versions)
 module use /usr/local/modulefiles/staging/eb/all/
 module load CUDA/11.0.2-GCC-9.3.0
-# module load CMake/3.15.3-GCCcore-8.3.0
-# module load Python/3.7.4-GCCcore-8.3.0
-
-
-# Make tmpdir incase it doesn't exist? This should not be neccesary...
-mkdir -p $TMPDIR
 
 # Set the location of the project root relative to this script
 PROJECT_ROOT=../..
@@ -34,4 +28,4 @@ echo $CUDA_VISIBLE_DEVICES
 nvidia-smi
 
 # Run the executable.
-./bin/linux-x64/Release/circles-benchmarking
+./bin/Release/circles-benchmarking
