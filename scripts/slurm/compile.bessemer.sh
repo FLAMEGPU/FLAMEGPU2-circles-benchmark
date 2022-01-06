@@ -9,10 +9,10 @@ module load CUDA/11.0.2-GCC-9.3.0
 
 # Load cmake via pip into a local venv
 module load Anaconda3/5.3.0
+
 conda create -n fgpu2-circles-benchmark
 source activate fgpu2-circles-benchmark
-pip install --user cmake==3.18.0
-export PATH=$PATH:~/.local/bin
+conda install -y cmake=3.18
 
 # Make sure temporary directory exists, used for RTC cache
 mkdir -p $TMPDIR
