@@ -59,31 +59,30 @@ Detail of dependencies and the `cmake` build process are described in full in th
 ```bash
 # Configure 
 cmake . -B build -DCMAKE_BUILD_TYPE=Release -DSEATBELTS=OFF -DBUILD_SWIG_PYTHON=OFF -DCUDA_ARCH=70
+# Build
 cmake --build build -j`nproc` 
-make
 ```
 
 ### Execution and Data generation
 
-The `FLAMEGPU2_INC_DIR` environment variable must be set for run-time compilation (TRC) to succeed. This can be done at the same time as execution of the model. E.g. 
-
 ```bash
 cd build
-FLAMEGPU2_INC_DIR=./_deps/flamegpu2-src/include/ ./bin/Release/circles-benchmarking 
+./bin/Release/circles-benchmarking 
 ```
+This will produce a number of `.csv` files in the `build` directory.
 
-This will produce 6 `.csv` files in the `build` directory.
+Note: The `FLAMEGPU2_INC_DIR` environment variable may need to be set to `./_deps/flamegpu2-src/include/` for run-time compilation (RTC) to succeed if the source directory is not automatically found.
+
 
 ## Plotting Results
 
-### Dependencies
-
-
 Figures can be generated from data in CSV files via a python script.
+
+### Dependencies
 
 It is recommended to use python virtual environment or conda environment for plotting dependencies.
 
-I.e. for linux to install the dependencies into a python3 virtual environment and plot the data within `build/performance_scaling.csv`
+I.e. for Linux to install the dependencies into a python3 virtual environment and plot the results from all experiments output to the `build` directory.
 
 ```bash
 # From the root of the repository
@@ -101,5 +100,5 @@ python3 plot.py build -o build/figures
 The sample figures were generated from the root directory using
 
 ```bash
-python3 plot.py sample/data/v100-470.82.01/alpha.2-v100-11.0-beltsoff -o sample/data-figures/v100-470.82.01/alpha.2-v100-11.0-beltsoff
+python3 plot.py sample/data/v100-470.82.01/alpha.2-v100-11.0-beltsoff -o sample/figures/v100-470.82.01/alpha.2-v100-11.0-beltsoff
 ```

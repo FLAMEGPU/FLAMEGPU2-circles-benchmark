@@ -16,18 +16,18 @@ The following machine configurations were used to obtained the data and figures 
 + GCC 9.3.0
 + CentOS 7.9.2009
 
-### GTX3080
+### RTX 3080
 
-+ GTX3080
++ RTX 3080
 + NVIDIA Driver 495.29.05
 + CUDA 11.2
-+ GCC 7.5.0
-+ Ubuntu 16.04.7 LTS
++ GCC 8.4.0
++ Ubuntu 20.04.3 LTS
 
 ### Titan V
 
 + Titan V 12GB
 + NVIDIA Driver 495.29.05
 + CUDA 11.2
-+ GCC 7.5.0
-+ Ubuntu 16.04.7 LTS
++ GCC 8.4.0
++ Ubuntu 20.04.3 LTS
