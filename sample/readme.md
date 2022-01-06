@@ -16,6 +16,15 @@ The following machine configurations were used to obtained the data and figures 
 + GCC 9.3.0
 + CentOS 7.9.2009
 
+### V100 PPC64LE (Bede)
+
++ Tesla V100-SXM2-32GB with host-device NVLink (POWER9 2.7GHz, 32 Cores)
++ NVIDIA Driver 470.57.02
++ CUDA 11.0 and 11.2
++ GCC 8.4.0
++ Red Hat Enterprise Linux 8.4 (Ootpa)
+
+
 ### RTX 3080
 
 + RTX 3080
