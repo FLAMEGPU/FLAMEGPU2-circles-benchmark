@@ -30,12 +30,12 @@ The results below are from the V100 runs on the Bessemer HPC system at the Unive
 
 ### Variable Density Benchmark
 
-+ Variable Density
-    + Communication Radius is fixed to `2.0`
-    + Agent Density is varied per unit of volume, from `1` to `4`
-    + Environment Volume is varied upto `~ 500000` units of volume.
-    + A single implementation is benchmarked
-        + Spatial3D messaging with RTC (run time compilation)
+
++ Communication Radius is fixed to `2.0`
++ Agent Density is varied per unit of volume, from `1` to `4`
++ Environment Volume is varied upto `~ 500000` units of volume.
++ A single implementation is benchmarked
+    + Spatial3D messaging with RTC (run time compilation)
 		
 [![variable-density volume](sample/figures/v100-470.82.01/alpha.2-v100-11.0-beltsoff/variable-density--volume--step-s--density--3drtc.png)](sample/figures/v100-470.82.01/alpha.2-v100-11.0-beltsoff/variable-density--volume--step-s--density--3drtc.png)
 
