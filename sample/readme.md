@@ -28,6 +28,6 @@ The following machine configurations were used to obtained the data and figures 
 
 + Titan V 12GB
 + NVIDIA Driver 495.29.05
-+ CUDA 11.2
++ CUDA 11.0 and 11.2
 + GCC 8.4.0
 + Ubuntu 20.04.3 LTS
