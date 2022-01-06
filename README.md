@@ -7,112 +7,96 @@ For a more complete description of the model, see:
 
 [Chisholm, Robert, Paul Richmond, and Steve Maddock. "A standardised benchmark for assessing the performance of fixed radius near neighbours." European Conference on Parallel Processing. Springer, Cham, 2016.](https://doi.org/10.1007/978-3-319-58943-5_25), ([pdf](https://eprints.whiterose.ac.uk/104079/1/paper.pdf)).
 
-## Benchmark Results
+## Benchmark Description and Results
 
-Two experiments are carried out:
+Three experiments are undertaken within this benchmark. There is a range of raw data in the [`sample/data`](sample/data) directory with a description of the machine configurations used to generate it in each directory.
 
-+ Fixed Density
-    + Communication Radius is fixed to `2.0`
-    + Agent Density is fixed to `1` agent per unit of volume 
-    + Environment Volume is varied, with values of up to `1000000` units of volume
-    + 4 Implementations are compared
-        + Bruteforce messaging 
-        + Bruteforce messaging with RTC (run time compilation)
-        + Spatial3D messaging 
-        + Spatial3D messaging with RTC (run time compilation) 
-+ Variable Density
-    + Communication Radius is fixed to `2.0`
-    + Agent Density is varied per unit of volume, from `1` to `4`
-    + Environment Volume is varied upto `~ 500000` units of volume.
-    + A single implementation is benchmarked
-        + Spatial3D messaging with RTC (run time compilation)
-+ Variable Communication Radius
-    + `circles_spatial3d_rtc` and `circles_bruteforce_rtc`
-    + Varied communication radius - shown on the X axis
-    + Model differentiated by marker
-    + Agent count is fixed at 64,000
-    + Environment width is fixed at 40
-    + Agent Density is `1.0f`
-
-The raw data in the [`sample/data`](sample/data) directory and the figures below were generated using:
-
-+ Tesla V100-SXM2-32GB
-+ NVIDIA Driver 460.32.03
-+ CUDA 10.2.98
-+ GCC 8.3.0
-+ CentOS 7.9.2009
-+ FLAME GPU 2 @ [`d238333`](https://github.com/FLAMEGPU/FLAMEGPU2/tree/d238333)
+The results below are from the V100 runs on the Bessemer HPC system at the University of Sheffield. Job submission scripts are included in the [`scripts/slurm`]() folder.
 
 ### Fixed Density Benchmark
 
-[![Fixed Density Benchmark](sample/figures/fixed-density--volume--step-ms--model--all.png)](sample/figures/fixed-density--volume--step-ms--model--all.png)
-[![Fixed Density Benchmark Zoomed](sample/figures/fixed-density--volume--step-ms--model--zoomed.png)](sample/figures/fixed-density--volume--step-ms--model--zoomed.png)
++ Communication Radius is fixed to `2.0`
++ Agent Density is fixed to `1` agent per unit of volume 
++ Environment Volume is varied, with values of up to `1000000` units of volume
++ 4 Implementations are compared
+	+ Bruteforce messaging 
+	+ Bruteforce messaging with RTC (run time compilation)
+	+ Spatial3D messaging 
+	+ Spatial3D messaging with RTC (run time compilation) 
+
+[![Fixed Density Benchmark](sample/figures/v100-470.82.01/alpha.2-v100-11.0-beltsoff/fixed-density--volume--step-s--model--all.png)](sample/figures/v100-470.82.01/alpha.2-v100-11.0-beltsoff/fixed-density--volume--step-s--model--all.png)
+[![Fixed Density Benchmark Zoomed](sample/figures/v100-470.82.01/alpha.2-v100-11.0-beltsoff/fixed-density--volume--step-s--model--zoomed.png)](sample/figures/v100-470.82.01/alpha.2-v100-11.0-beltsoff/fixed-density--volume--step-s--model--zoomed.png)
 
 ### Variable Density Benchmark
-[![variable-density volume](sample/figures/variable-density--volume--step-ms--density--3drtc.png)](sample/figures/variable-density--volume--step-ms--density--3drtc.png)
 
-The figure below was generated using:
 
-+ Titan V 12GB
-+ NVIDIA Driver 455.23.05
-+ CUDA 10.2.89
-+ GCC 7.5.0
-+ Ubuntu 16.04.7 LTS
++ Communication Radius is fixed to `2.0`
++ Agent Density is varied per unit of volume, from `1` to `4`
++ Environment Volume is varied upto `~ 500000` units of volume.
++ A single implementation is benchmarked
+    + Spatial3D messaging with RTC (run time compilation)
+		
+[![variable-density volume](sample/figures/v100-470.82.01/alpha.2-v100-11.0-beltsoff/variable-density--volume--step-s--density--3drtc.png)](sample/figures/v100-470.82.01/alpha.2-v100-11.0-beltsoff/variable-density--volume--step-s--density--3drtc.png)
 
 ### Variable Communication Radius Benchmark
-[![Variable Communication Radius Benchmark](sample/figures/comm-radius--lineplot-spatial3D-bruteforce-rtc-only.png)](sample/figures/comm-radius--lineplot-spatial3D-bruteforce-rtc-only.png)
 
-## Dependencies 
++ `circles_spatial3d_rtc` and `circles_bruteforce_rtc`
++ Varied communication radius - shown on the X axis
++ Model differentiated by marker
++ Agent count is fixed at 64,000
++ Environment width is fixed at 40
++ Agent Density is `1.0f`
 
-+ Model Compilation
-    + [CMake](https://cmake.org/download/) `>= 3.18`
-    + [CUDA](https://developer.nvidia.com/cuda-downloads) `>= 11.0` and a Compute Capability `>= 3.5` NVIDIA GPU.
-        + CUDA `>= 10.0` currently works, but support will be dropped in a future release.
-    + C++17 capable C++ compiler (host), compatible with the installed CUDA version
-        + [Microsoft Visual Studio 2019](https://visualstudio.microsoft.com/) (Windows)
-        + [make](https://www.gnu.org/software/make/) and [GCC](https://gcc.gnu.org/) `>= 7` (Linux)
-        + Older C++ compilers which support C++14 may currently work, but support will be dropped in a future release.
-    + [git](https://git-scm.com/)
 
-+ Plotting
-    + Python `>= 3.6`
-    + `numpy`
-    + `pandas`
-    + `matplotlib`
-    + `seaborn`
+[![Variable Communication Radius Benchmark](sample/figures/v100-470.82.01/alpha.2-v100-11.0-beltsoff/comm-radius--lineplot-spatial3D-bruteforce-rtc-only.png)](sample/figures/v100-470.82.01/alpha.2-v100-11.0-beltsoff/comm-radius--lineplot-spatial3D-bruteforce-rtc-only.png)
 
-## Running the Benchmark
+## Building and Running the Benchmark
 
-### Compilation via Cmake
-
-These instructions are for execution on Volta (`SM_70`) GPUs under linux.
+Detail of dependencies and the `cmake` build process are described in full in the [FLAMEGPU2-example-template Repo](https://github.com/FLAMEGPU/FLAMEGPU2-example-template) and are not repeated here. The benchmark should be built with seatbelts off (e.g. `-DSEATBELTS=OFF` passed to the `cmake` configuration step) to disable additional run-time checks and optionally disabling Python Swig support which is not needed for this model(-DBUILD_SWIG_PYTHON=OFF ). E.g. for Volta (`SM_70`) GPUs under Linux.
 
 ```bash
+# Configure 
 cmake . -B build -DCMAKE_BUILD_TYPE=Release -DSEATBELTS=OFF -DBUILD_SWIG_PYTHON=OFF -DCUDA_ARCH=70
+# Build
 cmake --build build -j`nproc` 
 ```
 
-### Execution / Data generation
+### Execution and Data generation
 
 ```bash
 cd build
-FLAMEGPU2_INC_DIR=./_deps/flamegpu2-src/include/ ./bin/Release/circles-benchmarking 
-# Generte plots
+./bin/Release/circles-benchmarking 
 ```
+This will produce a number of `.csv` files in the `build` directory.
 
-This will produce 4 `.csv` files in the `build` directory.
+Note: The `FLAMEGPU2_INC_DIR` environment variable may need to be set to `./_deps/flamegpu2-src/include/` for run-time compilation (RTC) to succeed if the source directory is not automatically found.
 
-### Data plotting.
+
+## Plotting Results
+
+Figures can be generated from data in CSV files via a python script.
+
+### Dependencies
+
+It is recommended to use python virtual environment or conda environment for plotting dependencies.
+
+I.e. for Linux to install the dependencies into a python3 virtual environment and plot the results from all experiments output to the `build` directory.
 
 ```bash
-cd build
-python3 ../plot.py . -o figures
+# From the root of the repository
+# Create the venv
+python3 -m venv .venv
+# Activate the venv
+source .venv/bin/activate
+# Install the dependencies via pip
+python3 -m pip install -Ur requirements.txt
+# Plot using csv files contained within the build directory
+python3 plot.py build -o build/figures
+# Use -h / --help for more information on optional plotting script parameters.
 ```
-
-This will generate figures in `build/figures`
 
 The sample figures were generated from the root directory using
 
 ```bash
-python3 plot.py sample/data/ -o sample/data-figures
+python3 plot.py sample/data/v100-470.82.01/alpha.2-v100-11.0-beltsoff -o sample/figures/v100-470.82.01/alpha.2-v100-11.0-beltsoff
 ```
