@@ -15,15 +15,14 @@ The results below are from the V100 runs on the Bessemer HPC system at the Unive
 
 ### Fixed Density Benchmark
 
-+ Fixed Density
-    + Communication Radius is fixed to `2.0`
-    + Agent Density is fixed to `1` agent per unit of volume 
-    + Environment Volume is varied, with values of up to `1000000` units of volume
-    + 4 Implementations are compared
-        + Bruteforce messaging 
-        + Bruteforce messaging with RTC (run time compilation)
-        + Spatial3D messaging 
-        + Spatial3D messaging with RTC (run time compilation) 
++ Communication Radius is fixed to `2.0`
++ Agent Density is fixed to `1` agent per unit of volume 
++ Environment Volume is varied, with values of up to `1000000` units of volume
++ 4 Implementations are compared
+	+ Bruteforce messaging 
+	+ Bruteforce messaging with RTC (run time compilation)
+	+ Spatial3D messaging 
+	+ Spatial3D messaging with RTC (run time compilation) 
 
 [![Fixed Density Benchmark](sample/figures/v100-470.82.01/alpha.2-v100-11.0-beltsoff/fixed-density--volume--step-s--model--all.png)](sample/figures/v100-470.82.01/alpha.2-v100-11.0-beltsoff/fixed-density--volume--step-s--model--all.png)
 [![Fixed Density Benchmark Zoomed](sample/figures/v100-470.82.01/alpha.2-v100-11.0-beltsoff/fixed-density--volume--step-s--model--zoomed.png)](sample/figures/v100-470.82.01/alpha.2-v100-11.0-beltsoff/fixed-density--volume--step-s--model--zoomed.png)
@@ -41,13 +40,12 @@ The results below are from the V100 runs on the Bessemer HPC system at the Unive
 
 ### Variable Communication Radius Benchmark
 
-+ Variable Communication Radius
-    + `circles_spatial3d_rtc` and `circles_bruteforce_rtc`
-    + Varied communication radius - shown on the X axis
-    + Model differentiated by marker
-    + Agent count is fixed at 64,000
-    + Environment width is fixed at 40
-    + Agent Density is `1.0f`
++ `circles_spatial3d_rtc` and `circles_bruteforce_rtc`
++ Varied communication radius - shown on the X axis
++ Model differentiated by marker
++ Agent count is fixed at 64,000
++ Environment width is fixed at 40
++ Agent Density is `1.0f`
 
 
 [![Variable Communication Radius Benchmark](sample/figures/v100-470.82.01/alpha.2-v100-11.0-beltsoff/comm-radius--lineplot-spatial3D-bruteforce-rtc-only.png)](sample/figures/v100-470.82.01/alpha.2-v100-11.0-beltsoff/comm-radius--lineplot-spatial3D-bruteforce-rtc-only.png)
