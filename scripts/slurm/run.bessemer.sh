@@ -24,7 +24,6 @@ cd build
 export FLAMEGPU2_INC_DIR=_deps/flamegpu2-src/include
 
 # Output some GPU information into the Log
-echo $CUDA_VISIBLE_DEVICES
 nvidia-smi
 
 # Run the executable.
