@@ -96,7 +96,7 @@ bool run_experiment(
                 if (fp_perSimulationCSV) {
                     fprintf(
                         fp_perSimulationCSV, 
-                        "%s,%d,%d,%s,%u,%u,%.3f,%.3f,%u,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f\n",
+                        "%s,%d,%d,%s,%u,%u,%.6f,%.6f,%u,%.6f,%.6f,%.6f,%.6f,%.6f,%.6f,%.6f\n",
                         deviceName.c_str(),
                         isReleaseMode(),
                         isSeatbeltsON(),
@@ -119,7 +119,7 @@ bool run_experiment(
                     for(uint32_t step = 0; step < runOutputs.s_per_step->size(); step++){
                         auto& s_step = runOutputs.s_per_step->at(step);
                         fprintf(fp_perStepPerSimulationCSV,
-                            "%s,%d,%d,%s,%u,%u,%.3f,%.3f,%u,%.3f,%u,%.3f\n",
+                            "%s,%d,%d,%s,%u,%u,%.6f,%.6f,%u,%.6f,%u,%.6f\n",
                             deviceName.c_str(),
                             isReleaseMode(),
                             isSeatbeltsON(),
