@@ -89,8 +89,8 @@ FLAMEGPU_STEP_FUNCTION(Validation) {
 }  // namespace
 
 // Run an individual simulation, using 
-void run_circles_spatial3D(const RunSimulationInputs runInputs, RunSimulationOutputs &runOutputs){
-    flamegpu::ModelDescription model("circles_spatial3D");
+void run_circles_bruteforce_sorted(const RunSimulationInputs runInputs, RunSimulationOutputs &runOutputs){
+    flamegpu::ModelDescription model("circles_bruteforce_sorted");
     // Calculate environment bounds.
     const float ENV_WIDTH = runInputs.ENV_WIDTH;
     const float ENV_MIN = -0.5 * ENV_WIDTH;
