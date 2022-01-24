@@ -342,10 +342,11 @@ int main(int argc, const char ** argv) {
     custom_cli cli = parse_custom_cli(argc, argv);
 
     // Launch each experiment.
-    bool success_1 = experiment_total_scale_all(cli);
-    bool success_2 = experiment_density_spatial(cli);
+    //bool success_1 = experiment_total_scale_all(cli);
+    //bool success_2 = experiment_density_spatial(cli);
     bool success_3 = experiment_comm_radius(cli);
 
     // exit code
-    return success_1 && success_2 && success_3 ? EXIT_SUCCESS : EXIT_FAILURE;
+    //return success_1 && success_2 && success_3 ? EXIT_SUCCESS : EXIT_FAILURE;
+    return success_3 ? EXIT_SUCCESS : EXIT_FAILURE;
 }
