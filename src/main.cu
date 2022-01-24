@@ -14,6 +14,8 @@ void run_circles_bruteforce(const RunSimulationInputs runInputs, RunSimulationOu
 void run_circles_bruteforce_rtc(const RunSimulationInputs runInputs, RunSimulationOutputs &runOutputs);
 void run_circles_spatial3D(const RunSimulationInputs runInputs, RunSimulationOutputs &runOutputs);
 void run_circles_spatial3D_rtc(const RunSimulationInputs runInputs, RunSimulationOutputs &runOutputs);
+void run_circles_bruteforce_sorted(const RunSimulationInputs runInputs, RunSimulationOutputs &runOutputs);
+void run_circles_bruteforce_rtc_sorted(const RunSimulationInputs runInputs, RunSimulationOutputs &runOutputs);
 
 
 bool run_experiment(
@@ -303,6 +305,8 @@ bool experiment_comm_radius(custom_cli cli){
         {std::string("circles_spatial3D_rtc"), run_circles_spatial3D_rtc},
         {std::string("circles_bruteforce"), run_circles_bruteforce},
         {std::string("circles_bruteforce_rtc"), run_circles_bruteforce_rtc},
+        {std::string("circles_bruteforce_sorted"), run_circles_bruteforce_sorted},
+        {std::string("circles_bruteforce_rtc_sorted"), run_circles_bruteforce_rtc_sorted},
     };
 
     // Construct the vector of RunSimulationInputs to pass to the run_experiment method.
