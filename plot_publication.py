@@ -13,7 +13,7 @@ import pathlib
 DEFAULT_DPI = 300
 
 # Default directory for visualisation images
-DEFAULT_INPUT_DIR="./sample/data/v100-470.82.01/alpha.2-v100-11.0-beltsoff"
+DEFAULT_INPUT_DIR= "." #"./sample/data/v100-470.82.01/alpha.2-v100-11.0-beltsoff"
 DEFAULT_OUTPUT_DIR = "." #"./sample/figures/v100-470.82.01/alpha.2-v100-11.0-beltsoff"
 
 # Drift csv filename from simulation output
@@ -107,13 +107,12 @@ def main():
     sns.set_theme(style='white')
     
     # setup sub plot using mosaic layout
-    gs_kw = dict(width_ratios=[1, 1], height_ratios=[1, 1, 1, 1])
+    gs_kw = dict(width_ratios=[1, 1], height_ratios=[1, 1, 1])
     f, ax = plt.subplot_mosaic([['p1', 'p2'],
                                 ['p3', 'p4'],
-                                ['p5', 'p6'],
-                                ['.' , '.' ],
+                                ['p5' , '.' ],
                                 ],
-                                  gridspec_kw=gs_kw, figsize=(5, 7.5),
+                                  gridspec_kw=gs_kw, figsize=(7.5, 7.5),
                                   constrained_layout=True)
     input_dir = pathlib.Path(args.input_dir)
     
@@ -146,20 +145,19 @@ def main():
     rad_df = pd.read_csv(input_dir/VARIABLE_RADIUS_CSV_FILENAME, sep=',', quotechar='"')
     rad_df.columns = rad_df.columns.str.strip()
     rad_df["comm_radius_as_percentage_env_width"] = rad_df["comm_radius"] / rad_df["env_width"] *100
-    rad_df['step_message_count'] = rad_df['mean_message_count'] / rad_df['steps']
 
     # Plot radius comparison
     rad_df = rad_df.query("model == 'circles_spatial3D' or model == 'circles_bruteforce'")
     plt_df_rad = sns.lineplot(x='comm_radius_as_percentage_env_width', y='s_step_mean', hue='model', data=rad_df, ax=ax['p3'], palette=custom_palette, ci="sd")
     plt_df_rad.ticklabel_format(style='plain', axis='x') # no scientific notation
-    plt_df_rad.set(xlabel='R as % of W', ylabel='Step time (s)')
+    plt_df_rad.set(xlabel='r as % of W', ylabel='Step time (s)')
     ax['p3'].set_title(label='c', loc='left', fontweight="bold")
     ax['p3'].legend().set_visible(False)
     
     # plot data volume
     messages_df = rad_df.query("model == 'circles_spatial3D'")
-    plt_df_rad = sns.lineplot(x='comm_radius_as_percentage_env_width', y='step_message_count', hue='model', data=messages_df, ax=ax['p4'], palette=custom_palette, ci="sd")
-    plt_df_rad.set(xlabel='R as % of W', ylabel='Messages / step')
+    plt_df_rad = sns.lineplot(x='comm_radius_as_percentage_env_width', y='mean_message_count', hue='model', data=messages_df, ax=ax['p4'], palette=custom_palette, ci="sd")
+    plt_df_rad.set(xlabel='r as % of W', ylabel='Messages / step')
     ax['p4'].set_title(label='d', loc='left', fontweight="bold")
     ax['p4'].legend().set_visible(False)
     
@@ -171,14 +169,15 @@ def main():
     lines, labels = [sum(lol, []) for lol in zip(*lines_labels)]
     labels = [MODEL_NAME_MAP[l] for l in labels] # Rename labels to provide readable legends
     unique = {k:v for k, v in zip(labels, lines)} 
-    f.legend(unique.values(), unique.keys(), loc='lower center')
+    f.legend(unique.values(), unique.keys(), loc='lower right')
 
     
         
     # Save to image
     #f.tight_layout()
     output_dir = pathlib.Path(args.output_dir) 
-    f.savefig(output_dir/"figure.png", dpi=args.dpi) 
+    f.savefig(output_dir/"paper_figure.png", dpi=args.dpi) 
+    f.savefig(output_dir/"paper_figure.eps", format='eps', dpi=args.dpi)
     
     #plt.show()
 
