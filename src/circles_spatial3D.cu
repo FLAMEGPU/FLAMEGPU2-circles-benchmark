@@ -116,6 +116,7 @@ void run_circles_spatial3D(const RunSimulationInputs runInputs, RunSimulationOut
 #endif
         agent.newFunction("output_message", output_message).setMessageOutput("location");
         agent.newFunction("move", move).setMessageInput("location");
+        agent.setSortPeriod(runInputs.SORT_PERIOD);
     }
 
     // Global environment variables.

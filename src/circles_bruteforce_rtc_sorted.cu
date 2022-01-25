@@ -119,6 +119,7 @@ void run_circles_bruteforce_rtc_sorted(const RunSimulationInputs runInputs, RunS
         agent.newVariable<float>("drift");  // Store the distance moved here, for validation
         agent.newRTCFunction("output_message", output_message).setMessageOutput("location");
         agent.newRTCFunction("move", move).setMessageInput("location");
+        agent.setSortPeriod(runInputs.SORT_PERIOD);
     }
 
     // Global environment variables.

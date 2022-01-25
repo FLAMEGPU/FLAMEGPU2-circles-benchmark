@@ -30,6 +30,7 @@ struct RunSimulationInputs {
     const uint32_t AGENT_COUNT;
     const float ENV_WIDTH;
     const float COMM_RADIUS;
+    const uint32_t SORT_PERIOD;
 };
 
 
