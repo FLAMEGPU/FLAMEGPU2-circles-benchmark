@@ -47,11 +47,11 @@ bool run_experiment(
 
     // Output the CSV header for each output CSV file.
     if (fp_perSimulationCSV) {
-        fprintf(fp_perSimulationCSV, "GPU,release_mode,seatbelts_on,model,steps,agent_count,env_width,comm_radius,repeat,agent_density,mean_message_count,s_rtc,s_simulation,s_init,s_exit,s_step_mean\n");
+        fprintf(fp_perSimulationCSV, "GPU,release_mode,seatbelts_on,model,steps,agent_count,env_width,comm_radius,sort_period,repeat,agent_density,mean_message_count,s_rtc,s_simulation,s_init,s_exit,s_step_mean\n");
     }
         
     if (fp_perStepPerSimulationCSV) {
-        fprintf(fp_perStepPerSimulationCSV, "GPU,release_mode,seatbelts_on,model,steps,agent_count,env_width,comm_radius,repeat,agent_density,step,s_step\n");
+        fprintf(fp_perStepPerSimulationCSV, "GPU,release_mode,seatbelts_on,model,steps,agent_count,env_width,comm_radius,sort_period,repeat,agent_density,step,s_step\n");
     }
 
 
@@ -89,7 +89,8 @@ bool run_experiment(
                     inputStruct.SEED + repeatIdx,
                     inputStruct.AGENT_COUNT, 
                     inputStruct.ENV_WIDTH,
-                    inputStruct.COMM_RADIUS
+                    inputStruct.COMM_RADIUS,
+                    inputStruct.SORT_PERIOD
                 };
                 RunSimulationOutputs runOutputs = {};
                 modelFunction(runInputs, runOutputs);
@@ -98,7 +99,7 @@ bool run_experiment(
                 if (fp_perSimulationCSV) {
                     fprintf(
                         fp_perSimulationCSV, 
-                        "%s,%d,%d,%s,%u,%u,%.6f,%.6f,%u,%.6f,%.6f,%.6f,%.6f,%.6f,%.6f,%.6f\n",
+                        "%s,%d,%d,%s,%u,%u,%.6f,%.6f,%u,%u,%.6f,%.6f,%.6f,%.6f,%.6f,%.6f,%.6f\n",
                         deviceName.c_str(),
                         isReleaseMode(),
                         isSeatbeltsON(),
@@ -107,6 +108,7 @@ bool run_experiment(
                         inputStruct.AGENT_COUNT,
                         inputStruct.ENV_WIDTH,
                         inputStruct.COMM_RADIUS,
+                        inputStruct.SORT_PERIOD,
                         repeatIdx,
                         runOutputs.agentDensity,
                         runOutputs.mean_messageCount,
@@ -121,7 +123,7 @@ bool run_experiment(
                     for(uint32_t step = 0; step < runOutputs.s_per_step->size(); step++){
                         auto& s_step = runOutputs.s_per_step->at(step);
                         fprintf(fp_perStepPerSimulationCSV,
-                            "%s,%d,%d,%s,%u,%u,%.6f,%.6f,%u,%.6f,%u,%.6f\n",
+                            "%s,%d,%d,%s,%u,%u,%.6f,%.6f,%u,%u,%.6f,%u,%.6f\n",
                             deviceName.c_str(),
                             isReleaseMode(),
                             isSeatbeltsON(),
@@ -130,6 +132,7 @@ bool run_experiment(
                             inputStruct.AGENT_COUNT,
                             inputStruct.ENV_WIDTH,
                             inputStruct.COMM_RADIUS,
+                            inputStruct.SORT_PERIOD,
                             repeatIdx,
                             runOutputs.agentDensity,
                             step,
@@ -162,7 +165,9 @@ bool experiment_total_scale_all(custom_cli cli){
     // Fixed comm radius 
     const float COMM_RADIUS = 2.f;
     // Fixed density
-    const float DENSITY = 1.0f; 
+    const float DENSITY = 1.0f;
+    // Fixed sort period
+    const uint32_t SORT_PERIOD = 1u; 
 
     // Sweep over environment widths, which lead to scaled 
     // Env width needs to be atleast 5 * comm_radius to not read all messages? (so that there are bins in atleast each dim?)
@@ -203,7 +208,8 @@ bool experiment_total_scale_all(custom_cli cli){
             cli.seed,
             popSize,
             envWidth,
-            COMM_RADIUS
+            COMM_RADIUS,
+            SORT_PERIOD
         });
     }
 
@@ -230,6 +236,7 @@ bool experiment_density_spatial(const custom_cli cli) {
     // Fixed comm radius 
     const float COMM_RADIUS = 2.f;
 
+    const uint32_t SORT_PERIOD = 1u; 
     // Sweep over densities.
     // std::vector<float> DENSITIES = {1.f, 2.f, 4.f, 8.f}; 
     // std::vector<float> DENSITIES = {1.f, 2.f, 3.f, 4.f, 5.f, 6.f, 8.f, 9.f, 10.f}; 
@@ -272,9 +279,58 @@ bool experiment_density_spatial(const custom_cli cli) {
                 cli.seed,
                 popSize,
                 envWidth,
-                COMM_RADIUS
+                COMM_RADIUS,
+                SORT_PERIOD
             });
         }
+    }
+
+    // Run the experriment
+    bool success = run_experiment(
+        EXPERIMENT_LABEL,
+        cli.device,
+        cli.repetitions,
+        INPUTS_STRUCTS,
+        MODELS,
+        cli.dry
+    );
+
+    return success;
+}
+
+bool experiment_sort_period(custom_cli cli){
+    // Name the experiment - this will end up in filenames/paths.
+    const std::string EXPERIMENT_LABEL="sort-period";
+    
+    const uint32_t popSize = 64000;
+    const float ENV_WIDTH = 40.0f;  
+    const float comm_radius = 40.0f;
+
+    std::vector<uint32_t> sortPeriods = {0u, 1u, 2u, 5u, 10u, 20u, 50u, 100u, 200u}; 
+
+    // Select the models to execute.
+    std::map<std::string, std::function<void(const RunSimulationInputs, RunSimulationOutputs&)>> MODELS = {
+        {std::string("circles_spatial3D"), run_circles_spatial3D},
+        {std::string("circles_spatial3D_rtc"), run_circles_spatial3D_rtc},
+        //{std::string("circles_bruteforce"), run_circles_bruteforce},
+        //{std::string("circles_bruteforce_rtc"), run_circles_bruteforce_rtc},
+        {std::string("circles_bruteforce_sorted"), run_circles_bruteforce_sorted},
+        {std::string("circles_bruteforce_rtc_sorted"), run_circles_bruteforce_rtc_sorted},
+    };
+
+    // Construct the vector of RunSimulationInputs to pass to the run_experiment method.
+    auto INPUTS_STRUCTS = std::vector<RunSimulationInputs>();
+    for(const auto& sortPeriod : sortPeriods){
+        // Envwidth is scaled with population size.
+        INPUTS_STRUCTS.push_back({
+            cli.device,
+            cli.steps,
+            cli.seed,
+            popSize,
+            ENV_WIDTH,
+            comm_radius,
+            sortPeriod
+        });
     }
 
     // Run the experriment
@@ -296,7 +352,7 @@ bool experiment_comm_radius(custom_cli cli){
     
     const uint32_t popSize = 64000;
     const float ENV_WIDTH = 40.0f;  
-
+    const uint32_t SORT_PERIOD = 1u; 
     const std::vector<float> comm_radii = {2.0f, 4.0f, 6.0f, 8.0f, 10.0f, 12.0f, 14.0f, 16.0f, 18.0f, 20.0f, 22.0f, 24.0f, 26.0f, 28.0f, 30.0f, 32.0f, 34.0f, 36.0f, 38.0f, 40.0f};
 
     // Select the models to execute.
@@ -319,7 +375,8 @@ bool experiment_comm_radius(custom_cli cli){
             cli.seed,
             popSize,
             ENV_WIDTH,
-            comm_radius
+            comm_radius,
+            SORT_PERIOD
         });
     }
 
@@ -336,7 +393,6 @@ bool experiment_comm_radius(custom_cli cli){
     return success;
 }
 
-
 int main(int argc, const char ** argv) {
     // Custom arg parsing, to prevent the current F2 arg parsing from occuring. 
     custom_cli cli = parse_custom_cli(argc, argv);
@@ -344,9 +400,10 @@ int main(int argc, const char ** argv) {
     // Launch each experiment.
     //bool success_1 = experiment_total_scale_all(cli);
     //bool success_2 = experiment_density_spatial(cli);
-    bool success_3 = experiment_comm_radius(cli);
+    //bool success_3 = experiment_comm_radius(cli);
+    bool success_4 = experiment_sort_period(cli);
 
     // exit code
     //return success_1 && success_2 && success_3 ? EXIT_SUCCESS : EXIT_FAILURE;
-    return success_3 ? EXIT_SUCCESS : EXIT_FAILURE;
+    return success_4 ? EXIT_SUCCESS : EXIT_FAILURE;
 }
