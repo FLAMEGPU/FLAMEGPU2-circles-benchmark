@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+#include <numeric>
 
 // Control validation of the circles model?
 #define CIRCLES_VALIDATION 0
