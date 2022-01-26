@@ -295,7 +295,7 @@ bool experiment_comm_radius(custom_cli cli){
     const uint32_t popSize = 64000;
     const float ENV_WIDTH = 40.0f;  
 
-    const std::vector<float> comm_radii = {2.0f, 4.0f, 6.0f, 8.0f, 10.0f, 12.0f, 14.0f, 16.0f, 18.0f, 20.0f, 22.0f, 24.0f, 26.0f, 28.0f, 30.0f, 32.0f, 34.0f, 36.0f, 38.0f, 40.0f};
+    const std::vector<float> comm_radii = {2.0f, 4.0f, 6.0f, 8.0f, 10.0f, 12.0f, 14.0f, 16.0f, 18.0f, 20.0f};
 
     // Select the models to execute.
     std::map<std::string, std::function<void(const RunSimulationInputs, RunSimulationOutputs&)>> MODELS = {
