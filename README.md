@@ -13,6 +13,10 @@ Three experiments are undertaken within this benchmark. There is a range of raw 
 
 The results below are from the V100 runs on the Bessemer HPC system at the University of Sheffield. Job submission scripts are included in the [`scripts/slurm`]() folder.
 
+A combined figure for use in publication is shown below. For details please refer to the publication.
+
+[![Combined Benchmark Figure](sample/figures/v100-470.82.01/alpha.2-v100-11.0-beltsoff/paper_figure.png)](sample/figures/v100-470.82.01/alpha.2-v100-11.0-beltsoff/paper_figure.png)
+
 ### Fixed Density Benchmark
 
 + Communication Radius is fixed to `2.0`
@@ -74,7 +78,7 @@ Note: The `FLAMEGPU2_INC_DIR` environment variable may need to be set to `./_dep
 
 ## Plotting Results
 
-Figures can be generated from data in CSV files via a python script.
+Individual figures can be generated from data in CSV files via a python script `plot.py`. Alternatively a combined figure used for publication can be produced using `plot_publication.py`.
 
 ### Dependencies
 
@@ -99,4 +103,10 @@ The sample figures were generated from the root directory using
 
 ```bash
 python3 plot.py sample/data/v100-470.82.01/alpha.2-v100-11.0-beltsoff -o sample/figures/v100-470.82.01/alpha.2-v100-11.0-beltsoff
+```
+
+The publication figure was generated using 
+
+```bash
+python3 plot_publication.py sample/data/v100-470.82.01/alpha.2-v100-11.0-beltsoff -o sample/figures/v100-470.82.01/alpha.2-v100-11.0-beltsoff
 ```
