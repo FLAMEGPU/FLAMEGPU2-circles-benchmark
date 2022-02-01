@@ -107,10 +107,10 @@ def main():
     sns.set_theme(style='white')
     
     # setup sub plot using mosaic layout
-    gs_kw = dict(width_ratios=[1, 1], height_ratios=[1, 1, 1])
+    gs_kw = dict(width_ratios=[1, 1], height_ratios=[1, 1, 0.5])
     f, ax = plt.subplot_mosaic([['p1', 'p2'],
                                 ['p3', 'p4'],
-                                ['p5' , '.' ],
+                                ['.' , '.' ],
                                 ],
                                   gridspec_kw=gs_kw, figsize=(7.5, 7.5),
                                   constrained_layout=True)
@@ -129,7 +129,7 @@ def main():
     plt_df_bf = sns.lineplot(x='agent_count', y='s_step_mean', hue='model', style='model', data=scale_df_bf, ax=ax['p1'], palette=custom_palette, ci="sd")
     # plt_df_bf.ticklabel_format(style='plain', axis='x') # no scientific notation
     plt_df_bf.set(xlabel='N', ylabel='Step time (s)')
-    ax['p1'].set_title(label='a', loc='left', fontweight="bold")
+    ax['p1'].set_title(label='A', loc='left', fontweight="bold")
     ax['p1'].legend().set_visible(False)
     
     # Plot spatial
@@ -137,7 +137,7 @@ def main():
     plt_df_s = sns.lineplot(x='agent_count', y='s_step_mean', hue='model', style='model', data=scale_df_spatial, ax=ax['p2'], palette=custom_palette, ci="sd")
     # plt_df_s.ticklabel_format(style='plain', axis='x') # no scientific notation
     plt_df_s.set(xlabel='N', ylabel='')
-    ax['p2'].set_title(label='b', loc='left', fontweight="bold")
+    ax['p2'].set_title(label='B', loc='left', fontweight="bold")
     ax['p2'].legend().set_visible(False)
     
     
@@ -151,14 +151,14 @@ def main():
     plt_df_rad = sns.lineplot(x='comm_radius_as_percentage_env_width', y='s_step_mean', hue='model', data=rad_df, ax=ax['p3'], palette=custom_palette, ci="sd")
     plt_df_rad.ticklabel_format(style='plain', axis='x') # no scientific notation
     plt_df_rad.set(xlabel='r as % of W', ylabel='Step time (s)')
-    ax['p3'].set_title(label='c', loc='left', fontweight="bold")
+    ax['p3'].set_title(label='C', loc='left', fontweight="bold")
     ax['p3'].legend().set_visible(False)
     
     # plot data volume
     messages_df = rad_df.query("model == 'circles_spatial3D'")
     plt_df_rad = sns.lineplot(x='comm_radius_as_percentage_env_width', y='mean_message_count', hue='model', data=messages_df, ax=ax['p4'], palette=custom_palette, ci="sd")
     plt_df_rad.set(xlabel='r as % of W', ylabel='Messages / step')
-    ax['p4'].set_title(label='d', loc='left', fontweight="bold")
+    ax['p4'].set_title(label='D', loc='left', fontweight="bold")
     ax['p4'].legend().set_visible(False)
     
    
@@ -177,7 +177,7 @@ def main():
     #f.tight_layout()
     output_dir = pathlib.Path(args.output_dir) 
     f.savefig(output_dir/"paper_figure.png", dpi=args.dpi) 
-    f.savefig(output_dir/"paper_figure.eps", format='eps', dpi=args.dpi)
+    f.savefig(output_dir/"paper_figure.pdf", format='pdf', dpi=args.dpi)
     
     #plt.show()
 
