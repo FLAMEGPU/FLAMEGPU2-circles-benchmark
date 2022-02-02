@@ -23,8 +23,6 @@ SET(ALL_SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/src/circles_bruteforce_rtc.cu
     ${CMAKE_CURRENT_SOURCE_DIR}/src/circles_spatial3D.cu
     ${CMAKE_CURRENT_SOURCE_DIR}/src/circles_spatial3D_rtc.cu
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/circles_bruteforce_sorted.cu
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/circles_bruteforce_rtc_sorted.cu
     ${CMAKE_CURRENT_SOURCE_DIR}/src/common.cuh
     ${CMAKE_CURRENT_SOURCE_DIR}/src/util.cuh
     ${CMAKE_CURRENT_SOURCE_DIR}/src/main.cu

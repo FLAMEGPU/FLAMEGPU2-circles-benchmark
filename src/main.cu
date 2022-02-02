@@ -14,9 +14,6 @@ void run_circles_bruteforce(const RunSimulationInputs runInputs, RunSimulationOu
 void run_circles_bruteforce_rtc(const RunSimulationInputs runInputs, RunSimulationOutputs &runOutputs);
 void run_circles_spatial3D(const RunSimulationInputs runInputs, RunSimulationOutputs &runOutputs);
 void run_circles_spatial3D_rtc(const RunSimulationInputs runInputs, RunSimulationOutputs &runOutputs);
-void run_circles_bruteforce_sorted(const RunSimulationInputs runInputs, RunSimulationOutputs &runOutputs);
-void run_circles_bruteforce_rtc_sorted(const RunSimulationInputs runInputs, RunSimulationOutputs &runOutputs);
-
 
 bool run_experiment(
     const std::string LABEL,
@@ -312,10 +309,6 @@ bool experiment_sort_period(custom_cli cli){
     std::map<std::string, std::function<void(const RunSimulationInputs, RunSimulationOutputs&)>> MODELS = {
         {std::string("circles_spatial3D"), run_circles_spatial3D},
         {std::string("circles_spatial3D_rtc"), run_circles_spatial3D_rtc},
-        //{std::string("circles_bruteforce"), run_circles_bruteforce},
-        //{std::string("circles_bruteforce_rtc"), run_circles_bruteforce_rtc},
-        //{std::string("circles_bruteforce_sorted"), run_circles_bruteforce_sorted},
-        //{std::string("circles_bruteforce_rtc_sorted"), run_circles_bruteforce_rtc_sorted},
     };
 
     // Construct the vector of RunSimulationInputs to pass to the run_experiment method.
@@ -363,8 +356,6 @@ bool experiment_comm_radius(custom_cli cli){
         {std::string("circles_spatial3D_rtc"), run_circles_spatial3D_rtc},
         {std::string("circles_bruteforce"), run_circles_bruteforce},
         {std::string("circles_bruteforce_rtc"), run_circles_bruteforce_rtc},
-        {std::string("circles_bruteforce_sorted"), run_circles_bruteforce_sorted},
-        {std::string("circles_bruteforce_rtc_sorted"), run_circles_bruteforce_rtc_sorted},
     };
 
     // Construct the vector of RunSimulationInputs to pass to the run_experiment method.
@@ -400,12 +391,11 @@ int main(int argc, const char ** argv) {
     custom_cli cli = parse_custom_cli(argc, argv);
 
     // Launch each experiment.
-    //bool success_1 = experiment_total_scale_all(cli);
-    //bool success_2 = experiment_density_spatial(cli);
-    //bool success_3 = experiment_comm_radius(cli);
+    bool success_1 = experiment_total_scale_all(cli);
+    bool success_2 = experiment_density_spatial(cli);
+    bool success_3 = experiment_comm_radius(cli);
     bool success_4 = experiment_sort_period(cli);
 
     // exit code
-    //return success_1 && success_2 && success_3 ? EXIT_SUCCESS : EXIT_FAILURE;
-    return success_4 ? EXIT_SUCCESS : EXIT_FAILURE;
+    return success_1 && success_2 && success_3 && success_4 ? EXIT_SUCCESS : EXIT_FAILURE;
 }
