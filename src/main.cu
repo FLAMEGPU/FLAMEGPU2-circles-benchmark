@@ -99,7 +99,7 @@ bool run_experiment(
                 if (fp_perSimulationCSV) {
                     fprintf(
                         fp_perSimulationCSV, 
-                        "%s,%d,%d,%s,%u,%u,%.3f,%.3f,%u,%u,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f\n",
+                        "%s,%d,%d,%s,%u,%u,%.6f,%.6f,%u,%u,%.6f,%.6f,%.6f,%.6f,%.6f,%.6f,%.6f\n",
                         deviceName.c_str(),
                         isReleaseMode(),
                         isSeatbeltsON(),
@@ -123,7 +123,7 @@ bool run_experiment(
                     for(uint32_t step = 0; step < runOutputs.s_per_step->size(); step++){
                         auto& s_step = runOutputs.s_per_step->at(step);
                         fprintf(fp_perStepPerSimulationCSV,
-                            "%s,%d,%d,%s,%u,%u,%.3f,%.3f,%u,%u,%.3f,%u,%.3f\n",
+                            "%s,%d,%d,%s,%u,%u,%.6f,%.6f,%u,%u,%.6f,%u,%.6f\n",
                             deviceName.c_str(),
                             isReleaseMode(),
                             isSeatbeltsON(),
@@ -304,9 +304,9 @@ bool experiment_sort_period(custom_cli cli){
     
     const uint32_t popSize = 64000;
     const float ENV_WIDTH = 40.0f;  
-    const float comm_radius = 40.0f;
 
-    std::vector<uint32_t> sortPeriods = {0u, 1u, 2u, 5u, 10u, 20u, 50u, 100u, 200u}; 
+    const std::vector<float> comm_radii = {2.0f, 4.0f, 6.0f, 8.0f};
+    const std::vector<uint32_t> sortPeriods = {0u, 1u, 2u, 5u, 10u, 20u, 50u, 100u, 200u}; 
 
     // Select the models to execute.
     std::map<std::string, std::function<void(const RunSimulationInputs, RunSimulationOutputs&)>> MODELS = {
@@ -314,23 +314,25 @@ bool experiment_sort_period(custom_cli cli){
         {std::string("circles_spatial3D_rtc"), run_circles_spatial3D_rtc},
         //{std::string("circles_bruteforce"), run_circles_bruteforce},
         //{std::string("circles_bruteforce_rtc"), run_circles_bruteforce_rtc},
-        {std::string("circles_bruteforce_sorted"), run_circles_bruteforce_sorted},
-        {std::string("circles_bruteforce_rtc_sorted"), run_circles_bruteforce_rtc_sorted},
+        //{std::string("circles_bruteforce_sorted"), run_circles_bruteforce_sorted},
+        //{std::string("circles_bruteforce_rtc_sorted"), run_circles_bruteforce_rtc_sorted},
     };
 
     // Construct the vector of RunSimulationInputs to pass to the run_experiment method.
     auto INPUTS_STRUCTS = std::vector<RunSimulationInputs>();
     for(const auto& sortPeriod : sortPeriods){
-        // Envwidth is scaled with population size.
-        INPUTS_STRUCTS.push_back({
-            cli.device,
-            cli.steps,
-            cli.seed,
-            popSize,
-            ENV_WIDTH,
-            comm_radius,
-            sortPeriod
-        });
+	for(const auto& comm_radius : comm_radii) {
+            // Envwidth is scaled with population size.
+            INPUTS_STRUCTS.push_back({
+                cli.device,
+                cli.steps,
+                cli.seed,
+                popSize,
+                ENV_WIDTH,
+                comm_radius,
+                sortPeriod
+            });
+	}
     }
 
     // Run the experriment

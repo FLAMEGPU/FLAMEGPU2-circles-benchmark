@@ -223,7 +223,7 @@ def store_processed_data(input_dataframes, processed_dataframes, output_dir, for
                 try:
                     if verbose:
                         print(f"Writing to {output_csv_path}")
-                    processed_df.to_csv(output_csv_path, sep=",", header=True, index=False, quotechar='"', float_format='%.3f')
+                    processed_df.to_csv(output_csv_path, sep=",", header=True, index=False, quotechar='"', float_format='%.6f')
                 except Exception as e:
                     print(f"Error: could not write to {output_csv_path} with exception {e}")
                     success = False
@@ -241,7 +241,7 @@ def store_processed_data(input_dataframes, processed_dataframes, output_dir, for
         if "s_rtc" in input_df: 
             max_s_rtc = input_df["s_rtc"].max()
             mean_s_rtc = input_df["s_rtc"].mean()
-            print(f"{csv_name}: max_s_rtc {max_s_rtc:.3f}, mean_s_rtc {mean_s_rtc:.3f}")
+            print(f"{csv_name}: max_s_rtc {max_s_rtc:.6f}, mean_s_rtc {mean_s_rtc:.6f}")
 
     return success
 
