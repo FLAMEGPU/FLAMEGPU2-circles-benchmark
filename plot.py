@@ -10,6 +10,10 @@ import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 import seaborn as sns
 
+
+DEFAULT_INPUT_DIR = "./sample/data/v100-470.82.01/alpha.2-v100-11.0-beltsoff"
+DEFAULT_OUTPUT_DIR = "./sample/figures/v100-470.82.01/alpha.2-v100-11.0-beltsoff"
+
 # Maximum DPI
 MAX_SANE_DPI = 1000
 # Default DPI
@@ -82,7 +86,8 @@ def cli():
         "-o", 
         "--output-dir", 
         type=str, 
-        help="directory to output figures into."
+        help="directory to output figures into.",
+        default=DEFAULT_OUTPUT_DIR
     )
     parser.add_argument(
         "--dpi", 
@@ -97,10 +102,11 @@ def cli():
         help="Show the plot(s)"
     )
     parser.add_argument(
-        "input_dir", 
+        "-i",
+        "--input_dir", 
         type=str, 
         help="Input directory, containing the 4 expected input csv files",
-        default="."
+        default=DEFAULT_INPUT_DIR
     )
 
     args = parser.parse_args()
