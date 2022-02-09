@@ -57,7 +57,7 @@ A combined figure for use in publication is shown below. For details please refe
 ### Variable Sort Period Benchmark
 
 + Runs for communication radii of `2.0`, `4.0`, `6.0`, `8.0`
-+ Sort period is varied - shown on the X axis - a sort period of 0 represents no sorting
++ Sort period is varied - shown on the X axis - a sort period of 0 represents no sorting, simulation runs for 200 steps in all cases
 + Model differentiated by marker
 + Agent count is fixed at 64,000
 + Environment width is fixed at 40
