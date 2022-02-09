@@ -20,8 +20,9 @@ DEFAULT_OUTPUT_DIR = "." #"./sample/figures/v100-470.82.01/alpha.2-v100-11.0-bel
 VARIABLE_POP_CSV_FILENAME = "fixed-density_perSimulationCSV.csv"
 VARIABLE_RADIUS_CSV_FILENAME = "comm-radius_perSimulationCSV.csv"
 VARIABLE_DENSITY_CSV_FILENAME = "variable-density_perSimulationCSV.csv"
+VARIABLE_SORT_PERIOD_CSV_FILENAME = "sort-period_perSimulationCSV.csv"
 
-EXPECTED_INPUT_FILES = [VARIABLE_POP_CSV_FILENAME, VARIABLE_RADIUS_CSV_FILENAME]
+EXPECTED_INPUT_FILES = [VARIABLE_POP_CSV_FILENAME, VARIABLE_RADIUS_CSV_FILENAME, VARIABLE_SORT_PERIOD_CSV_FILENAME]
 
 MODEL_NAME_MAP = {'circles_bruteforce': "Brute Force", 
                   'circles_spatial3D': "Spatial", 
@@ -107,10 +108,10 @@ def main():
     sns.set_theme(style='white')
     
     # setup sub plot using mosaic layout
-    gs_kw = dict(width_ratios=[1, 1], height_ratios=[1, 1, 0.5])
+    gs_kw = dict(width_ratios=[1, 1], height_ratios=[1, 1, 1])
     f, ax = plt.subplot_mosaic([['p1', 'p2'],
                                 ['p3', 'p4'],
-                                ['.' , '.' ],
+                                ['p5' , '.' ],
                                 ],
                                   gridspec_kw=gs_kw, figsize=(7.5, 7.5),
                                   constrained_layout=True)
@@ -162,6 +163,19 @@ def main():
     ax['p4'].legend().set_visible(False)
     
    
+    # Load per simulation step data into data frame (strip any white space)
+    sort_df = pd.read_csv(input_dir/VARIABLE_SORT_PERIOD_CSV_FILENAME, sep=',', quotechar='"')
+    sort_df.columns = sort_df.columns.str.strip()
+
+    # Plot sort period comparison
+    plot_for_com_radius = 8
+    max_sort_period_to_plot = 20
+    sort_df = sort_df.query("sort_period <= " + str(max_sort_period_to_plot) + " and comm_radius == " + str(plot_for_com_radius) + " and (model == 'circles_spatial3D' or model == 'circles_spatial3D_rtc')")
+    plt_df_sort = sns.lineplot(x='sort_period', y='s_step_mean', hue='model', data=sort_df, ax=ax['p5'], palette=custom_palette, ci="sd")
+    plt_df_sort.ticklabel_format(style='plain', axis='x') # no scientific notation
+    plt_df_sort.set(xlabel='Sort period (steps)', ylabel='Step time (s)')
+    ax['p5'].set_title(label='E', loc='left', fontweight="bold")
+    ax['p5'].legend().set_visible(False)
     
 
     # Legend

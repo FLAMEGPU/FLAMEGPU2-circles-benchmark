@@ -54,6 +54,17 @@ A combined figure for use in publication is shown below. For details please refe
 
 [![Variable Communication Radius Benchmark](sample/figures/v100-470.82.01/alpha.2-v100-11.0-beltsoff/comm-radius--lineplot-spatial3D-bruteforce-rtc-only.png)](sample/figures/v100-470.82.01/alpha.2-v100-11.0-beltsoff/comm-radius--lineplot-spatial3D-bruteforce-rtc-only.png)
 
+### Variable Sort Period Benchmark
+
++ Runs for communication radii of `2.0`, `4.0`, `6.0`, `8.0`
++ Sort period is varied - shown on the X axis - a sort period of 0 represents no sorting, simulation runs for 200 steps in all cases
++ Model differentiated by marker
++ Agent count is fixed at 64,000
++ Environment width is fixed at 40
++ Agent density is `1.0f`
+
+[![variable-sort-period](sample/figures/v100-470.82.01/alpha.2-v100-11.0-beltsoff/sort-period--lineplot--sort_period--mean_s_step_mean--model-comm_radius.png)](sample/figures/v100-470.82.01/alpha.2-v100-11.0-beltsoff/sort-period--lineplot--sort_period--mean_s_step_mean--model-comm_radius.png)
+
 ## Building and Running the Benchmark
 
 Detail of dependencies and the `cmake` build process are described in full in the [FLAMEGPU2-example-template Repo](https://github.com/FLAMEGPU/FLAMEGPU2-example-template) and are not repeated here. The benchmark should be built with seatbelts off (e.g. `-DSEATBELTS=OFF` passed to the `cmake` configuration step) to disable additional run-time checks and optionally disabling Python Swig support which is not needed for this model(-DBUILD_SWIG_PYTHON=OFF ). E.g. for Volta (`SM_70`) GPUs under Linux.
