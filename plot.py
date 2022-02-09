@@ -31,7 +31,9 @@ EXPECTED_CSV_FILES=[
     "variable-density_perSimulationCSV.csv",
     "variable-density_perStepPerSimulationCSV.csv",
     "comm-radius_perSimulationCSV.csv",
-    "comm-radius_perStepPerSimulationCSV.csv"
+    "comm-radius_perStepPerSimulationCSV.csv",
+    "sort-period_perSimulationCSV.csv",
+    "sort-period_perStepPerSimulationCSV.csv"
 ]
 
 
@@ -48,6 +50,10 @@ GROUP_BY_COLUMNS_PER_STEP_PER_SIM = ["GPU","release_mode","seatbelts_on","model"
 # input csv columns which identify a row as a duplicate of another repetition for aggregation, for per-sim csv
 GROUP_BY_COLUMNS_PER_SIM = ["GPU","release_mode","seatbelts_on","model","steps","agent_count","env_width","comm_radius"]
 
+# Handle columns which only appear in specific files
+FILE_SPECIFIC_COLUMNS = {
+   'sort-period_perSimulationCSV.csv': "sort_period" 
+}
 
 # Aggregate operations to apply across grouped csv rows, for the per-step per-sim csvs
 AGGREGATIONS_PER_STEP_PER_SIM = {
@@ -65,6 +71,7 @@ AGGREGATIONS_PER_SIM = {
     's_exit': ['mean'],
     's_step_mean': ['mean'],
 }
+
 
 
 
@@ -190,6 +197,10 @@ def process_data(input_dataframes, verbose):
         # Columns to group data by - i.e. identify repetitions of a single run
         group_by_columns = GROUP_BY_COLUMNS_PER_STEP_PER_SIM if csv_is_per_step else GROUP_BY_COLUMNS_PER_SIM
 
+        # Handle file specific columns
+        if csv_name in FILE_SPECIFIC_COLUMNS:
+            group_by_columns.append(FILE_SPECIFIC_COLUMNS[csv_name])
+
         # fetch the appropriate list of aggregate operations to apply.
         aggregations = AGGREGATIONS_PER_STEP_PER_SIM if csv_is_per_step else AGGREGATIONS_PER_SIM
 
@@ -279,6 +290,7 @@ MANUAL_PRETTY_CSV_KEY_MAP = {
     "mean_s_step": "Average Step Time (s)",
     "mean_agent_density": "Agent Density",
     "env_volume": "Environment Volume",
+    "sort_period": "Sort Period (steps)"
 }
 
 def pretty_csv_key(csv_key):
@@ -668,6 +680,19 @@ PLOTS_PER_CSV={
             df_query="model == 'circles_bruteforce_rtc'",
             miny=0,
             maxy=0.15,
+            sns_palette=SEQUENTIAL_PALETTE
+        )
+    ],
+    "sort-period_perSimulationCSV.csv": [
+        PlotOptions(
+            filename="lineplot--sort_period--mean_s_step_mean--model-comm_radius.png",
+            plot_type="lineplot",
+            xkey="sort_period",
+            ykey="mean_s_step_mean",
+            huekey="model",
+            stylekey="comm_radius",
+            df_query="sort_period <= 20 and (model == 'circles_spatial3D_rtc' or model == 'circles_spatial3D')",
+            miny=0,
             sns_palette=SEQUENTIAL_PALETTE
         )
     ]

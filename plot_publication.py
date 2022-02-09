@@ -169,7 +169,8 @@ def main():
 
     # Plot sort period comparison
     plot_for_com_radius = 8
-    sort_df = sort_df.query("comm_radius == " + str(plot_for_com_radius) + " and (model == 'circles_spatial3D' or model == 'circles_spatial3D_rtc')")
+    max_sort_period_to_plot = 20
+    sort_df = sort_df.query("sort_period <= " + str(max_sort_period_to_plot) + " and comm_radius == " + str(plot_for_com_radius) + " and (model == 'circles_spatial3D' or model == 'circles_spatial3D_rtc')")
     plt_df_sort = sns.lineplot(x='sort_period', y='s_step_mean', hue='model', data=sort_df, ax=ax['p5'], palette=custom_palette, ci="sd")
     plt_df_sort.ticklabel_format(style='plain', axis='x') # no scientific notation
     plt_df_sort.set(xlabel='Sort period (steps)', ylabel='Step time (s)')
