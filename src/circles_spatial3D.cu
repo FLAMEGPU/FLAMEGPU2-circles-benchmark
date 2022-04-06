@@ -33,9 +33,9 @@ FLAMEGPU_AGENT_FUNCTION(move, flamegpu::MessageSpatial3D, flamegpu::MessageNone)
             float x21 = x2 - x1;
             float y21 = y2 - y1;
             float z21 = z2 - z1;
-            const float separation = cbrt(x21*x21 + y21*y21 + z21*z21);
+            const float separation = sqrtf(x21*x21 + y21*y21 + z21*z21);
             if (separation < RADIUS && separation > 0.0f) {
-                float k = sinf((separation / RADIUS)*3.141*-2)*REPULSE_FACTOR;
+                float k = sinf((separation / RADIUS)*3.141f*-2)*REPULSE_FACTOR;
                 // Normalise without recalculating separation
                 x21 /= separation;
                 y21 /= separation;
@@ -55,7 +55,7 @@ FLAMEGPU_AGENT_FUNCTION(move, flamegpu::MessageSpatial3D, flamegpu::MessageNone)
     FLAMEGPU->setVariable<float>("y", y1 + fy);
     FLAMEGPU->setVariable<float>("z", z1 + fz);
 #if defined(CIRCLES_VALIDATION) && CIRCLES_VALIDATION
-    FLAMEGPU->setVariable<float>("drift", cbrt(fx*fx + fy*fy + fz*fz));
+    FLAMEGPU->setVariable<float>("drift", sqrtf(fx*fx + fy*fy + fz*fz));
 #endif
     float totalMessageCount = FLAMEGPU->getVariable<float>("totalMessageCount");
     FLAMEGPU->setVariable<float>("totalMessageCount", totalMessageCount + messageCount);
