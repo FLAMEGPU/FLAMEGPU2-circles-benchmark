@@ -348,14 +348,14 @@ bool experiment_comm_radius(custom_cli cli){
     const uint32_t popSize = 64000;
     const float ENV_WIDTH = 40.0f;  
     const uint32_t SORT_PERIOD = 1u; 
-    const std::vector<float> comm_radii = {2.0f, 4.0f, 6.0f, 8.0f, 10.0f, 12.0f, 14.0f, 16.0f, 18.0f, 20.0f, 22.0f, 24.0f, 26.0f, 28.0f, 30.0f, 32.0f, 34.0f, 36.0f, 38.0f, 40.0f};
+    const std::vector<float> comm_radii = {40.0f};
 
     // Select the models to execute.
     std::map<std::string, std::function<void(const RunSimulationInputs, RunSimulationOutputs&)>> MODELS = {
         {std::string("circles_spatial3D"), run_circles_spatial3D},
-        {std::string("circles_spatial3D_rtc"), run_circles_spatial3D_rtc},
-        {std::string("circles_bruteforce"), run_circles_bruteforce},
-        {std::string("circles_bruteforce_rtc"), run_circles_bruteforce_rtc},
+        // {std::string("circles_spatial3D_rtc"), run_circles_spatial3D_rtc},
+        // {std::string("circles_bruteforce"), run_circles_bruteforce},
+        // {std::string("circles_bruteforce_rtc"), run_circles_bruteforce_rtc},
     };
 
     // Construct the vector of RunSimulationInputs to pass to the run_experiment method.
@@ -391,10 +391,10 @@ int main(int argc, const char ** argv) {
     custom_cli cli = parse_custom_cli(argc, argv);
 
     // Launch each experiment.
-    bool success_1 = experiment_total_scale_all(cli);
-    bool success_2 = experiment_density_spatial(cli);
+    bool success_1 = true;// experiment_total_scale_all(cli);
+    bool success_2 = true;// experiment_density_spatial(cli);
     bool success_3 = experiment_comm_radius(cli);
-    bool success_4 = experiment_sort_period(cli);
+    bool success_4 = true;// experiment_sort_period(cli);
 
     // exit code
     return success_1 && success_2 && success_3 && success_4 ? EXIT_SUCCESS : EXIT_FAILURE;
