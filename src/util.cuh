@@ -116,7 +116,7 @@ custom_cli parse_custom_cli(const int argc, const char ** argv) {
                 print_cli_help(argc, argv);
                 exit(EXIT_FAILURE);
             }
-        } else if (arg.compare("-d") == 0 || arg.compare("--d") == 0 ) {
+        } else if (arg.compare("-d") == 0 || arg.compare("--device") == 0 ) {
             if(i + 1 < argc){
                 try {
                     std::string v(argv[i+1]);
