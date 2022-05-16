@@ -12,6 +12,9 @@
 module use /usr/local/modulefiles/staging/eb/all/
 module load CUDA/11.0.2-GCC-9.3.0
 
+# CD into the script's directory, so the relative path exists when not exeucted as a batch job. 
+cd "$(dirname "$0")"
+
 # Set the location of the project root relative to this script
 PROJECT_ROOT=../..
 

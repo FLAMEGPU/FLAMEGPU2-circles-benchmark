@@ -14,6 +14,9 @@ conda create -n fgpu2-circles-benchmark
 source activate fgpu2-circles-benchmark
 conda install -y cmake=3.18
 
+# CD into the script's directory, so the relative path exists when not exeucted as a batch job. 
+cd "$(dirname "$0")"
+
 # Set the location of the project root relative to this script
 PROJECT_ROOT=../..
 
