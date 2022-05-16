@@ -14,9 +14,6 @@ conda create -n fgpu2-circles-benchmark
 source activate fgpu2-circles-benchmark
 conda install -y cmake=3.18
 
-# Make sure temporary directory exists, used for RTC cache
-mkdir -p $TMPDIR
-
 # Set the location of the project root relative to this script
 PROJECT_ROOT=../..
 
