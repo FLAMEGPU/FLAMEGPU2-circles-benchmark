@@ -19,7 +19,15 @@ module load GCC/11.2.0
 module load CUDA/11.4.1
 
 # CD into the script's directory, so the relative path exists when not exeucted as a batch job. 
-cd "$(dirname "$0")"
+# This needs special handling for slurm submiutted jobs compared to direct execution of the script
+if [ -n $SLURM_JOB_ID ];  then
+    # check the original location through scontrol and $SLURM_JOB_ID
+    SCRIPT_PATH=$(scontrol show job $SLURM_JOBID | awk -F= '/Command=/{print $2}')
+else
+    # otherwise: started with bash. Get the real location.
+    SCRIPT_PATH=$(realpath $0)
+fi
+cd "$(dirname $(SCRIPT_PATH)"
 
 # Set the location of the project root relative to this script
 PROJECT_ROOT=../..
