@@ -1,7 +1,9 @@
 #!/bin/bash
 #SBATCH --time=00:30:00
-#SBATCH --ntasks=4
 #SBATCH --job-name=compile.bessemer.sh
+# 8 CPU cores + enough memory (< 8/40ths of the node memory)
+#SBATCH --cpus-per-task=8
+#SBATCH --mem=32G
 
 # Load modules for compilation
 module use /usr/local/modulefiles/staging/eb/all/
