@@ -64,7 +64,7 @@ def validate_args(args):
     if args.output_dir is not None:
         p = pathlib.Path(args.output_dir)
         try:
-            p.mkdir(exist_ok=True)
+            p.mkdir(exist_ok=True, parents=True)
         except Exception as e:
             print(f"Error: Could not create output directory {p}: {e}")
             valid = False
