@@ -31,7 +31,7 @@ cd $PROJECT_ROOT
 mkdir -p build && cd build
 
 # Configure cmake for A100 GPUs (SM_80) in Release without seatbelts
-cmake .. -DCMAKE_CUDA_ARCHITECTURES=80 -DCMAKE_BUILD_TYPE=Release -DFLAMEGPU_SEATBELTS=OFF 
+cmake .. -DCMAKE_CUDA_ARCHITECTURES=80 -DCMAKE_BUILD_TYPE=Release -DFLAMEGPU_SEATBELTS=OFF -DFLAMEGPU_SHARE_USAGE_SATATISTICS=OFF
 
 # Compile the code using all available processors.
 cmake --build . -j `nproc`
