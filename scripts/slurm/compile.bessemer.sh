@@ -27,7 +27,7 @@ cd $PROJECT_ROOT
 mkdir -p build && cd build
 
 # Configure cmake.
-cmake .. -DCUDA_ARCH=70 -DCMAKE_BUILD_TYPE=Release -DSEATBELTS=OFF 
+cmake .. -DCMAKE_CUDA_ARCHITECTURES=70 -DCMAKE_BUILD_TYPE=Release -DFLAMEGPU_SEATBELTS=OFF 
 
 # Compile the code with make for GPUs in Bessener (SM_70)
 make -j `nproc`
