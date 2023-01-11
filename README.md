@@ -11,7 +11,7 @@ For a more complete description of the model, see:
 
 Three experiments are undertaken within this benchmark. There is a range of raw data in the [`sample/data`](sample/data) directory with a description of the machine configurations used to generate it in each directory.
 
-The results below are from the V100 runs on the Bessemer HPC system at the University of Sheffield. Job submission scripts are included in the [`scripts/slurm`]() folder.
+The results below are from the V100 runs on the Bessemer HPC system at the University of Sheffield. Job submission scripts are included in the [`scripts/slurm`](scripts/slurm/) directory.
 
 A combined figure for use in publication is shown below. For details please refer to the publication.
 
@@ -23,22 +23,21 @@ A combined figure for use in publication is shown below. For details please refe
 + Agent Density is fixed to `1` agent per unit of volume 
 + Environment Volume is varied, with values of up to `1000000` units of volume
 + 4 Implementations are compared
-	+ Bruteforce messaging 
-	+ Bruteforce messaging with RTC (run time compilation)
-	+ Spatial3D messaging 
-	+ Spatial3D messaging with RTC (run time compilation) 
+  + Bruteforce messaging
+  + Bruteforce messaging with RTC (run time compilation)
+  + Spatial3D messaging
+  + Spatial3D messaging with RTC (run time compilation)
 
 [![Fixed Density Benchmark](sample/figures/v100-470.82.01/alpha.2-v100-11.0-beltsoff/fixed-density--volume--step-s--model--all.png)](sample/figures/v100-470.82.01/alpha.2-v100-11.0-beltsoff/fixed-density--volume--step-s--model--all.png)
 [![Fixed Density Benchmark Zoomed](sample/figures/v100-470.82.01/alpha.2-v100-11.0-beltsoff/fixed-density--volume--step-s--model--zoomed.png)](sample/figures/v100-470.82.01/alpha.2-v100-11.0-beltsoff/fixed-density--volume--step-s--model--zoomed.png)
 
 ### Variable Density Benchmark
 
-
 + Communication Radius is fixed to `2.0`
 + Agent Density is varied per unit of volume, from `1` to `4`
-+ Environment Volume is varied upto `~ 500000` units of volume.
++ Environment Volume is varied up to `~ 500000` units of volume.
 + A single implementation is benchmarked
-    + Spatial3D messaging with RTC (run time compilation)
+  + Spatial3D messaging with RTC (run time compilation)
 		
 [![variable-density volume](sample/figures/v100-470.82.01/alpha.2-v100-11.0-beltsoff/variable-density--volume--step-s--density--3drtc.png)](sample/figures/v100-470.82.01/alpha.2-v100-11.0-beltsoff/variable-density--volume--step-s--density--3drtc.png)
 
@@ -50,7 +49,6 @@ A combined figure for use in publication is shown below. For details please refe
 + Agent count is fixed at 64,000
 + Environment width is fixed at 40
 + Agent Density is `1.0f`
-
 
 [![Variable Communication Radius Benchmark](sample/figures/v100-470.82.01/alpha.2-v100-11.0-beltsoff/comm-radius--lineplot-spatial3D-bruteforce-rtc-only.png)](sample/figures/v100-470.82.01/alpha.2-v100-11.0-beltsoff/comm-radius--lineplot-spatial3D-bruteforce-rtc-only.png)
 
@@ -82,10 +80,10 @@ cmake --build build -j`nproc`
 cd build
 ./bin/Release/circles-benchmarking 
 ```
+
 This will produce a number of `.csv` files in the `build` directory.
 
 Note: The `FLAMEGPU2_INC_DIR` environment variable may need to be set to `./_deps/flamegpu2-src/include/` for run-time compilation (RTC) to succeed if the source directory is not automatically found.
-
 
 ## Plotting Results
 
