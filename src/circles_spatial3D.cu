@@ -149,6 +149,7 @@ void run_circles_spatial3D(const RunSimulationInputs runInputs, RunSimulationOut
 
     // Set config configuraiton properties 
     simulation.SimulationConfig().timing = false;
+    simulation.SimulationConfig().telemetry = false;
     simulation.SimulationConfig().verbosity = flamegpu::Verbosity::Quiet;
     simulation.SimulationConfig().random_seed = runInputs.SEED;
     simulation.SimulationConfig().steps = runInputs.STEPS;
