@@ -31,4 +31,4 @@ echo "HOSTNAME=${HOSTNAME}"
 nvidia-smi
 
 # Run the executable.
-./bin/Release/circles-benchmarking
+./bin/Release/circles-benchmark

@@ -78,7 +78,7 @@ cmake --build build -j`nproc`
 
 ```bash
 cd build
-./bin/Release/circles-benchmarking 
+./bin/Release/circles-benchmark
 ```
 
 This will produce a number of `.csv` files in the `build` directory.

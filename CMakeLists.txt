@@ -14,10 +14,10 @@ include(${CMAKE_CURRENT_LIST_DIR}/cmake/flamegpu2.cmake)
 
 # Handle CMAKE_CUDA_ARCHITECTURES gracefully, passign the project name for code-injection
 include(${FLAMEGPU_ROOT}/cmake/CUDAArchitectures.cmake)
-flamegpu_init_cuda_architectures(PROJECT circles-benchmarking)
+flamegpu_init_cuda_architectures(PROJECT circles-benchmark)
 
 # Name the project and set languages, this must be done after flamegpu_init_cuda_architectures
-project(circles-benchmarking CUDA CXX)
+project(circles-benchmark CUDA CXX)
 
 # Include common rules from the FLAMEGPU/FLAMEGPU2 repositories CMake
 include(${FLAMEGPU_ROOT}/cmake/common.cmake)
