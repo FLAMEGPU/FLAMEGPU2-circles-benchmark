@@ -12,7 +12,7 @@ module load CUDA/11.0.2-GCC-9.3.0
 # Load cmake via pip into a local venv
 module load Anaconda3/5.3.0
 
-conda create -n fgpu2-circles-benchmark
+conda create -yn fgpu2-circles-benchmark
 source activate fgpu2-circles-benchmark
 conda install -y cmake=3.18
 
