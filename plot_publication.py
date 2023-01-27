@@ -149,7 +149,7 @@ def main():
 
     # Plot radius comparison
     rad_df = rad_df.query("model == 'circles_spatial3D' or model == 'circles_bruteforce'")
-    plt_df_rad = sns.lineplot(x='comm_radius_as_percentage_env_width', y='s_step_mean', hue='model', data=rad_df, ax=ax['p3'], palette=custom_palette, ci="sd")
+    plt_df_rad = sns.lineplot(x='comm_radius_as_percentage_env_width', y='s_step_mean', hue='model', style='model', data=rad_df, ax=ax['p3'], palette=custom_palette, ci="sd")
     plt_df_rad.ticklabel_format(style='plain', axis='x') # no scientific notation
     plt_df_rad.set(xlabel='r as % of W', ylabel='Step time (s)')
     ax['p3'].set_title(label='C', loc='left', fontweight="bold")
@@ -157,7 +157,7 @@ def main():
     
     # plot data volume
     messages_df = rad_df.query("model == 'circles_spatial3D'")
-    plt_df_rad = sns.lineplot(x='comm_radius_as_percentage_env_width', y='mean_message_count', hue='model', data=messages_df, ax=ax['p4'], palette=custom_palette, ci="sd")
+    plt_df_rad = sns.lineplot(x='comm_radius_as_percentage_env_width', y='mean_message_count', hue='model', style='model', data=messages_df, ax=ax['p4'], palette=custom_palette, ci="sd")
     plt_df_rad.set(xlabel='r as % of W', ylabel='Messages / step')
     ax['p4'].set_title(label='D', loc='left', fontweight="bold")
     ax['p4'].legend().set_visible(False)
@@ -171,7 +171,7 @@ def main():
     plot_for_com_radius = 8
     max_sort_period_to_plot = 20
     sort_df = sort_df.query("sort_period <= " + str(max_sort_period_to_plot) + " and comm_radius == " + str(plot_for_com_radius) + " and (model == 'circles_spatial3D' or model == 'circles_spatial3D_rtc')")
-    plt_df_sort = sns.lineplot(x='sort_period', y='s_step_mean', hue='model', data=sort_df, ax=ax['p5'], palette=custom_palette, ci="sd")
+    plt_df_sort = sns.lineplot(x='sort_period', y='s_step_mean', hue='model', style='model', data=sort_df, ax=ax['p5'], palette=custom_palette, ci="sd")
     plt_df_sort.ticklabel_format(style='plain', axis='x') # no scientific notation
     plt_df_sort.set(xlabel='Sort period (steps)', ylabel='Step time (s)')
     ax['p5'].set_title(label='E', loc='left', fontweight="bold")
