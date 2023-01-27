@@ -15,7 +15,7 @@ The results below are from the V100 runs on the Bessemer HPC system at the Unive
 
 A combined figure for use in publication is shown below. For details please refer to the publication.
 
-[![Combined Benchmark Figure](sample/figures/v100-515.65.01/2.00-rc-v100-11.0-beltsoff/paper_figure.png)](sample/figures/v100-515.65.01/2.00-rc-v100-11.0-beltsoff/paper_figure.png)
+[![Combined Benchmark Figure](sample/figures/v100-515.65.01/2.0.0-rc-v100-11.0-beltsoff/paper_figure.png)](sample/figures/v100-515.65.01/2.0.0-rc-v100-11.0-beltsoff/paper_figure.png)
 
 ### Fixed Density Benchmark
 
@@ -28,8 +28,8 @@ A combined figure for use in publication is shown below. For details please refe
   + Spatial3D messaging
   + Spatial3D messaging with RTC (run time compilation)
 
-[![Fixed Density Benchmark](sample/figures/v100-515.65.01/2.00-rc-v100-11.0-beltsoff/fixed-density--volume--step-s--model--all.png)](sample/figures/v100-515.65.01/2.00-rc-v100-11.0-beltsoff/fixed-density--volume--step-s--model--all.png)
-[![Fixed Density Benchmark Zoomed](sample/figures/v100-515.65.01/2.00-rc-v100-11.0-beltsoff/fixed-density--volume--step-s--model--zoomed.png)](sample/figures/v100-515.65.01/2.00-rc-v100-11.0-beltsoff/fixed-density--volume--step-s--model--zoomed.png)
+[![Fixed Density Benchmark](sample/figures/v100-515.65.01/2.0.0-rc-v100-11.0-beltsoff/fixed-density--volume--step-s--model--all.png)](sample/figures/v100-515.65.01/2.0.0-rc-v100-11.0-beltsoff/fixed-density--volume--step-s--model--all.png)
+[![Fixed Density Benchmark Zoomed](sample/figures/v100-515.65.01/2.0.0-rc-v100-11.0-beltsoff/fixed-density--volume--step-s--model--zoomed.png)](sample/figures/v100-515.65.01/2.0.0-rc-v100-11.0-beltsoff/fixed-density--volume--step-s--model--zoomed.png)
 
 ### Variable Density Benchmark
 
@@ -39,7 +39,7 @@ A combined figure for use in publication is shown below. For details please refe
 + A single implementation is benchmarked
   + Spatial3D messaging with RTC (run time compilation)
 		
-[![variable-density volume](sample/figures/v100-515.65.01/2.00-rc-v100-11.0-beltsoff/variable-density--volume--step-s--density--3drtc.png)](sample/figures/v100-515.65.01/2.00-rc-v100-11.0-beltsoff/variable-density--volume--step-s--density--3drtc.png)
+[![variable-density volume](sample/figures/v100-515.65.01/2.0.0-rc-v100-11.0-beltsoff/variable-density--volume--step-s--density--3drtc.png)](sample/figures/v100-515.65.01/2.0.0-rc-v100-11.0-beltsoff/variable-density--volume--step-s--density--3drtc.png)
 
 ### Variable Communication Radius Benchmark
 
@@ -50,7 +50,7 @@ A combined figure for use in publication is shown below. For details please refe
 + Environment width is fixed at 40
 + Agent Density is `1.0f`
 
-[![Variable Communication Radius Benchmark](sample/figures/v100-515.65.01/2.00-rc-v100-11.0-beltsoff/comm-radius--lineplot-spatial3D-bruteforce-rtc-only.png)](sample/figures/v100-515.65.01/2.00-rc-v100-11.0-beltsoff/comm-radius--lineplot-spatial3D-bruteforce-rtc-only.png)
+[![Variable Communication Radius Benchmark](sample/figures/v100-515.65.01/2.0.0-rc-v100-11.0-beltsoff/comm-radius--lineplot-spatial3D-bruteforce-rtc-only.png)](sample/figures/v100-515.65.01/2.0.0-rc-v100-11.0-beltsoff/comm-radius--lineplot-spatial3D-bruteforce-rtc-only.png)
 
 ### Variable Sort Period Benchmark
 
@@ -61,7 +61,7 @@ A combined figure for use in publication is shown below. For details please refe
 + Environment width is fixed at 40
 + Agent density is `1.0f`
 
-[![variable-sort-period](sample/figures/v100-515.65.01/2.00-rc-v100-11.0-beltsoff/sort-period--lineplot--sort_period--mean_s_step_mean--model-comm_radius.png)](sample/figures/v100-515.65.01/2.00-rc-v100-11.0-beltsoff/sort-period--lineplot--sort_period--mean_s_step_mean--model-comm_radius.png)
+[![variable-sort-period](sample/figures/v100-515.65.01/2.0.0-rc-v100-11.0-beltsoff/sort-period--lineplot--sort_period--mean_s_step_mean--model-comm_radius.png)](sample/figures/v100-515.65.01/2.0.0-rc-v100-11.0-beltsoff/sort-period--lineplot--sort_period--mean_s_step_mean--model-comm_radius.png)
 
 ## Building and Running the Benchmark
 
@@ -111,11 +111,11 @@ python3 plot.py build -o build/figures
 The sample figures were generated from the root directory using
 
 ```bash
-python3 plot.py -i sample/data/v100-515.65.01/2.00-rc-v100-11.0-beltsoff -o sample/figures/v100-515.65.01/2.00-rc-v100-11.0-beltsoff
+python3 plot.py -i sample/data/v100-515.65.01/2.0.0-rc-v100-11.0-beltsoff -o sample/figures/v100-515.65.01/2.0.0-rc-v100-11.0-beltsoff
 ```
 
 The publication figure was generated using 
 
 ```bash
-python3 plot_publication.py -i sample/data/v100-515.65.01/2.00-rc-v100-11.0-beltsoff -o sample/figures/v100-515.65.01/2.00-rc-v100-11.0-beltsoff
+python3 plot_publication.py -i sample/data/v100-515.65.01/2.0.0-rc-v100-11.0-beltsoff -o sample/figures/v100-515.65.01/2.0.0-rc-v100-11.0-beltsoff
 ```
