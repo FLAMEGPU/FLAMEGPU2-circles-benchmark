@@ -11,11 +11,11 @@ For a more complete description of the model, see:
 
 Three experiments are undertaken within this benchmark. There is a range of raw data in the [`sample/data`](sample/data) directory with a description of the machine configurations used to generate it in each directory.
 
-The results below are from the V100 runs on the Bessemer HPC system at the University of Sheffield. Job submission scripts are included in the [`scripts/slurm`]() folder.
+The results below are from the V100 runs on the Bessemer HPC system at the University of Sheffield. Job submission scripts are included in the [`scripts/slurm`](scripts/slurm/) directory.
 
 A combined figure for use in publication is shown below. For details please refer to the publication.
 
-[![Combined Benchmark Figure](sample/figures/v100-470.82.01/alpha.2-v100-11.0-beltsoff/paper_figure.png)](sample/figures/v100-470.82.01/alpha.2-v100-11.0-beltsoff/paper_figure.png)
+[![Combined Benchmark Figure](sample/figures/v100-515.65.01/2.0.0-rc-v100-11.0-beltsoff/paper_figure.png)](sample/figures/v100-515.65.01/2.0.0-rc-v100-11.0-beltsoff/paper_figure.png)
 
 ### Fixed Density Benchmark
 
@@ -23,24 +23,23 @@ A combined figure for use in publication is shown below. For details please refe
 + Agent Density is fixed to `1` agent per unit of volume 
 + Environment Volume is varied, with values of up to `1000000` units of volume
 + 4 Implementations are compared
-	+ Bruteforce messaging 
-	+ Bruteforce messaging with RTC (run time compilation)
-	+ Spatial3D messaging 
-	+ Spatial3D messaging with RTC (run time compilation) 
+  + Bruteforce messaging
+  + Bruteforce messaging with RTC (run time compilation)
+  + Spatial3D messaging
+  + Spatial3D messaging with RTC (run time compilation)
 
-[![Fixed Density Benchmark](sample/figures/v100-470.82.01/alpha.2-v100-11.0-beltsoff/fixed-density--volume--step-s--model--all.png)](sample/figures/v100-470.82.01/alpha.2-v100-11.0-beltsoff/fixed-density--volume--step-s--model--all.png)
-[![Fixed Density Benchmark Zoomed](sample/figures/v100-470.82.01/alpha.2-v100-11.0-beltsoff/fixed-density--volume--step-s--model--zoomed.png)](sample/figures/v100-470.82.01/alpha.2-v100-11.0-beltsoff/fixed-density--volume--step-s--model--zoomed.png)
+[![Fixed Density Benchmark](sample/figures/v100-515.65.01/2.0.0-rc-v100-11.0-beltsoff/fixed-density--volume--step-s--model--all.png)](sample/figures/v100-515.65.01/2.0.0-rc-v100-11.0-beltsoff/fixed-density--volume--step-s--model--all.png)
+[![Fixed Density Benchmark Zoomed](sample/figures/v100-515.65.01/2.0.0-rc-v100-11.0-beltsoff/fixed-density--volume--step-s--model--zoomed.png)](sample/figures/v100-515.65.01/2.0.0-rc-v100-11.0-beltsoff/fixed-density--volume--step-s--model--zoomed.png)
 
 ### Variable Density Benchmark
 
-
 + Communication Radius is fixed to `2.0`
 + Agent Density is varied per unit of volume, from `1` to `4`
-+ Environment Volume is varied upto `~ 500000` units of volume.
++ Environment Volume is varied up to `~ 500000` units of volume.
 + A single implementation is benchmarked
-    + Spatial3D messaging with RTC (run time compilation)
+  + Spatial3D messaging with RTC (run time compilation)
 		
-[![variable-density volume](sample/figures/v100-470.82.01/alpha.2-v100-11.0-beltsoff/variable-density--volume--step-s--density--3drtc.png)](sample/figures/v100-470.82.01/alpha.2-v100-11.0-beltsoff/variable-density--volume--step-s--density--3drtc.png)
+[![variable-density volume](sample/figures/v100-515.65.01/2.0.0-rc-v100-11.0-beltsoff/variable-density--volume--step-s--density--3drtc.png)](sample/figures/v100-515.65.01/2.0.0-rc-v100-11.0-beltsoff/variable-density--volume--step-s--density--3drtc.png)
 
 ### Variable Communication Radius Benchmark
 
@@ -51,8 +50,7 @@ A combined figure for use in publication is shown below. For details please refe
 + Environment width is fixed at 40
 + Agent Density is `1.0f`
 
-
-[![Variable Communication Radius Benchmark](sample/figures/v100-470.82.01/alpha.2-v100-11.0-beltsoff/comm-radius--lineplot-spatial3D-bruteforce-rtc-only.png)](sample/figures/v100-470.82.01/alpha.2-v100-11.0-beltsoff/comm-radius--lineplot-spatial3D-bruteforce-rtc-only.png)
+[![Variable Communication Radius Benchmark](sample/figures/v100-515.65.01/2.0.0-rc-v100-11.0-beltsoff/comm-radius--lineplot-spatial3D-bruteforce-rtc-only.png)](sample/figures/v100-515.65.01/2.0.0-rc-v100-11.0-beltsoff/comm-radius--lineplot-spatial3D-bruteforce-rtc-only.png)
 
 ### Variable Sort Period Benchmark
 
@@ -63,15 +61,15 @@ A combined figure for use in publication is shown below. For details please refe
 + Environment width is fixed at 40
 + Agent density is `1.0f`
 
-[![variable-sort-period](sample/figures/v100-470.82.01/alpha.2-v100-11.0-beltsoff/sort-period--lineplot--sort_period--mean_s_step_mean--model-comm_radius.png)](sample/figures/v100-470.82.01/alpha.2-v100-11.0-beltsoff/sort-period--lineplot--sort_period--mean_s_step_mean--model-comm_radius.png)
+[![variable-sort-period](sample/figures/v100-515.65.01/2.0.0-rc-v100-11.0-beltsoff/sort-period--lineplot--sort_period--mean_s_step_mean--model-comm_radius.png)](sample/figures/v100-515.65.01/2.0.0-rc-v100-11.0-beltsoff/sort-period--lineplot--sort_period--mean_s_step_mean--model-comm_radius.png)
 
 ## Building and Running the Benchmark
 
-Detail of dependencies and the `cmake` build process are described in full in the [FLAMEGPU2-example-template Repo](https://github.com/FLAMEGPU/FLAMEGPU2-example-template) and are not repeated here. The benchmark should be built with seatbelts off (e.g. `-DSEATBELTS=OFF` passed to the `cmake` configuration step) to disable additional run-time checks and optionally disabling Python Swig support which is not needed for this model(-DBUILD_SWIG_PYTHON=OFF ). E.g. for Volta (`SM_70`) GPUs under Linux.
+Detail of dependencies and the `cmake` build process are described in full in the [FLAMEGPU2-example-template Repo](https://github.com/FLAMEGPU/FLAMEGPU2-example-template) and are not repeated here. The benchmark should be built with seatbelts off (e.g. `-DFLAMEGPU_SEATBELTS=OFF` passed to the `cmake` configuration step) to disable additional run-time checks. E.g. for Volta (`SM_70`) GPUs under Linux.
 
 ```bash
 # Configure 
-cmake . -B build -DCMAKE_BUILD_TYPE=Release -DSEATBELTS=OFF -DBUILD_SWIG_PYTHON=OFF -DCUDA_ARCH=70
+cmake . -B build -DCMAKE_BUILD_TYPE=Release -DFLAMEGPU_SEATBELTS=OFF -DCMAKE_CUDA_ARCHITECTURES=70
 # Build
 cmake --build build -j`nproc` 
 ```
@@ -80,12 +78,12 @@ cmake --build build -j`nproc`
 
 ```bash
 cd build
-./bin/Release/circles-benchmarking 
+./bin/Release/circles-benchmark
 ```
+
 This will produce a number of `.csv` files in the `build` directory.
 
 Note: The `FLAMEGPU2_INC_DIR` environment variable may need to be set to `./_deps/flamegpu2-src/include/` for run-time compilation (RTC) to succeed if the source directory is not automatically found.
-
 
 ## Plotting Results
 
@@ -113,11 +111,11 @@ python3 plot.py build -o build/figures
 The sample figures were generated from the root directory using
 
 ```bash
-python3 plot.py sample/data/v100-470.82.01/alpha.2-v100-11.0-beltsoff -o sample/figures/v100-470.82.01/alpha.2-v100-11.0-beltsoff
+python3 plot.py -i sample/data/v100-515.65.01/2.0.0-rc-v100-11.0-beltsoff -o sample/figures/v100-515.65.01/2.0.0-rc-v100-11.0-beltsoff
 ```
 
 The publication figure was generated using 
 
 ```bash
-python3 plot_publication.py sample/data/v100-470.82.01/alpha.2-v100-11.0-beltsoff -o sample/figures/v100-470.82.01/alpha.2-v100-11.0-beltsoff
+python3 plot_publication.py -i sample/data/v100-515.65.01/2.0.0-rc-v100-11.0-beltsoff -o sample/figures/v100-515.65.01/2.0.0-rc-v100-11.0-beltsoff
 ```

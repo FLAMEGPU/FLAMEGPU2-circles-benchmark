@@ -29,7 +29,7 @@ FLAMEGPU_AGENT_FUNCTION(move, flamegpu::MessageSpatial3D, flamegpu::MessageNone)
     const float z1 = FLAMEGPU->getVariable<float>("z");
     int count = 0;
     int messageCount = 0;
-    for (const auto &message : FLAMEGPU->message_in(x1, y1, z1)) {
+    for (const auto message : FLAMEGPU->message_in(x1, y1, z1)) {
         if (message.getVariable<int>("id") != ID) {
             const float x2 = message.getVariable<float>("x");
             const float y2 = message.getVariable<float>("y");
@@ -103,14 +103,14 @@ void run_circles_spatial3D_rtc(const RunSimulationInputs runInputs, RunSimulatio
     runOutputs.agentDensity = runInputs.AGENT_COUNT / (ENV_WIDTH * ENV_WIDTH * ENV_WIDTH);
 
     {   // Location message
-        flamegpu::MessageSpatial3D::Description &message = model.newMessage<flamegpu::MessageSpatial3D>("location");
+        flamegpu::MessageSpatial3D::Description message = model.newMessage<flamegpu::MessageSpatial3D>("location");
         message.newVariable<int>("id");
         message.setRadius(runInputs.COMM_RADIUS);
         message.setMin(ENV_MIN, ENV_MIN, ENV_MIN);
         message.setMax(ENV_MAX, ENV_MAX, ENV_MAX);
     }
     {   // Circle agent
-        flamegpu::AgentDescription &agent = model.newAgent("Circle");
+        flamegpu::AgentDescription agent = model.newAgent("Circle");
         agent.newVariable<int>("id");
         agent.newVariable<float>("x");
         agent.newVariable<float>("y");
@@ -124,7 +124,7 @@ void run_circles_spatial3D_rtc(const RunSimulationInputs runInputs, RunSimulatio
 
     // Global environment variables.
     {
-        flamegpu::EnvironmentDescription &env = model.Environment();
+        flamegpu::EnvironmentDescription env = model.Environment();
         env.newProperty("repulse", ENV_REPULSE);
     }
 
@@ -140,11 +140,11 @@ void run_circles_spatial3D_rtc(const RunSimulationInputs runInputs, RunSimulatio
 #endif  // CIRCLES_VALIDATION
 
     {   // Layer #1
-        flamegpu::LayerDescription &layer = model.newLayer();
+        flamegpu::LayerDescription layer = model.newLayer();
         layer.addAgentFunction("Circle", "output_message");
     }
     {   // Layer #2
-        flamegpu::LayerDescription &layer = model.newLayer();
+        flamegpu::LayerDescription layer = model.newLayer();
         layer.addAgentFunction("Circle", "move");
     }
 
@@ -153,7 +153,8 @@ void run_circles_spatial3D_rtc(const RunSimulationInputs runInputs, RunSimulatio
 
     // Set config configuraiton properties 
     simulation.SimulationConfig().timing = false;
-    simulation.SimulationConfig().verbose = false;
+    simulation.SimulationConfig().telemetry = false;
+    simulation.SimulationConfig().verbosity = flamegpu::Verbosity::Quiet;
     simulation.SimulationConfig().random_seed = runInputs.SEED;
     simulation.SimulationConfig().steps = runInputs.STEPS;
     simulation.CUDAConfig().device_id = runInputs.CUDA_DEVICE;

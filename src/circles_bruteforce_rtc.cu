@@ -26,7 +26,7 @@ FLAMEGPU_AGENT_FUNCTION(move, flamegpu::MessageBruteForce, flamegpu::MessageNone
     const float y1 = FLAMEGPU->getVariable<float>("y");
     const float z1 = FLAMEGPU->getVariable<float>("z");
     int count = 0;
-    for (const auto &message : FLAMEGPU->message_in) {
+    for (const auto message : FLAMEGPU->message_in) {
         if (message.getVariable<int>("id") != ID) {
             const float x2 = message.getVariable<float>("x");
             const float y2 = message.getVariable<float>("y");
@@ -89,14 +89,14 @@ void run_circles_bruteforce_rtc(const RunSimulationInputs runInputs, RunSimulati
     runOutputs.agentDensity = runInputs.AGENT_COUNT / (ENV_WIDTH * ENV_WIDTH * ENV_WIDTH);
 
     {   // Location message
-        flamegpu::MessageBruteForce::Description &message = model.newMessage<flamegpu::MessageBruteForce>("location");
+        flamegpu::MessageBruteForce::Description message = model.newMessage<flamegpu::MessageBruteForce>("location");
         message.newVariable<int>("id");
         message.newVariable<float>("x");
         message.newVariable<float>("y");
         message.newVariable<float>("z");
     }
     {   // Circle agent
-        flamegpu::AgentDescription &agent = model.newAgent("Circle");
+        flamegpu::AgentDescription agent = model.newAgent("Circle");
         agent.newVariable<int>("id");
         agent.newVariable<float>("x");
         agent.newVariable<float>("y");
@@ -108,7 +108,7 @@ void run_circles_bruteforce_rtc(const RunSimulationInputs runInputs, RunSimulati
 
     // Global environment variables.
     {
-        flamegpu::EnvironmentDescription &env = model.Environment();
+        flamegpu::EnvironmentDescription env = model.Environment();
         env.newProperty("repulse", ENV_REPULSE);
         env.newProperty("radius", runInputs.COMM_RADIUS);
     }
@@ -122,11 +122,11 @@ void run_circles_bruteforce_rtc(const RunSimulationInputs runInputs, RunSimulati
 #endif  // CIRCLES_VALIDATION
 
     {   // Layer #1
-        flamegpu::LayerDescription &layer = model.newLayer();
+        flamegpu::LayerDescription layer = model.newLayer();
         layer.addAgentFunction("Circle", "output_message");
     }
     {   // Layer #2
-        flamegpu::LayerDescription &layer = model.newLayer();
+        flamegpu::LayerDescription layer = model.newLayer();
         layer.addAgentFunction("Circle", "move");
     }
 
@@ -135,7 +135,8 @@ void run_circles_bruteforce_rtc(const RunSimulationInputs runInputs, RunSimulati
 
     // Set config configuraiton properties 
     simulation.SimulationConfig().timing = false;
-    simulation.SimulationConfig().verbose = false;
+    simulation.SimulationConfig().telemetry = false;
+    simulation.SimulationConfig().verbosity = flamegpu::Verbosity::Quiet;
     simulation.SimulationConfig().random_seed = runInputs.SEED;
     simulation.SimulationConfig().steps = runInputs.STEPS;
     simulation.CUDAConfig().device_id = runInputs.CUDA_DEVICE;
