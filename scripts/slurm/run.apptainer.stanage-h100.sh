@@ -1,13 +1,12 @@
 #!/bin/bash
-#SBATCH --time=14:00:00
-#SBATCH --partition=dcs-gpu
-#SBATCH --account=dcs-res
-# 1 GPU
-#SBATCH --gres=gpu:1
-# 1 CPU core
-#SBATCH --cpus-per-task=1
-# 1 GPU's worth of host memory
-#SBATCH --mem=32G
+#SBATCH --time=8:00:00
+#SBATCH --partition=gpu
+#SBATCH --qos=gpu
+#SBATCH --gres=gpu:h100:1
+
+# 24 CPU cores (1/2 of the node) and 1 GPUs worth of memory < 1/2th of the node)
+#SBATCH --cpus-per-task=24
+#SBATCH --mem=82G
 
 # Set the location of the project root relative to this script
 # This version will only work within a slurm job, submit from this directory.
@@ -17,7 +16,7 @@ APPTAINER_IMAGE_PATH=${PROJECT_ROOT}/flamegpu2-circles-benchmark-11.8.sif
 
 # navigate into a working directory directory.
 cd $PROJECT_ROOT
-mkdir -p apptainer-workdir && cd apptainer-workdir
+mkdir -p apptainer-workdir-h100 && cd apptainer-workdir-h100
 
 # Output the node this was executed on
 echo "HOSTNAME=${HOSTNAME}"

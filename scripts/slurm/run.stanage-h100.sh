@@ -1,22 +1,16 @@
 #!/bin/bash
 #SBATCH --time=8:00:00
-#SBATCH --partition=gpu-a100-tmp
+#SBATCH --partition=gpu
 #SBATCH --qos=gpu
-# 1 GPU
-#SBATCH --gres=gpu:1
-# 1 CPU core
-#SBATCH --cpus-per-task=1
-# 1 GPU's worth of host memory
-#SBATCH --mem=80G
+#SBATCH --gres=gpu:h100:1
 
-# Use A100 specific module environment
-module unuse /usr/local/modulefiles/live/eb/all
-module unuse /usr/local/modulefiles/live/noeb
-module use /usr/local/modulefiles/staging/eb-znver3/all/
+# 24 CPU cores (1/2 of the node) and 1 GPUs worth of memory < 1/2th of the node)
+#SBATCH --cpus-per-task=24
+#SBATCH --mem=82G
 
-# Load modules from the A100 specific environment
-module load GCC/11.2.0
-module load CUDA/11.4.1
+# GPU node module environment is active on the GPU nodes automatically now, load appropriate modules
+module load GCC/11.3.0
+module load CUDA/12.0.0
 
 # Set the location of the project root relative to this script
 PROJECT_ROOT=../..
