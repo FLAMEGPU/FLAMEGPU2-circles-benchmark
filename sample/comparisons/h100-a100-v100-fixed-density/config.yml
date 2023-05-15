@@ -1,0 +1,42 @@
+LABELLED_INPUT_DIRS:
+  # "V100 SXM2 CUDA 11.0": "../../figures/v100-515.65.01/2.0.0-rc-v100-11.0-beltsoff/"
+  "V100 SXM2 CUDA 11.8": "../../figures/v100-525.105.17/2.0.0-rc-v100-11.8-beltsoff/"
+  "A100 SXM4 CUDA 11.8": "../../figures/a100-525.105.17/2.0.0-rc-a100-11.8-beltsoff/"
+  "H100 PCIe CUDA 11.8": "../../figures/h100-525.105.17/2.0.0-rc-h100-11.8-beltsoff/"
+INPUT_FILE_PER_DIR: "processed_fixed-density_perSimulationCSV.csv"
+OUTPUT_DIR: "."
+OUTPUT_FILE_PREFIX: plot-h100-a100-v100-fixed-density
+COMBINED_CSV_OUTPUT_FILENAME: combined-h100-a100-v100-fixed-density.csv
+SIMULATORS:
+  "Circles Brute Force": "circles_bruteforce"
+  "Circles Brute Force RTC": "circles_bruteforce_rtc"
+  "Circles Spatial3D": "circles_spatial3D"
+  "Circles Spatial3D RTC": "circles_spatial3D_rtc"
+TITLE_PREFIX: "FLAME GPU 2 Circles Fixed-Density Benchmark:"
+X: "agent_count"
+XLABEL: "Population Size"
+Y: "mean_s_simulation"
+YLABEL: "Mean Simulation Time (s)"
+YLIM_BOTTOM: 0
+HUE: "label"
+HUELABEL: "GPU/CUDA"
+STYLE: "label"
+STYLELABEL: "GPU/CUDA"
+FIGSIZE_INCHES: [16, 9]
+SNS_CONTEXT: "talk"
+SNS_PALETTE: "Dark2"
+SNS_STYLE: "darkgrid"
+DPI: 96
+LEGEND_BORDER_PAD: 0.5
+EXTERNAL_LEGEND: False
+SPEEDUP_OUTPUT_FILE_PREFIX: plot-speedup-v100-fixed-density-max-pop
+SPEEDUP_FILTER_COLUMN: "agent_count" 
+SPEEDUP_BASE_INPUT_LABEL: "V100 SXM2 CUDA 11.8"
+SPEEDUP_TITLE: "FLAME GPU 2 Circles Fixed-Density Benchmark: Speedup vs V100 SXM2 CUDA 11.8"
+SPEEDUP_X: "model"
+SPEEDUP_XLABEL: "Model Implementation"
+SPEEDUP_Y: "mean_s_simulation"
+SPEEDUP_YLABEL: "Simulation Speedup"
+SPEEDUP_YLIM_TOP: 2.5
+SPEEDUP_HUE: "label"
+SPEEDUP_HUE_LABEL: "GPU/CUDA"
