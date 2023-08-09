@@ -56,7 +56,7 @@ constexpr bool isReleaseMode() {
 
 }
 constexpr bool isSeatbeltsON() {
-    #if defined(SEATBELTS) && !SEATBELTS
+    #if defined(FLAMEGPU_SEATBELTS) && !FLAMEGPU_SEATBELTS
         return false;
     #else 
         return true;
