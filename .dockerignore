@@ -1,0 +1,25 @@
+# Configuration files
+*.json
+*.yaml
+
+# Container files
+*.sif
+.dockerignore
+Dockerfile
+
+# Build directories
+build**/
+
+# Python venv directories
+.venv**/
+venv**/
+
+# Sample data directory
+Sample
+
+# Slurm job submission scripts 
+scripts/
+
+# Python plotting stuff
+requirements.txt
+plot*.py
