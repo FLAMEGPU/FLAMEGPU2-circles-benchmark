@@ -1,3 +1,11 @@
+# Configuration files
+*.json
+*.yaml
+*.yml
+
+# Container files
+*.sif
+
 # Images etc.
 *.png
 *.csv

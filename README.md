@@ -119,3 +119,22 @@ The publication figure was generated using
 ```bash
 python3 plot_publication.py -i sample/data/v100-515.65.01/2.0.0-rc-v100-11.0-beltsoff -o sample/figures/v100-515.65.01/2.0.0-rc-v100-11.0-beltsoff
 ```
+
+## Docker and Singularity/Apptainer
+
+A Dockerfile is provided to enable creation of a container based on a CUDA 11.8 base image, with builds for SM 70, 80 and 90 GPUs.
+
+Once complete, the dockerfile can be converted to apptainer / singularity for execution on HPC systems where docker is unavailable.
+
+For example, the following commands can be used:
+
+```bash
+# Build the docker container, which may require root.
+docker build . -t flamegpu2-circles-benchmark-11.8
+# Run the benchmark via docker, may require root
+docker run --rm -it --gpus all  -v .:/app -w /app flamegpu2-circles-benchmark-11.8 /opt/FLAMEGPU2-circles-benchmark/build/bin/Release/circles-benchmark
+# Create an apptainer container, from the latest version of the docker container built locally. May require root.
+apptainer build flamegpu2-circles-benchmark-11.8.sif docker-daemon://flamegpu2-circles-benchmark-11.8:latest
+# Run via apptainer, shouldn't require root
+apptainer exec --nv --cleanenv flamegpu2-circles-benchmark-11.8.sif /opt/FLAMEGPU2-circles-benchmark/build/bin/Release/circles-benchmark
+```
