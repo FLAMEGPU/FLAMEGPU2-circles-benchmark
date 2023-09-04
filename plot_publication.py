@@ -117,9 +117,9 @@ def main():
                                   constrained_layout=True)
     input_dir = pathlib.Path(args.input_dir)
     
-    # common palette
+    # common palette and stylemap
     custom_palette = {"circles_bruteforce": "g", "circles_bruteforce_rtc": "r", "circles_spatial3D": "b", "circles_spatial3D_rtc": "k"}
-
+    dashes_map = {"circles_bruteforce": "", "circles_bruteforce_rtc": (3.7, 1.6), "circles_spatial3D": "", "circles_spatial3D_rtc": (3.7, 1.6)}
     
     # Load per simulation step data into data frame (strip any white space)
     pop_df = pd.read_csv(input_dir/VARIABLE_POP_CSV_FILENAME, sep=',', quotechar='"')
@@ -127,7 +127,7 @@ def main():
 
     # Plot popsize brute force
     scale_df_bf = pop_df.query("model == 'circles_bruteforce_rtc' or model == 'circles_bruteforce'")
-    plt_df_bf = sns.lineplot(x='agent_count', y='s_step_mean', hue='model', style='model', data=scale_df_bf, ax=ax['p1'], palette=custom_palette, ci="sd")
+    plt_df_bf = sns.lineplot(x='agent_count', y='s_step_mean', hue='model', style='model', data=scale_df_bf, ax=ax['p1'], palette=custom_palette, dashes=dashes_map, ci="sd")
     # plt_df_bf.ticklabel_format(style='plain', axis='x') # no scientific notation
     plt_df_bf.set(xlabel='N', ylabel='Step time (s)')
     ax['p1'].set_title(label='A', loc='left', fontweight="bold")
@@ -135,7 +135,7 @@ def main():
     
     # Plot spatial
     scale_df_spatial = pop_df.query("model == 'circles_spatial3D_rtc' or model == 'circles_spatial3D'")
-    plt_df_s = sns.lineplot(x='agent_count', y='s_step_mean', hue='model', style='model', data=scale_df_spatial, ax=ax['p2'], palette=custom_palette, ci="sd")
+    plt_df_s = sns.lineplot(x='agent_count', y='s_step_mean', hue='model', style='model', data=scale_df_spatial, ax=ax['p2'], palette=custom_palette, dashes=dashes_map, ci="sd")
     # plt_df_s.ticklabel_format(style='plain', axis='x') # no scientific notation
     plt_df_s.set(xlabel='N', ylabel='')
     ax['p2'].set_title(label='B', loc='left', fontweight="bold")
@@ -149,7 +149,7 @@ def main():
 
     # Plot radius comparison
     rad_df = rad_df.query("model == 'circles_spatial3D' or model == 'circles_bruteforce'")
-    plt_df_rad = sns.lineplot(x='comm_radius_as_percentage_env_width', y='s_step_mean', hue='model', style='model', data=rad_df, ax=ax['p3'], palette=custom_palette, ci="sd")
+    plt_df_rad = sns.lineplot(x='comm_radius_as_percentage_env_width', y='s_step_mean', hue='model', style='model', data=rad_df, ax=ax['p3'], palette=custom_palette, dashes=dashes_map, ci="sd")
     plt_df_rad.ticklabel_format(style='plain', axis='x') # no scientific notation
     plt_df_rad.set(xlabel='r as % of W', ylabel='Step time (s)')
     ax['p3'].set_title(label='C', loc='left', fontweight="bold")
@@ -157,7 +157,7 @@ def main():
     
     # plot data volume
     messages_df = rad_df.query("model == 'circles_spatial3D'")
-    plt_df_rad = sns.lineplot(x='comm_radius_as_percentage_env_width', y='mean_message_count', hue='model', style='model', data=messages_df, ax=ax['p4'], palette=custom_palette, ci="sd")
+    plt_df_rad = sns.lineplot(x='comm_radius_as_percentage_env_width', y='mean_message_count', hue='model', style='model', data=messages_df, ax=ax['p4'], palette=custom_palette, dashes=dashes_map, ci="sd")
     plt_df_rad.set(xlabel='r as % of W', ylabel='Messages / step')
     ax['p4'].set_title(label='D', loc='left', fontweight="bold")
     ax['p4'].legend().set_visible(False)
@@ -171,7 +171,7 @@ def main():
     plot_for_com_radius = 8
     max_sort_period_to_plot = 20
     sort_df = sort_df.query("sort_period <= " + str(max_sort_period_to_plot) + " and comm_radius == " + str(plot_for_com_radius) + " and (model == 'circles_spatial3D' or model == 'circles_spatial3D_rtc')")
-    plt_df_sort = sns.lineplot(x='sort_period', y='s_step_mean', hue='model', style='model', data=sort_df, ax=ax['p5'], palette=custom_palette, ci="sd")
+    plt_df_sort = sns.lineplot(x='sort_period', y='s_step_mean', hue='model', style='model', data=sort_df, ax=ax['p5'], palette=custom_palette, dashes=dashes_map, ci="sd")
     plt_df_sort.ticklabel_format(style='plain', axis='x') # no scientific notation
     plt_df_sort.set(xlabel='Sort period (steps)', ylabel='Step time (s)')
     ax['p5'].set_title(label='E', loc='left', fontweight="bold")
