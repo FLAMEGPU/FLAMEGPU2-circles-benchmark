@@ -1,8 +1,8 @@
-# Minimum CMake version 3.18 for CUDA --std=c++17 
-cmake_minimum_required(VERSION 3.18...3.25 FATAL_ERROR)
+# Minimum CMake version 3.25.2 for CUDA --std=c++20
+cmake_minimum_required(VERSION 3.25.2...4.1.1 FATAL_ERROR)
 
-# Optionaly set the version of flamegpu which should be used, ideally a tag (i.e. `v2.0.0-rc`) or branch name, or potentially a commit hash.
-set(FLAMEGPU_VERSION "v2.0.0-rc" CACHE STRING "FLAMEGPU/FLAMEGPU2 git branch or tag to use")
+# Optionally set the version of flamegpu which should be used, ideally a tag (i.e. `v2.0.0-rc`) or branch name, or potentially a commit hash.
+set(FLAMEGPU_VERSION "v2.0.0-rc.4" CACHE STRING "FLAMEGPU/FLAMEGPU2 git branch or tag to use")
 # If the above version is a hash instead, also set FLAMEGPU_VERSION_ALLOW_HASH to ON
 # set(FLAMEGPU_VERSION_ALLOW_HASH "ON")
 
@@ -12,7 +12,7 @@ option(FLAMEGPU_VISUALISATION "Enable FLAMEGPU visualisation support" OFF)
 # Our core dependency is FLAMEGPU2 lib, first lets find it
 include(${CMAKE_CURRENT_LIST_DIR}/cmake/flamegpu2.cmake)
 
-# Handle CMAKE_CUDA_ARCHITECTURES gracefully, passign the project name for code-injection
+# Handle CMAKE_CUDA_ARCHITECTURES gracefully, passing the project name for code-injection
 include(${FLAMEGPU_ROOT}/cmake/CUDAArchitectures.cmake)
 flamegpu_init_cuda_architectures(PROJECT circles-benchmark)
 
