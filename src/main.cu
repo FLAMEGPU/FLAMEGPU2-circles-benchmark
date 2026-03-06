@@ -30,7 +30,6 @@ bool run_experiment(
     std::FILE * fp_perSimulationCSV = std::fopen(filename_perSimulationCSV.c_str(), "w");
     if(fp_perSimulationCSV == nullptr) {
         printf("Error: could not open csv file %s\n", filename_perSimulationCSV.c_str());
-        std::fclose(fp_perSimulationCSV);
         return false;
     }
     std::string filename_perStepPerSimulationCSV = LABEL + std::string("_perStepPerSimulationCSV.csv");
@@ -38,7 +37,6 @@ bool run_experiment(
     if(fp_perStepPerSimulationCSV == nullptr) {
         printf("Error: could not open csv file %s\n", filename_perStepPerSimulationCSV.c_str());
         std::fclose(fp_perSimulationCSV);
-        std::fclose(fp_perStepPerSimulationCSV);
         return false;
     }
 
