@@ -33,12 +33,12 @@ bool run_experiment(
         return false;
     }
     std::string filename_perStepPerSimulationCSV = LABEL + std::string("_perStepPerSimulationCSV.csv");
-    std::FILE * fp_perStepPerSimulationCSV = std::fopen(filename_perStepPerSimulationCSV.c_str(), "w");
-    if(fp_perStepPerSimulationCSV == nullptr) {
-        printf("Error: could not open csv file %s\n", filename_perStepPerSimulationCSV.c_str());
-        std::fclose(fp_perSimulationCSV);
-        return false;
-    }
+    std::FILE * fp_perStepPerSimulationCSV = nullptr; // std::fopen(filename_perStepPerSimulationCSV.c_str(), "w");
+    // if(fp_perStepPerSimulationCSV == nullptr) {
+    //     printf("Error: could not open csv file %s\n", filename_perStepPerSimulationCSV.c_str());
+    //     std::fclose(fp_perSimulationCSV);
+    //     return false;
+    // }
 
     // Output the CSV header for each output CSV file.
     if (fp_perSimulationCSV) {
@@ -186,8 +186,8 @@ bool experiment_total_scale_all(custom_cli cli){
     std::map<std::string, std::function<void(const RunSimulationInputs, RunSimulationOutputs&)>> MODELS = {
         {std::string("circles_spatial3D"), run_circles_spatial3D},
         {std::string("circles_spatial3D_rtc"), run_circles_spatial3D_rtc},
-        {std::string("circles_bruteforce"), run_circles_bruteforce},
-        {std::string("circles_bruteforce_rtc"), run_circles_bruteforce_rtc},
+        // {std::string("circles_bruteforce"), run_circles_bruteforce},
+        // {std::string("circles_bruteforce_rtc"), run_circles_bruteforce_rtc},
     };
 
     // Construct the vector of RunSimulationInputs to pass to the run_experiment method.
@@ -389,10 +389,11 @@ int main(int argc, const char ** argv) {
     custom_cli cli = parse_custom_cli(argc, argv);
 
     // Launch each experiment.
+    // Todo: make this cli configurable
     bool success_1 = experiment_total_scale_all(cli);
-    bool success_2 = experiment_density_spatial(cli);
-    bool success_3 = experiment_comm_radius(cli);
-    bool success_4 = experiment_sort_period(cli);
+    bool success_2 = true;  // experiment_density_spatial(cli);
+    bool success_3 = true;  // experiment_comm_radius(cli);
+    bool success_4 = true;  // experiment_sort_period(cli);
 
     // exit code
     return success_1 && success_2 && success_3 && success_4 ? EXIT_SUCCESS : EXIT_FAILURE;
