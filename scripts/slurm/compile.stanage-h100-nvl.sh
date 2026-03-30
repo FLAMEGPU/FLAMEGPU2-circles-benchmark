@@ -20,7 +20,8 @@ PROJECT_ROOT=../..
 cd $PROJECT_ROOT
 
 # Configure cmake for H100 NVL GPUs (SM_90) in Release without seatbelts
-cmake -S . -B build-h100-nvl -DCMAKE_CUDA_ARCHITECTURES="90" -DCMAKE_BUILD_TYPE=Release -DFLAMEGPU_SEATBELTS=OFF -DFLAMEGPU_SHARE_USAGE_STATISTICS=OFF
+# Uses -DCMAKE_SKIP_RPATH=TRUE to ensure that the stub is not linked against when building from a non-GPU enabled node (which does not load the non-stub libcuda when module load CUDA)
+cmake -S . -B build-h100-nvl -DCMAKE_CUDA_ARCHITECTURES="90" -DCMAKE_BUILD_TYPE=Release -DFLAMEGPU_SEATBELTS=OFF -DFLAMEGPU_SHARE_USAGE_STATISTICS=OFF -DCMAKE_SKIP_RPATH=TRUE
 
 # Compile the code using all available processors.
 cmake --build build-h100-nvl -j `nproc`
