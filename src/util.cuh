@@ -34,14 +34,16 @@ std::string getGPUName(int device){
                 cudaFree(0); // Make a context / slightly warm the decice?
             } else {
                 fprintf(stderr, "Fatal Error: could not get device name.\n");
+                fprintf(stderr, "%d: %s\n", status, cudaGetErrorName(status));
                 exit(EXIT_FAILURE);
             }
         } else {
-            fprintf(stderr, "Fatal Error: device %d does not exist\n", device);
+            fprintf(stderr, "Fatal Error: device %d does not exist (%d devices)\n", device, cudaDeviceCount);
             exit(EXIT_FAILURE);
         }
     } else {
         fprintf(stderr, "Fatal Error: Could not detect the number of CUDA devices\n");
+        fprintf(stderr, "%d: %s\n", status, cudaGetErrorName(status));
         exit(EXIT_FAILURE);
     }
     return deviceName;
