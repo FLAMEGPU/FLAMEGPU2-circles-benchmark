@@ -1,15 +1,15 @@
 #!/bin/bash
 #SBATCH --time=8:00:00
-#SBATCH --partition=gpu
+#SBATCH --partition=gpu-h100-nvl
 #SBATCH --qos=gpu
 #SBATCH --gres=gpu:1
 
-# 12 CPU cores (1/4th of the node) and 1 GPUs worth of memory < 1/4th of the node)
+# 24 CPU cores (1/4 of the node) and 1 GPUs worth of memory < 1/4th of the node)
 # This could probably be a single CPU...
-#SBATCH --cpus-per-task=12
-#SBATCH --mem=82G
+#SBATCH --cpus-per-task=24
+#SBATCH --mem=96G
 
-# A100 module environment is active on the A100 nodes automatically now, load appropriate modules
+# GPU node module environment is active on the GPU nodes automatically now, load appropriate modules
 module load GCC/12.3.0
 module load CUDA/12.4.0
 
@@ -18,7 +18,7 @@ PROJECT_ROOT=../..
 
 # navigate into the `build` directory.
 cd $PROJECT_ROOT
-cd build-a100
+cd build-h100-nvl
 
 # Set FLAMEGPU2_INC_DIR pointing at the included dependency, relative to the build dir where execution is occurring.
 # Long term this should not be required
