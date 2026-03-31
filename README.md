@@ -138,3 +138,45 @@ apptainer build flamegpu2-circles-benchmark-11.8.sif docker-daemon://flamegpu2-c
 # Run via apptainer, shouldn't require root
 apptainer exec --nv --cleanenv flamegpu2-circles-benchmark-11.8.sif /opt/FLAMEGPU2-circles-benchmark/build/bin/Release/circles-benchmark
 ```
+
+## TUoS Stanage benchmark
+
+To use this repository as a (short-term) benchmark for GPU performance regression testing during the stanage os upgrade:
+
+1. Clone this repository, and switch to the `rc4-rit-benchmark` branch or specific commit hash. 
+    ```bash
+    git clone --branch rc4-rit-benchmark https://github.com/FLAMEGPU/FLAMEGPU2-circles-benchmark
+    ```
+    - We'll try not to delete this any time soon, but don't assume this will be here forever... 
+        - i.e. once we have the reframe version in place
+2. On Stanage, submit the 2 compilation jobs
+    ```bash
+    cd /path/to/FLAMEGPU2-circles-benchmark/scripts/slurm
+    sbatch compile.stanage-a100-h100pcie.sh
+    sbatch compile.stanage-h100-nvl.sh
+    ```
+3. On Stanage, submit the 3 execution jobs after compilation jobs have finished (or use `-d afterok:<JOBID>`, before the script path)
+    ```bash
+    cd /path/to/FLAMEGPU2-circles-benchmark/scripts/slurm
+    sbatch run.stanage-a100.sh
+    sbatch run.stanage-h100pcie.sh
+    sbatch run.stanage-h100-nvl.sh
+    ```
+4. Copy the CSV files from each build directory to somewhere sensible, with one child dir per model
+    ```bash
+    cd /path/to/FLAMEGPU2-circles-benchmark/
+    cp -r build-a100/\*.csv /path/to/somewhere/stanage/run1/a100-sxm4
+    cp -r build-h100pcie/\*.csv /path/to/somewhere/stanage/run1/h100-pcie
+    cp -r build-h100-nvl/\*.csv /path/to/somewhere/stanage/run1/h100-nvl
+    ```
+5. Extract data from the CSV(s).
+    ```bash
+    # venv
+    cd /path/to/FLAMEGPU2-circles-benchmark/scripts/slurm
+    python3 -m venv .venv
+    source .venv/bin/activate
+    pip install -r requirements.txt
+    # postprocess and compare to a baseline. will spit our more useful csv(s) and maybe some plots. 
+    python3 postproc-spatial-fixed-for-stanage.py -i run1 /path/to/somewhere/stanage/run1 -i run2 /path/to/somewhere/stanage/run2 -o /path/to/somewhere/stanage/comparison/
+    ```
+
