@@ -118,7 +118,7 @@ class ComparisonPlotConfig():
             raise Exception("INPUT_FILE_PER_DIR must be non-empty")
         for l, d in self.get_abs_LABELLED_INPUT_DIRS().items():
             if not d.is_dir():
-                raise Exception(f"LABELLED_INPUT_DIRS[{l}] = {f} is not a valid directory")
+                raise Exception(f"LABELLED_INPUT_DIRS[{l}] = {d} is not a valid directory")
             # Error if INPUT_FILE_PER_DIR is not specified. 
             f = d / self.INPUT_FILE_PER_DIR
             if not f.is_file():
