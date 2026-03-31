@@ -1,5 +1,6 @@
 #!/bin/bash
-#SBATCH --time=8:00:00
+# spatial-only takes minutes not hours
+#SBATCH --time=0:15:00
 #SBATCH --partition=gpu-h100
 #SBATCH --qos=gpu
 #SBATCH --gres=gpu:1

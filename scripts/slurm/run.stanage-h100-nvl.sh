@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH --time=8:00:00
+#SBATCH --time=0:15:00
 #SBATCH --partition=gpu-h100-nvl
 #SBATCH --qos=gpu
 #SBATCH --gres=gpu:1
